@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GitHooks.CommandLines/GitHooks.CommandLines.csproj" Id="5c7b9ce5-7265-41cc-bebd-db36d0cf839c" />
+    <Project Path="src/GitHooks.Pipelines/GitHooks.Pipelines.csproj" Id="a8f03696-0dd7-4b1e-bbe6-21c3d0f44b46" />
+    <Project Path="src/GitHooks.Tasks/GitHooks.Tasks.csproj" Id="03bb294e-8de9-486b-a62e-13709dee6d89" />
+    <Project Path="src/GitHooks/GitHooks.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/GitHooks.Pipelines.Tests/GitHooks.Pipelines.Tests.csproj" Id="bf0e3e25-5477-4f2d-83b6-7211d17aaef9" />
+  </Folder>
+</Solution>

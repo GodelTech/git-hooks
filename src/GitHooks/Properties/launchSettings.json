@@ -1,0 +1,29 @@
+{
+  "profiles": {
+    "run --file": {
+      "commandName": "Project",
+      "commandLineArgs": "run --file examples/commit-msg.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run --hook": {
+      "commandName": "Project",
+      "commandLineArgs": "run --hook commit-msg",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "install": {
+      "commandName": "Project",
+      "commandLineArgs": "install",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "uninstall": {
+      "commandName": "Project",
+      "commandLineArgs": "uninstall",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "list": {
+      "commandName": "Project",
+      "commandLineArgs": "list",
+      "workingDirectory": "$(SolutionDir)"
+    }
+  }
+}
