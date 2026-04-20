@@ -2,8 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+
+    <AssemblyName>GitHooks.Tests</AssemblyName>
+    <RootNamespace>GitHooks.Tests</RootNamespace>
+
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

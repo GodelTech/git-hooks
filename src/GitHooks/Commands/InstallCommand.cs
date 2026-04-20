@@ -1,0 +1,49 @@
+using System.CommandLine;
+
+using GitHooks.Handlers;
+
+namespace GitHooks.Commands;
+
+/// <summary>
+/// Command to install git hooks by writing hook scripts and configuring git.
+/// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="InstallCommand"/> class.
+/// </remarks>
+/// <param name="installHandler">The handler that performs hook installation.</param>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1010:Collections should implement generic interface", Justification = "Inherited from System.CommandLine.Command base class")]
+public class InstallCommand(IInstallHandler installHandler)
+    : CommandBase("install", $"Write hook scripts into {DefaultHooksPath}/ and configure git to use that directory.")
+{
+    private const string DefaultHooksPath = ".githooks";
+
+    private readonly IInstallHandler _installHandler = installHandler;
+
+    /// <inheritdoc/>
+    public override IEnumerable<Option> CreateOptions()
+    {
+        yield return new Option<string>(
+            "--hooks-path"
+        )
+        {
+            Description = $"Git global core.hooksPath value to setup. Default: {DefaultHooksPath}",
+            DefaultValueFactory = _ => DefaultHooksPath
+        };
+        yield return new Option<bool>(
+            "--force"
+        )
+        {
+            Description = "Force installation by overwriting existing git global core.hooksPath without prompting.",
+            DefaultValueFactory = _ => false
+        };
+    }
+
+    /// <inheritdoc/>
+    public override Task<int> HandleActionAsync(ParseResult parseResult, CancellationToken token)
+    {
+        var hooksPath = parseResult.GetValue<string>("--hooks-path") ?? DefaultHooksPath;
+        var force = parseResult.GetValue<bool>("--force");
+
+        return _installHandler.HandleAsync(hooksPath, force, token);
+    }
+}
