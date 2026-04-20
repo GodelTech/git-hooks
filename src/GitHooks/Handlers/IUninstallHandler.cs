@@ -1,3 +1,5 @@
+using GitHooks.CommandLine;
+
 namespace GitHooks.Handlers;
 
 /// <summary>
@@ -8,8 +10,8 @@ public interface IUninstallHandler
     /// <summary>
     /// Handles the uninstallation of git hooks by removing the core.hooksPath configuration.
     /// </summary>
-    /// <param name="scope">The git configuration scope ("global" or "system").</param>
+    /// <param name="scope">The git configuration scope.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation, returning an exit code.</returns>
-    public Task<int> HandleAsync(string scope, CancellationToken cancellationToken = default);
+    public Task<int> HandleAsync(GitConfigScope scope, CancellationToken cancellationToken = default);
 }

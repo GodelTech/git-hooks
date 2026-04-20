@@ -15,7 +15,7 @@ public class UninstallHandler(
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
-    public async Task<int> HandleAsync(string scope, CancellationToken cancellationToken = default)
+    public async Task<int> HandleAsync(GitConfigScope scope, CancellationToken cancellationToken = default)
     {
         if (!await _gitCommandLine.IsAvailableAsync(cancellationToken))
         {
@@ -27,7 +27,7 @@ public class UninstallHandler(
 
         if (!existing.IsSuccess)
         {
-            _console.MarkupLine($"[green][[OK]][/] {scope} core.hooksPath is not configured. Nothing to uninstall.");
+            _console.MarkupLine($"[green][[OK]][/] {scope.ToGitString()} core.hooksPath is not configured. Nothing to uninstall.");
             return 0;
         }
 
@@ -37,11 +37,11 @@ public class UninstallHandler(
 
         if (!unsetResult.IsSuccess)
         {
-            _console.MarkupLine($"[red][[ERROR]][/] Failed to unset core.hooksPath: {unsetResult.Error.Trim()}");
+            _console.MarkupLine($"[red][[ERROR]][/] Failed to unset {scope.ToGitString()} core.hooksPath: {unsetResult.Error.Trim()}");
             return 1;
         }
 
-        _console.MarkupLine($"[green][[SUCCESS]][/] {scope} core.hooksPath ([blue]{existingValue}[/]) has been removed.");
+        _console.MarkupLine($"[green][[SUCCESS]][/] {scope.ToGitString()} core.hooksPath ([blue]{existingValue}[/]) has been removed.");
         return 0;
     }
 }

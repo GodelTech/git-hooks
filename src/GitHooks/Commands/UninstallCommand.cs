@@ -1,5 +1,6 @@
 using System.CommandLine;
 
+using GitHooks.CommandLine;
 using GitHooks.Handlers;
 
 namespace GitHooks.Commands;
@@ -15,18 +16,18 @@ namespace GitHooks.Commands;
 public class UninstallCommand(IUninstallHandler uninstallHandler)
     : CommandBase("uninstall", "Remove the git core.hooksPath configuration.")
 {
-    private const string DefaultScope = "global";
+    private const GitConfigScope DefaultScope = GitConfigScope.Global;
 
     private readonly IUninstallHandler _uninstallHandler = uninstallHandler;
 
     /// <inheritdoc/>
     public override IEnumerable<Option> CreateOptions()
     {
-        yield return new Option<string>(
+        yield return new Option<GitConfigScope>(
             "--scope"
         )
         {
-            Description = "Git configuration scope to use (global or system). Default: global",
+            Description = "Git configuration scope to use (local, global, or system). Default: global",
             DefaultValueFactory = _ => DefaultScope
         };
     }
@@ -34,7 +35,7 @@ public class UninstallCommand(IUninstallHandler uninstallHandler)
     /// <inheritdoc/>
     public override Task<int> HandleActionAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
-        var scope = parseResult.GetValue<string>("--scope") ?? DefaultScope;
+        var scope = parseResult.GetValue<GitConfigScope>("--scope");
 
         return _uninstallHandler.HandleAsync(scope, cancellationToken);
     }

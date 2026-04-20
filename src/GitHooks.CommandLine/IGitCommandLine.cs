@@ -15,25 +15,25 @@ public interface IGitCommandLine
     /// <summary>
     /// Gets the core.hooksPath configuration value.
     /// </summary>
-    /// <param name="scope">The configuration scope ("global" or "system").</param>
+    /// <param name="scope">The git configuration scope.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation, returning the command-line result.</returns>
-    public Task<CommandLineResult> GetCoreHooksPathAsync(string scope, CancellationToken cancellationToken = default);
+    public Task<CommandLineResult> GetCoreHooksPathAsync(GitConfigScope scope, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sets the core.hooksPath configuration value.
     /// </summary>
-    /// <param name="scope">The configuration scope ("global" or "system").</param>
+    /// <param name="scope">The git configuration scope.</param>
     /// <param name="value">The value to set.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation, returning the command-line result.</returns>
-    public Task<CommandLineResult> SetCoreHooksPathAsync(string scope, string value, CancellationToken cancellationToken = default);
+    public Task<CommandLineResult> SetCoreHooksPathAsync(GitConfigScope scope, string value, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Unsets the core.hooksPath configuration value.
     /// </summary>
-    /// <param name="scope">The configuration scope ("global" or "system").</param>
+    /// <param name="scope">The git configuration scope.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation, returning the command-line result.</returns>
-    public Task<CommandLineResult> UnsetCoreHooksPathAsync(string scope, CancellationToken cancellationToken = default);
+    public Task<CommandLineResult> UnsetCoreHooksPathAsync(GitConfigScope scope, CancellationToken cancellationToken = default);
 }

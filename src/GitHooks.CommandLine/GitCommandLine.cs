@@ -20,20 +20,20 @@ public class GitCommandLine(ICommandLineRunner commandLineRunner) : IGitCommandL
     }
 
     /// <inheritdoc/>
-    public Task<CommandLineResult> GetCoreHooksPathAsync(string scope, CancellationToken cancellationToken = default)
+    public Task<CommandLineResult> GetCoreHooksPathAsync(GitConfigScope scope, CancellationToken cancellationToken = default)
     {
-        return _commandLineRunner.RunAsync("git", $"config --{scope} --get core.hooksPath", cancellationToken);
+        return _commandLineRunner.RunAsync("git", $"config --{scope.ToGitString()} --get core.hooksPath", cancellationToken);
     }
 
     /// <inheritdoc/>
-    public Task<CommandLineResult> SetCoreHooksPathAsync(string scope, string value, CancellationToken cancellationToken = default)
+    public Task<CommandLineResult> SetCoreHooksPathAsync(GitConfigScope scope, string value, CancellationToken cancellationToken = default)
     {
-        return _commandLineRunner.RunAsync("git", $"config --{scope} --set core.hooksPath \"{value}\"", cancellationToken);
+        return _commandLineRunner.RunAsync("git", $"config --{scope.ToGitString()} --set core.hooksPath \"{value}\"", cancellationToken);
     }
 
     /// <inheritdoc/>
-    public Task<CommandLineResult> UnsetCoreHooksPathAsync(string scope, CancellationToken cancellationToken = default)
+    public Task<CommandLineResult> UnsetCoreHooksPathAsync(GitConfigScope scope, CancellationToken cancellationToken = default)
     {
-        return _commandLineRunner.RunAsync("git", $"config --{scope} --unset core.hooksPath", cancellationToken);
+        return _commandLineRunner.RunAsync("git", $"config --{scope.ToGitString()} --unset core.hooksPath", cancellationToken);
     }
 }

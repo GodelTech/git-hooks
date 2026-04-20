@@ -1,5 +1,6 @@
 using System.CommandLine;
 
+using GitHooks.CommandLine;
 using GitHooks.Handlers;
 
 namespace GitHooks.Commands;
@@ -15,7 +16,7 @@ namespace GitHooks.Commands;
 public class InstallCommand(IInstallHandler installHandler)
     : CommandBase("install", $"Configure git core.hooksPath to use {DefaultHooksPath}/ directory.")
 {
-    private const string DefaultScope = "global";
+    private const GitConfigScope DefaultScope = GitConfigScope.Global;
     private const string DefaultHooksPath = ".githooks";
 
     private readonly IInstallHandler _installHandler = installHandler;
@@ -23,25 +24,26 @@ public class InstallCommand(IInstallHandler installHandler)
     /// <inheritdoc/>
     public override IEnumerable<Option> CreateOptions()
     {
-        yield return new Option<string>(
+        yield return new Option<GitConfigScope>(
             "--scope"
         )
         {
-            Description = "Git configuration scope to use (global or system). Default: global",
+            Description = "Git configuration scope to use (local, global, or system). Default: global",
             DefaultValueFactory = _ => DefaultScope
         };
+
         yield return new Option<string>(
             "--hooks-path"
         )
         {
-            Description = $"Git global core.hooksPath value to setup. Default: {DefaultHooksPath}",
+            Description = $"Git core.hooksPath value to setup. Default: {DefaultHooksPath}",
             DefaultValueFactory = _ => DefaultHooksPath
         };
         yield return new Option<bool>(
             "--force"
         )
         {
-            Description = "Force installation by overwriting existing git global core.hooksPath without prompting.",
+            Description = "Force installation by overwriting existing core.hooksPath without prompting.",
             DefaultValueFactory = _ => false
         };
     }
@@ -49,7 +51,7 @@ public class InstallCommand(IInstallHandler installHandler)
     /// <inheritdoc/>
     public override Task<int> HandleActionAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
-        var scope = parseResult.GetValue<string>("--scope") ?? DefaultScope;
+        var scope = parseResult.GetValue<GitConfigScope>("--scope");
         var hooksPath = parseResult.GetValue<string>("--hooks-path") ?? DefaultHooksPath;
         var force = parseResult.GetValue<bool>("--force");
 

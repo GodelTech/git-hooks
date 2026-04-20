@@ -15,7 +15,7 @@ public class InstallHandler(
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
-    public async Task<int> HandleAsync(string scope, string hooksPath, bool force, CancellationToken cancellationToken = default)
+    public async Task<int> HandleAsync(GitConfigScope scope, string hooksPath, bool force, CancellationToken cancellationToken = default)
     {
         if (!await _gitCommandLine.IsAvailableAsync(cancellationToken))
         {
@@ -31,13 +31,13 @@ public class InstallHandler(
 
             if (string.Equals(existingValue, hooksPath, StringComparison.Ordinal))
             {
-                _console.MarkupLine($"[green][[OK]][/] core.hooksPath is already set to: [blue]{existingValue}[/]");
+                _console.MarkupLine($"[green][[OK]][/] {scope.ToGitString()} core.hooksPath is already set to: [blue]{existingValue}[/]");
                 return 0;
             }
 
             if (!force)
             {
-                _console.MarkupLine($"[red][[ERROR]][/] core.hooksPath is already set to: [blue]{existingValue}[/]. Use --force to overwrite.");
+                _console.MarkupLine($"[red][[ERROR]][/] {scope.ToGitString()} core.hooksPath is already set to: [blue]{existingValue}[/]. Use --force to overwrite.");
                 return 1;
             }
         }
@@ -46,11 +46,11 @@ public class InstallHandler(
 
         if (!setResult.IsSuccess)
         {
-            _console.MarkupLine($"[red][[ERROR]][/] Failed to set core.hooksPath: {setResult.Error.Trim()}");
+            _console.MarkupLine($"[red][[ERROR]][/] Failed to set {scope.ToGitString()} core.hooksPath: {setResult.Error.Trim()}");
             return 1;
         }
 
-        _console.MarkupLine($"[green][[SUCCESS]][/] {scope} core.hooksPath successfully set to: [blue]{hooksPath}[/]");
+        _console.MarkupLine($"[green][[SUCCESS]][/] {scope.ToGitString()} core.hooksPath successfully set to: [blue]{hooksPath}[/]");
         return 0;
     }
 }
