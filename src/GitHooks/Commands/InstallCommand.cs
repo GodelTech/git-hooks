@@ -5,7 +5,7 @@ using GitHooks.Handlers;
 namespace GitHooks.Commands;
 
 /// <summary>
-/// Command to install git hooks by writing hook scripts and configuring git.
+/// Command to install git hooks by configuring the git core.hooksPath setting.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="InstallCommand"/> class.
@@ -13,7 +13,7 @@ namespace GitHooks.Commands;
 /// <param name="installHandler">The handler that performs hook installation.</param>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1010:Collections should implement generic interface", Justification = "Inherited from System.CommandLine.Command base class")]
 public class InstallCommand(IInstallHandler installHandler)
-    : CommandBase("install", $"Write hook scripts into {DefaultHooksPath}/ and configure git to use that directory.")
+    : CommandBase("install", $"Configure git core.hooksPath to use {DefaultHooksPath}/ directory.")
 {
     private const string DefaultScope = "global";
     private const string DefaultHooksPath = ".githooks";
