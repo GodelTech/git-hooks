@@ -1,0 +1,17 @@
+{
+  "dotnet.defaultSolution": "git-hooks.slnx",
+  "dotnet.testSettings": ".runsettings",
+  "explorer.fileNesting.enabled": true,
+  "files.exclude": {
+    "**/.vs": true,
+    "**/bin": true,
+    "**/obj": true
+  },
+  "search.exclude": {
+    "**/bin": true,
+    "**/obj": true
+  },
+  "[csharp]": {
+    "editor.formatOnSave": true
+  }
+}
