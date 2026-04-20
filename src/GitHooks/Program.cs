@@ -1,3 +1,4 @@
+using GitHooks.CommandLine;
 using GitHooks.Commands;
 using GitHooks.Handlers;
 
@@ -6,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 using System.CommandLine;
 
-//using Spectre.Console;
+using Spectre.Console;
 
 namespace GitHooks;
 
@@ -50,7 +51,7 @@ internal sealed class Program
             }
         );
 
-        //services.AddSingleton(AnsiConsole.Console);
+        _ = services.AddSingleton(AnsiConsole.Console);
 
         // add commands:
         _ = services.AddTransient<CommandBase, InstallCommand>();
@@ -59,7 +60,8 @@ internal sealed class Program
         _ = services.AddTransient<IInstallHandler, InstallHandler>();
 
         // add services:
-        //_ = services.AddTransient<IGitCommandLine, GitCommandLine>();
+        _ = services.AddTransient<ICommandLineRunner, CommandLineRunner>();
+        _ = services.AddTransient<IGitCommandLine, GitCommandLine>();
 
         return services.BuildServiceProvider();
     }

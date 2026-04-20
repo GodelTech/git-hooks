@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/GitHooks.CommandLine/GitHooks.CommandLine.csproj" Id="f3c7d8d3-8e11-4208-b80c-0310bde43317" />
     <Project Path="src/GitHooks/GitHooks.csproj" />
   </Folder>
   <Folder Name="/test/">
