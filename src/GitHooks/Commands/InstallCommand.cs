@@ -15,6 +15,7 @@ namespace GitHooks.Commands;
 public class InstallCommand(IInstallHandler installHandler)
     : CommandBase("install", $"Write hook scripts into {DefaultHooksPath}/ and configure git to use that directory.")
 {
+    private const string DefaultScope = "global";
     private const string DefaultHooksPath = ".githooks";
 
     private readonly IInstallHandler _installHandler = installHandler;
@@ -22,6 +23,13 @@ public class InstallCommand(IInstallHandler installHandler)
     /// <inheritdoc/>
     public override IEnumerable<Option> CreateOptions()
     {
+        yield return new Option<string>(
+            "--scope"
+        )
+        {
+            Description = "Git configuration scope to use (global or system). Default: global",
+            DefaultValueFactory = _ => DefaultScope
+        };
         yield return new Option<string>(
             "--hooks-path"
         )
@@ -39,11 +47,12 @@ public class InstallCommand(IInstallHandler installHandler)
     }
 
     /// <inheritdoc/>
-    public override Task<int> HandleActionAsync(ParseResult parseResult, CancellationToken token)
+    public override Task<int> HandleActionAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
+        var scope = parseResult.GetValue<string>("--scope") ?? DefaultScope;
         var hooksPath = parseResult.GetValue<string>("--hooks-path") ?? DefaultHooksPath;
         var force = parseResult.GetValue<bool>("--force");
 
-        return _installHandler.HandleAsync(hooksPath, force, token);
+        return _installHandler.HandleAsync(scope, hooksPath, force, cancellationToken);
     }
 }

@@ -25,7 +25,7 @@ public abstract class CommandBase(string name, string? description = null)
     /// Handles the command action asynchronously.
     /// </summary>
     /// <param name="parseResult">The parse result containing command line arguments.</param>
-    /// <param name="token">A cancellation token.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A task representing the asynchronous operation with an exit code.</returns>
-    public abstract Task<int> HandleActionAsync(ParseResult parseResult, CancellationToken token);
+    public abstract Task<int> HandleActionAsync(ParseResult parseResult, CancellationToken cancellationToken);
 }

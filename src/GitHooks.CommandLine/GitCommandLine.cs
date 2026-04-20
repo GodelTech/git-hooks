@@ -18,4 +18,16 @@ public class GitCommandLine(ICommandLineRunner commandLineRunner) : IGitCommandL
 
         return result.IsSuccess;
     }
+
+    /// <inheritdoc/>
+    public Task<CommandLineResult> GetCoreHooksPathAsync(string scope, CancellationToken cancellationToken = default)
+    {
+        return _commandLineRunner.RunAsync("git", $"config --{scope} --get core.hooksPath", cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public Task<CommandLineResult> SetCoreHooksPathAsync(string scope, string value, CancellationToken cancellationToken = default)
+    {
+        return _commandLineRunner.RunAsync("git", $"config --{scope} --set core.hooksPath \"{value}\"", cancellationToken);
+    }
 }
