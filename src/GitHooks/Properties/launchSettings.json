@@ -1,0 +1,19 @@
+{
+  "profiles": {
+    "install": {
+      "commandName": "Project",
+      "commandLineArgs": "install",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run --file": {
+      "commandName": "Project",
+      "commandLineArgs": "run --file examples/commit-msg.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "uninstall": {
+      "commandName": "Project",
+      "commandLineArgs": "uninstall",
+      "workingDirectory": "$(SolutionDir)"
+    }
+  }
+}
