@@ -55,9 +55,11 @@ internal sealed class Program
 
         // add commands:
         _ = services.AddTransient<CommandBase, InstallCommand>();
+        _ = services.AddTransient<CommandBase, UninstallCommand>();
 
         // add command services:
         _ = services.AddTransient<IInstallHandler, InstallHandler>();
+        _ = services.AddTransient<IUninstallHandler, UninstallHandler>();
 
         // add services:
         _ = services.AddTransient<ICommandLineRunner, CommandLineRunner>();

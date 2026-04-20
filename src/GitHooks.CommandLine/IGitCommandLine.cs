@@ -28,4 +28,12 @@ public interface IGitCommandLine
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation, returning the command-line result.</returns>
     public Task<CommandLineResult> SetCoreHooksPathAsync(string scope, string value, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Unsets the core.hooksPath configuration value.
+    /// </summary>
+    /// <param name="scope">The configuration scope ("global" or "system").</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation, returning the command-line result.</returns>
+    public Task<CommandLineResult> UnsetCoreHooksPathAsync(string scope, CancellationToken cancellationToken = default);
 }

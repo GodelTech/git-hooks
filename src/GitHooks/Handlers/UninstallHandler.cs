@@ -1,0 +1,47 @@
+using GitHooks.CommandLine;
+
+using Spectre.Console;
+
+namespace GitHooks.Handlers;
+
+/// <summary>
+/// Default implementation of <see cref="IUninstallHandler"/>.
+/// </summary>
+public class UninstallHandler(
+    IGitCommandLine gitCommandLine,
+    IAnsiConsole console) : IUninstallHandler
+{
+    private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
+    private readonly IAnsiConsole _console = console;
+
+    /// <inheritdoc/>
+    public async Task<int> HandleAsync(string scope, CancellationToken cancellationToken = default)
+    {
+        if (!await _gitCommandLine.IsAvailableAsync(cancellationToken))
+        {
+            _console.MarkupLine("[red][[ERROR]][/] Git not found in PATH. Install Git and retry.");
+            return 1;
+        }
+
+        var existing = await _gitCommandLine.GetCoreHooksPathAsync(scope, cancellationToken);
+
+        if (!existing.IsSuccess)
+        {
+            _console.MarkupLine($"[green][[OK]][/] {scope} core.hooksPath is not configured. Nothing to uninstall.");
+            return 0;
+        }
+
+        var existingValue = existing.Output.Trim();
+
+        var unsetResult = await _gitCommandLine.UnsetCoreHooksPathAsync(scope, cancellationToken);
+
+        if (!unsetResult.IsSuccess)
+        {
+            _console.MarkupLine($"[red][[ERROR]][/] Failed to unset core.hooksPath: {unsetResult.Error.Trim()}");
+            return 1;
+        }
+
+        _console.MarkupLine($"[green][[SUCCESS]][/] {scope} core.hooksPath ([blue]{existingValue}[/]) has been removed.");
+        return 0;
+    }
+}

@@ -30,4 +30,10 @@ public class GitCommandLine(ICommandLineRunner commandLineRunner) : IGitCommandL
     {
         return _commandLineRunner.RunAsync("git", $"config --{scope} --set core.hooksPath \"{value}\"", cancellationToken);
     }
+
+    /// <inheritdoc/>
+    public Task<CommandLineResult> UnsetCoreHooksPathAsync(string scope, CancellationToken cancellationToken = default)
+    {
+        return _commandLineRunner.RunAsync("git", $"config --{scope} --unset core.hooksPath", cancellationToken);
+    }
 }
