@@ -20,7 +20,8 @@
       "preLaunchTask": "build",
       "program": "${workspaceFolder}/src/GitHooks/bin/Debug/net10.0/GitHooks.dll",
       "args": [
-        "create"
+        "create",
+        "--force"
       ],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal"
