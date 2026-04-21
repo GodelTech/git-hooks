@@ -13,7 +13,7 @@ namespace GitHooks.Commands;
 /// </remarks>
 /// <param name="createHookHandler">The handler that creates hook files.</param>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1010:Collections should implement generic interface", Justification = "Inherited from System.CommandLine.Command base class")]
-public class CreateCommand(ICreateHookHandler createHookHandler)
+public sealed class CreateCommand(ICreateHookHandler createHookHandler)
     : CommandBase("create", $"Create git hook files in the {GitHooksDefaults.HooksPath}/ directory.")
 {
     private static readonly string[] DefaultHooks =

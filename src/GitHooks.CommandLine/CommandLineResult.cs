@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace GitHooks.CommandLine;
 
 /// <summary>
@@ -36,17 +34,16 @@ public class CommandLineResult
     public int ExitCode { get; }
 
     /// <summary>
-    /// Creates a <see cref="CommandLineResult"/> from a completed <see cref="Process"/>.
+    /// Creates a <see cref="CommandLineResult"/> from a completed process's pre-read output.
+    /// Streams must be read asynchronously before calling this method to avoid pipe buffer deadlocks.
     /// </summary>
-    /// <param name="process">The process that has finished execution.</param>
-    /// <returns>A new <see cref="CommandLineResult"/> containing the process output, error, and exit code.</returns>
-    public static CommandLineResult FromProcess(Process process)
+    /// <param name="output">The standard output text.</param>
+    /// <param name="error">The standard error text.</param>
+    /// <param name="exitCode">The process exit code.</param>
+    /// <returns>A new <see cref="CommandLineResult"/>.</returns>
+    internal static CommandLineResult FromProcess(string output, string error, int exitCode)
     {
-        return new CommandLineResult(
-            process.StandardOutput.ReadToEnd(),
-            process.StandardError.ReadToEnd(),
-            process.ExitCode
-        );
+        return new CommandLineResult(output, error, exitCode);
     }
 
     /// <summary>

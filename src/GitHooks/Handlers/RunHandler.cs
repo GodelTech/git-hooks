@@ -7,7 +7,7 @@ namespace GitHooks.Handlers;
 /// <summary>
 /// Default implementation of <see cref="IRunHandler"/>.
 /// </summary>
-public class RunHandler(
+public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
     IAnsiConsole console) : IRunHandler
 {

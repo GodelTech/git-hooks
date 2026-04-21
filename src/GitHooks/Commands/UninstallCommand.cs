@@ -13,7 +13,7 @@ namespace GitHooks.Commands;
 /// </remarks>
 /// <param name="uninstallHandler">The handler that performs hook uninstallation.</param>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1010:Collections should implement generic interface", Justification = "Inherited from System.CommandLine.Command base class")]
-public class UninstallCommand(IUninstallHandler uninstallHandler)
+public sealed class UninstallCommand(IUninstallHandler uninstallHandler)
     : CommandBase("uninstall", "Remove the git core.hooksPath configuration.")
 {
     private readonly IUninstallHandler _uninstallHandler = uninstallHandler;

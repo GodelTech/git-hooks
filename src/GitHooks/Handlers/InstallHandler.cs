@@ -7,7 +7,7 @@ namespace GitHooks.Handlers;
 /// <summary>
 /// Default implementation of <see cref="IInstallHandler"/>.
 /// </summary>
-public class InstallHandler(
+public sealed class InstallHandler(
     IGitCommandLine gitCommandLine,
     IAnsiConsole console) : IInstallHandler
 {

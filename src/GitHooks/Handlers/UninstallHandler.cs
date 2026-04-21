@@ -7,7 +7,7 @@ namespace GitHooks.Handlers;
 /// <summary>
 /// Default implementation of <see cref="IUninstallHandler"/>.
 /// </summary>
-public class UninstallHandler(
+public sealed class UninstallHandler(
     IGitCommandLine gitCommandLine,
     IAnsiConsole console) : IUninstallHandler
 {

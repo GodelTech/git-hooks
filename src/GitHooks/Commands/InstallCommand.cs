@@ -13,7 +13,7 @@ namespace GitHooks.Commands;
 /// </remarks>
 /// <param name="installHandler">The handler that performs hook installation.</param>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1010:Collections should implement generic interface", Justification = "Inherited from System.CommandLine.Command base class")]
-public class InstallCommand(IInstallHandler installHandler)
+public sealed class InstallCommand(IInstallHandler installHandler)
     : CommandBase("install", $"Configure git core.hooksPath to use {GitHooksDefaults.HooksPath}/ directory.")
 {
     private readonly IInstallHandler _installHandler = installHandler;

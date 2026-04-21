@@ -15,7 +15,7 @@ namespace GitHooks.Commands;
 /// <param name="runHandler">The handler that processes run command behavior.</param>
 /// <param name="console">The console used for command-level validation output.</param>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1010:Collections should implement generic interface", Justification = "Inherited from System.CommandLine.Command base class")]
-public class RunCommand(IRunHandler runHandler, IAnsiConsole console)
+public sealed class RunCommand(IRunHandler runHandler, IAnsiConsole console)
     : CommandBase("run", "Read a hook YAML file and display repository path details.")
 {
     private readonly IRunHandler _runHandler = runHandler;
