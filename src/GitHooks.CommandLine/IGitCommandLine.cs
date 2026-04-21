@@ -13,6 +13,13 @@ public interface IGitCommandLine
     public Task<bool> IsAvailableAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Checks whether the current working directory is inside a git repository.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation, returning <c>true</c> if inside a git repository; otherwise, <c>false</c>.</returns>
+    public Task<bool> IsInsideGitRepositoryAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Gets the core.hooksPath configuration value.
     /// </summary>
     /// <param name="scope">The git configuration scope.</param>

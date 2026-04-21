@@ -20,6 +20,14 @@ public class GitCommandLine(ICommandLineRunner commandLineRunner) : IGitCommandL
     }
 
     /// <inheritdoc/>
+    public async Task<bool> IsInsideGitRepositoryAsync(CancellationToken cancellationToken = default)
+    {
+        var result = await _commandLineRunner.RunAsync("git", "rev-parse --is-inside-work-tree", cancellationToken);
+
+        return result.IsSuccess;
+    }
+
+    /// <inheritdoc/>
     public Task<CommandLineResult> GetCoreHooksPathAsync(GitConfigScope scope, CancellationToken cancellationToken = default)
     {
         return _commandLineRunner.RunAsync("git", $"config --{scope.ToGitString()} --get core.hooksPath", cancellationToken);

@@ -23,6 +23,12 @@ public class InstallHandler(
             return 1;
         }
 
+        if (scope == GitConfigScope.Local && !await _gitCommandLine.IsInsideGitRepositoryAsync(cancellationToken))
+        {
+            _console.MarkupLine("[red][[ERROR]][/] Not inside a git repository. The [blue]local[/] scope requires running from within a git repository.");
+            return 1;
+        }
+
         var existing = await _gitCommandLine.GetCoreHooksPathAsync(scope, cancellationToken);
 
         if (existing.IsSuccess)
