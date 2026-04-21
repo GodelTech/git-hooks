@@ -1,4 +1,4 @@
-namespace GitHooks.CommandLine;
+﻿namespace GitHooks.Infrastructure;
 
 /// <summary>
 /// Default implementation of <see cref="IGitCommandLine"/>.
@@ -51,3 +51,4 @@ public sealed class GitCommandLine(ICommandLineRunner commandLineRunner) : IGitC
         return _commandLineRunner.RunAsync("git", ["config", $"--{scope.ToGitString()}", "--unset", "core.hooksPath"], cancellationToken);
     }
 }
+

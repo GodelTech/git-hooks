@@ -1,6 +1,6 @@
-using System.Text;
+﻿using System.Text;
 
-namespace GitHooks.CommandLine;
+namespace GitHooks.Infrastructure;
 
 /// <summary>
 /// Default implementation of <see cref="IHookFileManager"/>.
@@ -90,3 +90,4 @@ public sealed class HookFileManager : IHookFileManager
             """;
     }
 }
+

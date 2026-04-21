@@ -1,9 +1,10 @@
-<Solution>
+﻿<Solution>
   <Folder Name="/src/">
-    <Project Path="src/GitHooks.CommandLine/GitHooks.CommandLine.csproj" Id="f3c7d8d3-8e11-4208-b80c-0310bde43317" />
+    <Project Path="src/GitHooks.Infrastructure/GitHooks.Infrastructure.csproj" Id="f3c7d8d3-8e11-4208-b80c-0310bde43317" />
     <Project Path="src/GitHooks/GitHooks.csproj" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/GitHooks.Tests/GitHooks.Tests.csproj" Id="b3138dc6-0147-4d0f-b1ae-a14b1ca2e984" />
   </Folder>
 </Solution>
+

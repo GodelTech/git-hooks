@@ -22,7 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GitHooks.CommandLine\GitHooks.CommandLine.csproj" />
+    <ProjectReference Include="..\GitHooks.Infrastructure\GitHooks.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
+

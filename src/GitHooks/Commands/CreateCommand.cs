@@ -1,6 +1,6 @@
-using System.CommandLine;
+﻿using System.CommandLine;
 
-using GitHooks.CommandLine;
+using GitHooks.Infrastructure;
 using GitHooks.Handlers;
 
 namespace GitHooks.Commands;
@@ -86,3 +86,4 @@ public sealed class CreateCommand(ICreateHookHandler createHookHandler)
         return hooks.Length > 0 ? hooks : DefaultHooks;
     }
 }
+

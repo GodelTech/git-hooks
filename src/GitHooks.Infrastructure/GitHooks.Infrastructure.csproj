@@ -3,11 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
 
-    <AssemblyName>GitHooks.CommandLine</AssemblyName>
-    <RootNamespace>GitHooks.CommandLine</RootNamespace>
+    <AssemblyName>GitHooks.Infrastructure</AssemblyName>
+    <RootNamespace>GitHooks.Infrastructure</RootNamespace>
 
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
 </Project>
+

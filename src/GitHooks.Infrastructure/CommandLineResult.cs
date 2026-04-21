@@ -1,4 +1,4 @@
-namespace GitHooks.CommandLine;
+﻿namespace GitHooks.Infrastructure;
 
 /// <summary>
 /// Represents the result of a command-line process execution.
@@ -56,3 +56,4 @@ public class CommandLineResult
         return new CommandLineResult(string.Empty, ex.Message, 1);
     }
 }
+

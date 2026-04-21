@@ -1,6 +1,6 @@
-using System.CommandLine;
+﻿using System.CommandLine;
 
-using GitHooks.CommandLine;
+using GitHooks.Infrastructure;
 using GitHooks.Commands;
 using GitHooks.Handlers;
 
@@ -17,7 +17,7 @@ internal sealed class Program
     {
         using var serviceProvider = CreateServiceProvider();
 
-        var rootCommand = new RootCommand("githooks — run and manage YAML-defined git hook pipelines.");
+        var rootCommand = new RootCommand("githooks - run and manage YAML-defined git hook pipelines.");
 
         serviceProvider
             .GetServices<CommandBase>()
@@ -73,3 +73,4 @@ internal sealed class Program
         return services.BuildServiceProvider();
     }
 }
+

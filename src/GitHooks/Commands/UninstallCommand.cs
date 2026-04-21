@@ -1,6 +1,6 @@
-using System.CommandLine;
+﻿using System.CommandLine;
 
-using GitHooks.CommandLine;
+using GitHooks.Infrastructure;
 using GitHooks.Handlers;
 
 namespace GitHooks.Commands;
@@ -38,3 +38,4 @@ public sealed class UninstallCommand(IUninstallHandler uninstallHandler)
         return _uninstallHandler.HandleAsync(scope, cancellationToken);
     }
 }
+

@@ -1,4 +1,4 @@
-using GitHooks.CommandLine;
+﻿using GitHooks.Infrastructure;
 
 namespace GitHooks;
 
@@ -13,3 +13,4 @@ public static class GitHooksDefaults
     /// <summary>The default directory where hook files are stored.</summary>
     public const string HooksPath = ".githooks";
 }
+

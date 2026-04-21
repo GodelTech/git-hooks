@@ -1,4 +1,4 @@
-# AI Agent Guidelines for git-hooks
+﻿# AI Agent Guidelines for git-hooks
 
 This is a .NET CLI tool that configures Git hook execution by managing `core.hooksPath`. AI agents should understand this architecture to be immediately productive.
 
@@ -36,9 +36,9 @@ Infrastructure (Git Process Execution)
 | `src/GitHooks/Commands/CommandBase.cs` | Abstract base; defines option parsing & handler delegation |
 | `src/GitHooks/Commands/{Install,Uninstall}Command.cs` | Subcommand implementations (`install`, `uninstall`) |
 | `src/GitHooks/Handlers/{Install,Uninstall}Handler.cs` | Business logic: Git config validation & updates |
-| `src/GitHooks.CommandLine/` | Reusable CLI abstractions; could be published separately |
-| `src/GitHooks.CommandLine/IGitCommandLine.cs` | Git command wrapper interface |
-| `src/GitHooks.CommandLine/GitConfigScope.cs` | Enum for scope (local, global, system) |
+| `src/GitHooks.Infrastructure/` | Reusable CLI abstractions; could be published separately |
+| `src/GitHooks.Infrastructure/IGitCommandLine.cs` | Git command wrapper interface |
+| `src/GitHooks.Infrastructure/GitConfigScope.cs` | Enum for scope (local, global, system) |
 
 ## Core Concepts
 
@@ -143,14 +143,14 @@ Follow [C# Development Guidelines](.github/instructions/csharp.instructions.md):
 1. **[Program.cs](src/GitHooks/Program.cs)**: Entry point with DI setup and CLI structure
 2. **[CommandBase.cs](src/GitHooks/Commands/CommandBase.cs)**: Abstract base showing command pattern
 3. **[InstallHandler.cs](src/GitHooks/Handlers/InstallHandler.cs)**: Example of validation → action → output pattern
-4. **[GitCommandLine.cs](src/GitHooks.CommandLine/GitCommandLine.cs)**: Git operation abstraction
-5. **[CommandLineResult.cs](src/GitHooks.CommandLine/CommandLineResult.cs)**: Result object pattern
+4. **[GitCommandLine.cs](src/GitHooks.Infrastructure/GitCommandLine.cs)**: Git operation abstraction
+5. **[CommandLineResult.cs](src/GitHooks.Infrastructure/CommandLineResult.cs)**: Result object pattern
 
 ## Documentation
 
 - [Detailed Git Hooks Reference](docs/git-hooks-reference.md)
 - [Hooks Setup Guide](docs/hooks.md)
-- [README.md](README.md) — Project overview & usage examples
+- [README.md](README.md) – Project overview & usage examples
 
 ## Common Tasks
 
@@ -169,4 +169,5 @@ Follow [C# Development Guidelines](.github/instructions/csharp.instructions.md):
 - **Dependency Inversion**: Depend on `IGitCommandLine`, not concrete Git implementation
 - **Fail-Fast Validation**: Check preconditions early; return meaningful exit codes
 - **Idempotent Operations**: Setting same value twice should succeed
-- **Reusable Abstractions**: `GitHooks.CommandLine` library can be consumed separately
+- **Reusable Abstractions**: `GitHooks.Infrastructure` library can be consumed separately
+

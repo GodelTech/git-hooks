@@ -1,4 +1,4 @@
-using GitHooks.CommandLine;
+﻿using GitHooks.Infrastructure;
 
 using Spectre.Console;
 
@@ -60,3 +60,4 @@ public sealed class InstallHandler(
         return 0;
     }
 }
+

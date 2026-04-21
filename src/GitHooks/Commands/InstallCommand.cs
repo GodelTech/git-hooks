@@ -1,6 +1,6 @@
-using System.CommandLine;
+﻿using System.CommandLine;
 
-using GitHooks.CommandLine;
+using GitHooks.Infrastructure;
 using GitHooks.Handlers;
 
 namespace GitHooks.Commands;
@@ -55,3 +55,4 @@ public sealed class InstallCommand(IInstallHandler installHandler)
         return _installHandler.HandleAsync(scope, hooksPath, force, cancellationToken);
     }
 }
+

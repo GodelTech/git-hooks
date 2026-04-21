@@ -1,4 +1,4 @@
-namespace GitHooks.CommandLine;
+﻿namespace GitHooks.Infrastructure;
 
 /// <summary>
 /// Defines file-system operations for creating git hook files.
@@ -15,3 +15,4 @@ public interface IHookFileManager
     /// <returns>A task that represents the asynchronous operation, returning creation details.</returns>
     public Task<HookFileCreationResult> CreateHookFilesAsync(string hooksPath, IReadOnlyCollection<string> hookNames, bool overwrite, CancellationToken cancellationToken = default);
 }
+

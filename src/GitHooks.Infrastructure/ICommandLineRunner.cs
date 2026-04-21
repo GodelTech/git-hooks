@@ -1,4 +1,4 @@
-namespace GitHooks.CommandLine;
+﻿namespace GitHooks.Infrastructure;
 
 /// <summary>
 /// Defines a generic command-line runner.
@@ -16,3 +16,4 @@ public interface ICommandLineRunner
     /// <returns>A task that represents the asynchronous operation, returning a <see cref="CommandLineResult"/> with the process outcome.</returns>
     public Task<CommandLineResult> RunAsync(string fileName, IEnumerable<string> arguments, CancellationToken cancellationToken = default);
 }
+
