@@ -16,8 +16,6 @@ namespace GitHooks.Commands;
 public class UninstallCommand(IUninstallHandler uninstallHandler)
     : CommandBase("uninstall", "Remove the git core.hooksPath configuration.")
 {
-    private const GitConfigScope DefaultScope = GitConfigScope.Global;
-
     private readonly IUninstallHandler _uninstallHandler = uninstallHandler;
 
     /// <inheritdoc/>
@@ -28,7 +26,7 @@ public class UninstallCommand(IUninstallHandler uninstallHandler)
         )
         {
             Description = "Git configuration scope to use (local, global, or system). Default: global",
-            DefaultValueFactory = _ => DefaultScope
+            DefaultValueFactory = _ => GitHooksDefaults.Scope
         };
     }
 

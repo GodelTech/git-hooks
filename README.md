@@ -4,12 +4,13 @@ Dotnet tool to configure Git hook execution by managing `core.hooksPath`.
 
 ## What this tool does today
 
-This project currently supports two operations:
+This project currently supports three operations:
 
 - `install`: sets `core.hooksPath` for a selected Git config scope.
+- `create`: creates hook script files in the selected hooks directory.
 - `uninstall`: unsets `core.hooksPath` for a selected Git config scope.
 
-The tool does not create hook scripts for you. It configures where Git looks for them.
+The tool can generate hook file stubs and configure where Git looks for them.
 
 ## Common Git hooks you can use
 
@@ -28,6 +29,12 @@ For a full hook list, see `docs/git-hooks-reference.md` and Git docs: https://gi
 
 ```bash
 githooks install
+```
+
+### Create default hook files
+
+```bash
+githooks create
 ```
 
 ### Install for current repository

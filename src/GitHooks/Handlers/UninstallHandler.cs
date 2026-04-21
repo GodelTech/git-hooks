@@ -33,7 +33,7 @@ public class UninstallHandler(
 
         if (!existing.IsSuccess)
         {
-            _console.MarkupLine($"[green][[OK]][/] {scope.ToGitString()} core.hooksPath is not configured. Nothing to uninstall.");
+            _console.MarkupLineInterpolated($"[green][[OK]][/] {scope.ToGitString()} core.hooksPath is not configured. Nothing to uninstall.");
             return 0;
         }
 
@@ -43,11 +43,11 @@ public class UninstallHandler(
 
         if (!unsetResult.IsSuccess)
         {
-            _console.MarkupLine($"[red][[ERROR]][/] Failed to unset {scope.ToGitString()} core.hooksPath: {unsetResult.Error.Trim()}");
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to unset {scope.ToGitString()} core.hooksPath: {unsetResult.Error.Trim()}");
             return 1;
         }
 
-        _console.MarkupLine($"[green][[SUCCESS]][/] {scope.ToGitString()} core.hooksPath ([blue]{existingValue}[/]) has been removed.");
+        _console.MarkupLineInterpolated($"[green][[SUCCESS]][/] {scope.ToGitString()} core.hooksPath ([blue]{existingValue}[/]) has been removed.");
         return 0;
     }
 }

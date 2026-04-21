@@ -4,12 +4,11 @@ This guide explains what hooks exist in Git and how this tool helps you use them
 
 ## Tool responsibility
 
-`githooks` manages Git configuration only:
+`githooks` manages hook setup and Git configuration:
 
+- `create` generates hook script files in a hooks directory
 - `install` sets `core.hooksPath`
 - `uninstall` removes `core.hooksPath`
-
-It does not generate or maintain hook script files.
 
 ## What hooks exist
 
@@ -46,6 +45,22 @@ Behavior:
 - Default hooks path is `.githooks`
 - If a value already exists, install fails unless `--force` is provided
 
+## Create
+
+```bash
+githooks create
+githooks create --hooks pre-commit,commit-msg,pre-push
+githooks create --hooks pre-commit --hooks commit-msg --hooks pre-push
+githooks create --hooks-path .githooks --force
+```
+
+Behavior:
+
+- Default scope is `global`
+- Default hooks path is `.githooks`
+- Default hook set is `pre-commit`, `commit-msg`, `pre-push`, `prepare-commit-msg`, and `post-commit`
+- If a hook file already exists, create fails unless `--force` is provided
+
 ## Uninstall
 
 ```bash
@@ -71,15 +86,15 @@ Use `local` for repository-specific hooks and `global` for personal defaults.
 
 ## Single repository workflow
 
-1. Run install for local scope.
-2. Create the hooks directory if needed.
-3. Add hook files (`pre-commit`, `commit-msg`, etc.) to that directory.
+1. Create hook files in the repository hook directory.
+2. Run install for local scope.
+3. Customize generated hook scripts as needed.
 
 Example:
 
 ```bash
+githooks create --scope local --hooks-path .githooks
 githooks install --scope local --hooks-path .githooks
-mkdir -p .githooks
 ```
 
 ## Organization-wide workflow

@@ -1,11 +1,11 @@
+using System.CommandLine;
+
 using GitHooks.CommandLine;
 using GitHooks.Commands;
 using GitHooks.Handlers;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-
-using System.CommandLine;
 
 using Spectre.Console;
 
@@ -55,15 +55,18 @@ internal sealed class Program
 
         // add commands:
         _ = services.AddTransient<CommandBase, InstallCommand>();
+        _ = services.AddTransient<CommandBase, CreateCommand>();
         _ = services.AddTransient<CommandBase, UninstallCommand>();
 
         // add command services:
         _ = services.AddTransient<IInstallHandler, InstallHandler>();
+        _ = services.AddTransient<ICreateHookHandler, CreateHookHandler>();
         _ = services.AddTransient<IUninstallHandler, UninstallHandler>();
 
         // add services:
         _ = services.AddTransient<ICommandLineRunner, CommandLineRunner>();
         _ = services.AddTransient<IGitCommandLine, GitCommandLine>();
+        _ = services.AddTransient<IHookFileManager, HookFileManager>();
 
         return services.BuildServiceProvider();
     }

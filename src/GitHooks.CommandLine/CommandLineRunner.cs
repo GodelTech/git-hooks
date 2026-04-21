@@ -31,7 +31,15 @@ public class CommandLineRunner : ICommandLineRunner
 
             return CommandLineResult.FromProcess(process);
         }
-        catch (Exception ex) when (ex is Win32Exception or InvalidOperationException or ObjectDisposedException)
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex) when (
+            ex is Win32Exception
+            or InvalidOperationException
+            or ObjectDisposedException
+        )
         {
             return CommandLineResult.FromException(ex);
         }

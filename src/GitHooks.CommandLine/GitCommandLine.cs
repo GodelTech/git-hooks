@@ -36,7 +36,7 @@ public class GitCommandLine(ICommandLineRunner commandLineRunner) : IGitCommandL
     /// <inheritdoc/>
     public Task<CommandLineResult> SetCoreHooksPathAsync(GitConfigScope scope, string value, CancellationToken cancellationToken = default)
     {
-        return _commandLineRunner.RunAsync("git", $"config --{scope.ToGitString()} --set core.hooksPath \"{value}\"", cancellationToken);
+        return _commandLineRunner.RunAsync("git", $"config --{scope.ToGitString()} core.hooksPath \"{value}\"", cancellationToken);
     }
 
     /// <inheritdoc/>
