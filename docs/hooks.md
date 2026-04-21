@@ -13,14 +13,20 @@ It does not generate or maintain hook script files.
 
 ## What hooks exist
 
-Git supports many hooks. Common ones used in teams:
+Git supports many hooks across commit, merge, push, and server workflows.
 
-- `pre-commit`: checks before creating a commit (lint, formatting, tests)
-- `commit-msg`: validates commit message content
-- `pre-push`: checks before pushing
-- `post-commit`: runs after commit is created
+For a full, tabular reference of all supported hook names and where they run, see [git-hooks-reference.md](git-hooks-reference.md).
+
+Common examples:
+
+- `pre-commit`
+- `commit-msg`
+- `pre-push`
+- `post-commit`
 
 Git executes hooks by file name from the configured hooks directory. To use a hook, create a file with that exact hook name in your hooks path.
+
+Some hooks are command- or integration-specific and may not apply to every workflow.
 
 Reference: https://git-scm.com/docs/githooks
 

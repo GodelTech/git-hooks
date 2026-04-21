@@ -13,14 +13,14 @@ The tool does not create hook scripts for you. It configures where Git looks for
 
 ## Common Git hooks you can use
 
-After setting `core.hooksPath`, place standard Git hook files in that directory, for example:
+After setting `core.hooksPath`, place standard Git hook files in that directory. Common examples:
 
 - `pre-commit`
 - `commit-msg`
 - `pre-push`
 - `post-commit`
 
-For a full hook list, see Git docs: https://git-scm.com/docs/githooks
+For a full hook list, see `docs/git-hooks-reference.md` and Git docs: https://git-scm.com/docs/githooks
 
 ## Quick start
 
