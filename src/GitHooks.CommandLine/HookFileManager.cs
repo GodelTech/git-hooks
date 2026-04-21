@@ -77,7 +77,7 @@ public sealed class HookFileManager : IHookFileManager
             project_path="$repo_root/src/GitHooks"
             yaml_path="$repo_root/{hooksPath}/{hookName}.yaml"
 
-            dotnet run --project "$project_path" -- run --file "$yaml_path"
+            dotnet run --project "$project_path" --no-launch-profile -- run --file "$yaml_path"
 
             exit 0
             """;

@@ -60,6 +60,7 @@ Behavior:
 - Default hooks path is `.githooks`
 - Default hook set is `pre-commit`, `commit-msg`, `pre-push`, `prepare-commit-msg`, and `post-commit`
 - If a hook file already exists, create fails unless `--force` is provided
+- Generated hook files resolve `{hook-name}.yaml` from the repository root so they do not depend on the current working directory
 
 ## Uninstall
 
@@ -120,4 +121,4 @@ githooks install --scope global --hooks-path .githooks
 
 ## Planned capabilities
 
-YAML-defined hook pipeline execution is planned, but no `run` command is available in the current implementation.
+YAML-defined hook pipeline execution is planned. Current `run` behavior is informational: it prints the startup path, repository root, YAML path relative to the repository root, and the YAML file contents.

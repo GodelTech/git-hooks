@@ -28,6 +28,12 @@ public class GitCommandLine(ICommandLineRunner commandLineRunner) : IGitCommandL
     }
 
     /// <inheritdoc/>
+    public Task<CommandLineResult> GetTopLevelAsync(CancellationToken cancellationToken = default)
+    {
+        return _commandLineRunner.RunAsync("git", "rev-parse --show-toplevel", cancellationToken);
+    }
+
+    /// <inheritdoc/>
     public Task<CommandLineResult> GetCoreHooksPathAsync(GitConfigScope scope, CancellationToken cancellationToken = default)
     {
         return _commandLineRunner.RunAsync("git", $"config --{scope.ToGitString()} --get core.hooksPath", cancellationToken);

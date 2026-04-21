@@ -57,11 +57,13 @@ internal sealed class Program
         _ = services.AddTransient<CommandBase, InstallCommand>();
         _ = services.AddTransient<CommandBase, CreateCommand>();
         _ = services.AddTransient<CommandBase, UninstallCommand>();
+        _ = services.AddTransient<CommandBase, RunCommand>();
 
         // add command services:
         _ = services.AddTransient<IInstallHandler, InstallHandler>();
         _ = services.AddTransient<ICreateHookHandler, CreateHookHandler>();
         _ = services.AddTransient<IUninstallHandler, UninstallHandler>();
+        _ = services.AddTransient<IRunHandler, RunHandler>();
 
         // add services:
         _ = services.AddTransient<ICommandLineRunner, CommandLineRunner>();

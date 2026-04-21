@@ -4,11 +4,12 @@ Dotnet tool to configure Git hook execution by managing `core.hooksPath`.
 
 ## What this tool does today
 
-This project currently supports three operations:
+This project currently supports four operations:
 
 - `install`: sets `core.hooksPath` for a selected Git config scope.
 - `create`: creates hook script files in the selected hooks directory.
 - `uninstall`: unsets `core.hooksPath` for a selected Git config scope.
+- `run`: reads a YAML file, prints repository root path, and prints the YAML path relative to repository root.
 
 The tool can generate hook file stubs and configure where Git looks for them.
 
@@ -56,6 +57,14 @@ githooks uninstall
 githooks uninstall --scope local
 ```
 
+### Read and display YAML file details
+
+```bash
+githooks run --file pre-commit.yaml
+```
+
+Generated hook scripts resolve paths from the repository root instead of relying on the current working directory. This keeps project and YAML file discovery stable when Git invokes hooks.
+
 ## Scope behavior
 
 - `local`: current repository only (`.git/config`), must be inside a Git repository.
@@ -67,11 +76,12 @@ githooks uninstall --scope local
 - If Git is not in PATH, install Git and retry.
 - If `--scope local` fails, run inside a Git repository.
 - If hooks do not run, confirm `core.hooksPath` points to the folder containing your hook files.
+- Generated hook scripts resolve the repository root with `git rev-parse --show-toplevel`; they do not rely on the shell starting in a particular directory.
 - If a path is already configured, use `--force` to replace it.
 
 ## Roadmap
 
-YAML-defined hook pipelines are planned, but are not available as an executable command in the current implementation.
+YAML-defined hook execution pipelines are planned. Current `run` behavior is informational only: read and print YAML content with repository path context.
 
 ## Detailed docs
 
