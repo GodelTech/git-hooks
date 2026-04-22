@@ -3,7 +3,7 @@ namespace GitHooks.Infrastructure;
 /// <summary>
 /// Represents the result of a command-line process execution.
 /// </summary>
-public class CommandLineResult
+public sealed class CommandLineResult
 {
     private CommandLineResult(string output, string error, int exitCode)
     {
@@ -41,7 +41,7 @@ public class CommandLineResult
     /// <param name="error">The standard error text.</param>
     /// <param name="exitCode">The process exit code.</param>
     /// <returns>A new <see cref="CommandLineResult"/>.</returns>
-    internal static CommandLineResult FromProcess(string output, string error, int exitCode)
+    public static CommandLineResult FromProcess(string output, string error, int exitCode)
     {
         return new CommandLineResult(output, error, exitCode);
     }

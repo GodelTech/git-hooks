@@ -38,8 +38,12 @@ public sealed class GitHookCatalog : IGitHookCatalog
         new("post-index-change",  GitHookCategory.Checkout, "Runs after the staging area (index) is written to disk. Informational; cannot abort.",             CanAbort: false),
     ];
 
-    // Precomputed lookup for fast hook-name validation and metadata resolution.
     private static readonly Dictionary<string, GitHook> _hooksByName = _all.ToDictionary(hook => hook.Name, StringComparer.Ordinal);
+
+    private static readonly Dictionary<GitHookCategory, IReadOnlyCollection<GitHook>> _hooksByCategory =
+        _all
+            .GroupBy(hook => hook.Category)
+            .ToDictionary(g => g.Key, g => (IReadOnlyCollection<GitHook>)[.. g]);
 
     /// <summary>
     /// A shared singleton instance for use outside of dependency injection containers.
@@ -55,37 +59,9 @@ public sealed class GitHookCatalog : IGitHookCatalog
     /// <inheritdoc/>
     public IReadOnlyCollection<GitHook> GetHooks(GitHookCategory category)
     {
-        return _all.Where(h => h.Category == category).ToList().AsReadOnly();
-    }
-
-    /// <inheritdoc/>
-    public IReadOnlyCollection<GitHook> GetCommitHooks()
-    {
-        return GetHooks(GitHookCategory.Commit);
-    }
-
-    /// <inheritdoc/>
-    public IReadOnlyCollection<GitHook> GetPushHooks()
-    {
-        return GetHooks(GitHookCategory.Push);
-    }
-
-    /// <inheritdoc/>
-    public IReadOnlyCollection<GitHook> GetMergeHooks()
-    {
-        return GetHooks(GitHookCategory.Merge);
-    }
-
-    /// <inheritdoc/>
-    public IReadOnlyCollection<GitHook> GetRebaseHooks()
-    {
-        return GetHooks(GitHookCategory.Rebase);
-    }
-
-    /// <inheritdoc/>
-    public IReadOnlyCollection<GitHook> GetCheckoutHooks()
-    {
-        return GetHooks(GitHookCategory.Checkout);
+        return _hooksByCategory.TryGetValue(category, out var hooks)
+            ? hooks
+            : [];
     }
 
     /// <inheritdoc/>
@@ -97,15 +73,22 @@ public sealed class GitHookCatalog : IGitHookCatalog
             .Distinct(StringComparer.Ordinal)
             .ToArray();
 
-        var supportedHooks = normalizedHooks
-            .Where(_hooksByName.ContainsKey)
-            .Select(hook => _hooksByName[hook])
-            .ToArray();
+        var resolved = new List<GitHook>();
+        var invalid = new List<string>();
 
-        var invalidHooks = normalizedHooks
-            .Where(hook => !_hooksByName.ContainsKey(hook))
-            .ToArray();
+        foreach (var hook in normalizedHooks)
+        {
+            // Single TryGetValue per hook — avoids the double-lookup of ContainsKey + indexer.
+            if (_hooksByName.TryGetValue(hook, out var gitHook))
+            {
+                resolved.Add(gitHook);
+            }
+            else
+            {
+                invalid.Add(hook);
+            }
+        }
 
-        return new GitHookResolutionResult(supportedHooks, invalidHooks);
+        return new GitHookResolutionResult(resolved, invalid);
     }
 }

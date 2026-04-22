@@ -3,8 +3,6 @@ using System.CommandLine;
 using GitHooks.Commands;
 using GitHooks.Handlers;
 using GitHooks.Infrastructure;
-using GitHooks.Infrastructure.Git;
-using GitHooks.Infrastructure.GitHooks;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -58,20 +56,17 @@ internal sealed class Program
         // add commands:
         _ = services.AddTransient<CommandBase, InstallCommand>();
         _ = services.AddTransient<CommandBase, CreateCommand>();
-        _ = services.AddTransient<CommandBase, UninstallCommand>();
         _ = services.AddTransient<CommandBase, RunCommand>();
+        _ = services.AddTransient<CommandBase, UninstallCommand>();
 
-        // add command services:
+        // add command handlers:
         _ = services.AddTransient<IInstallHandler, InstallHandler>();
         _ = services.AddTransient<ICreateHookHandler, CreateHookHandler>();
-        _ = services.AddTransient<IUninstallHandler, UninstallHandler>();
         _ = services.AddTransient<IRunHandler, RunHandler>();
+        _ = services.AddTransient<IUninstallHandler, UninstallHandler>();
 
         // add services:
-        _ = services.AddTransient<ICommandLine, CommandLine>();
-        _ = services.AddTransient<IGitCommandLine, GitCommandLine>();
-        _ = services.AddSingleton<IGitHookCatalog, GitHookCatalog>();
-        _ = services.AddTransient<IHookFileManager, HookFileManager>();
+        _ = services.AddGitHooksInfrastructure();
 
         return services.BuildServiceProvider();
     }

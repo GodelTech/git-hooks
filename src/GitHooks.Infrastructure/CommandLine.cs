@@ -36,7 +36,15 @@ public sealed class CommandLine : ICommandLine
 
         try
         {
-            _ = process.Start();
+            // Start() returns false when a process-reuse scenario occurs (e.g. EnableRaisingEvents
+            // is set on an already-started Process). Treat it as a failure rather than silently
+            // reading from a stale process.
+            if (!process.Start())
+            {
+                return CommandLineResult.FromException(
+                    new InvalidOperationException($"Failed to start process '{fileName}': the process was not started.")
+                );
+            }
 
             // Read both streams concurrently before awaiting exit to avoid deadlock
             // when the process fills the pipe buffer before terminating.
