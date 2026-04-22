@@ -1,5 +1,6 @@
 using GitHooks.Infrastructure;
 using GitHooks.Infrastructure.Git;
+using GitHooks.Infrastructure.GitHooks;
 
 using Spectre.Console;
 
@@ -10,42 +11,12 @@ namespace GitHooks.Handlers;
 /// </summary>
 public sealed class CreateHookHandler(
     IGitCommandLine gitCommandLine,
+    IGitHookCatalog gitHookCatalog,
     IHookFileManager hookFileManager,
     IAnsiConsole console) : ICreateHookHandler
 {
-    private static readonly HashSet<string> SupportedHooks =
-    [
-        "applypatch-msg",
-        "pre-applypatch",
-        "post-applypatch",
-        "pre-commit",
-        "pre-merge-commit",
-        "prepare-commit-msg",
-        "commit-msg",
-        "post-commit",
-        "pre-rebase",
-        "post-rewrite",
-        "post-checkout",
-        "post-merge",
-        "pre-push",
-        "pre-receive",
-        "update",
-        "proc-receive",
-        "post-receive",
-        "post-update",
-        "reference-transaction",
-        "push-to-checkout",
-        "pre-auto-gc",
-        "post-index-change",
-        "sendemail-validate",
-        "fsmonitor-watchman",
-        "p4-changelist",
-        "p4-prepare-changelist",
-        "p4-post-changelist",
-        "p4-pre-submit"
-    ];
-
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
+    private readonly IGitHookCatalog _gitHookCatalog = gitHookCatalog;
     private readonly IHookFileManager _hookFileManager = hookFileManager;
     private readonly IAnsiConsole _console = console;
 
@@ -58,14 +29,31 @@ public sealed class CreateHookHandler(
             return 1;
         }
 
-        if (scope == GitConfigScope.Local && !await _gitCommandLine.IsInsideGitRepositoryAsync(cancellationToken))
+        if (!await _gitCommandLine.IsInsideGitRepositoryAsync(cancellationToken))
         {
-            _console.MarkupLine("[red][[ERROR]][/] Not inside a git repository. The [blue]local[/] scope requires running from within a git repository.");
+            _console.MarkupLine("[red][[ERROR]][/] Not inside a git repository. The [blue]create[/] command requires running from within a git repository.");
+            return 1;
+        }
+
+        var repositoryRootPathResult = await _gitCommandLine.GetRepositoryRootPathAsync(cancellationToken);
+
+        if (!repositoryRootPathResult.IsSuccess)
+        {
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to resolve repository root path: {repositoryRootPathResult.Error.Trim()}");
+            return 1;
+        }
+
+        var repositoryRootPath = repositoryRootPathResult.Output.Trim();
+
+        if (string.IsNullOrWhiteSpace(repositoryRootPath))
+        {
+            _console.MarkupLine("[red][[ERROR]][/] Git returned an empty repository root path.");
             return 1;
         }
 
         var normalizedHooks = NormalizeHooks(hooks);
-        var invalidHooks = normalizedHooks.Where(hook => !SupportedHooks.Contains(hook)).ToArray();
+        var supportedHookNames = _gitHookCatalog.GetAllHooks().Select(h => h.Name).ToHashSet(StringComparer.Ordinal);
+        var invalidHooks = normalizedHooks.Where(hook => !supportedHookNames.Contains(hook)).ToArray();
 
         if (invalidHooks.Length > 0)
         {
@@ -74,7 +62,7 @@ public sealed class CreateHookHandler(
             return 1;
         }
 
-        var creationResult = await _hookFileManager.CreateHookFilesAsync(hooksPath, normalizedHooks, force, cancellationToken);
+        var creationResult = await _hookFileManager.CreateHookFilesAsync(repositoryRootPath, hooksPath, normalizedHooks, force, cancellationToken);
 
         if (!creationResult.IsSuccess)
         {
@@ -82,7 +70,7 @@ public sealed class CreateHookHandler(
             return 1;
         }
 
-        _console.MarkupLineInterpolated($"[green][[SUCCESS]][/] Created {creationResult.CreatedHooks.Count} hook file(s) in: [blue]{hooksPath}[/]");
+        _console.MarkupLineInterpolated($"[green][[SUCCESS]][/] Created {creationResult.CreatedHooks.Count} hook file(s) in: [blue]{hooksPath}[/] ([grey]{creationResult.ResolvedHooksPath}[/])");
         _console.MarkupLineInterpolated($"[green][[OK]][/] Hooks: [blue]{string.Join(", ", creationResult.CreatedHooks)}[/]");
 
         return 0;

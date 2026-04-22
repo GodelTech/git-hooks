@@ -5,11 +5,12 @@ namespace GitHooks.Infrastructure;
 /// </summary>
 public sealed class HookFileCreationResult
 {
-    private HookFileCreationResult(bool isSuccess, IReadOnlyCollection<string> createdHooks, string error)
+    private HookFileCreationResult(bool isSuccess, IReadOnlyCollection<string> createdHooks, string error, string resolvedHooksPath)
     {
         IsSuccess = isSuccess;
         CreatedHooks = createdHooks;
         Error = error;
+        ResolvedHooksPath = resolvedHooksPath;
     }
 
     /// <summary>
@@ -28,13 +29,20 @@ public sealed class HookFileCreationResult
     public string Error { get; }
 
     /// <summary>
+    /// Gets the absolute resolved path where hook files were created.
+    /// Only meaningful when <see cref="IsSuccess"/> is <c>true</c>.
+    /// </summary>
+    public string ResolvedHooksPath { get; }
+
+    /// <summary>
     /// Creates a successful result instance.
     /// </summary>
     /// <param name="createdHooks">The hook names that were created.</param>
+    /// <param name="resolvedHooksPath">The absolute resolved path where hook files were created.</param>
     /// <returns>A successful <see cref="HookFileCreationResult"/>.</returns>
-    public static HookFileCreationResult Success(IReadOnlyCollection<string> createdHooks)
+    public static HookFileCreationResult Success(IReadOnlyCollection<string> createdHooks, string resolvedHooksPath)
     {
-        return new HookFileCreationResult(true, createdHooks, string.Empty);
+        return new HookFileCreationResult(true, createdHooks, string.Empty, resolvedHooksPath);
     }
 
     /// <summary>
@@ -44,6 +52,6 @@ public sealed class HookFileCreationResult
     /// <returns>A failed <see cref="HookFileCreationResult"/>.</returns>
     public static HookFileCreationResult Failure(string error)
     {
-        return new HookFileCreationResult(false, [], error);
+        return new HookFileCreationResult(false, [], error, string.Empty);
     }
 }

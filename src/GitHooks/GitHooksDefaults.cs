@@ -13,18 +13,9 @@ public static class GitHooksDefaults
     /// <summary>The default directory where hook files are stored.</summary>
     public const string HooksPath = ".githooks";
 
-    /// <summary>Default commit hook names.</summary>
-    public static readonly string[] CommitHooks =
-    [
-        "pre-commit",
-        "prepare-commit-msg",
-        "commit-msg",
-        "post-commit"
-    ];
+    /// <summary>The default commit hooks created when no hooks are specified.</summary>
+    public static readonly string[] CommitHooks = ["pre-commit", "prepare-commit-msg", "commit-msg", "post-commit"];
 
-    /// <summary>Default push hook names.</summary>
-    public static readonly string[] PushHooks =
-    [
-        "pre-push"
-    ];
+    /// <summary>The default push hooks created when no hooks are specified.</summary>
+    public static readonly string[] PushHooks = ["pre-push"];
 }

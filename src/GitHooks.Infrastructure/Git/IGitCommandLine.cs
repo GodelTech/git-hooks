@@ -24,7 +24,7 @@ public interface IGitCommandLine
     /// </summary>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation, returning the command-line result.</returns>
-    public Task<CommandLineResult> GetTopLevelAsync(CancellationToken cancellationToken = default);
+    public Task<CommandLineResult> GetRepositoryRootPathAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the core.hooksPath configuration value.

@@ -35,7 +35,7 @@
       "args": [
         "run",
         "--file",
-        "examples/commit-msg.yaml"
+        ".githooks/commit-msg.yaml"
       ],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal"

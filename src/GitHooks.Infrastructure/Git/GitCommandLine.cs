@@ -28,7 +28,7 @@ public sealed class GitCommandLine(ICommandLine commandLine) : IGitCommandLine
     }
 
     /// <inheritdoc/>
-    public Task<CommandLineResult> GetTopLevelAsync(CancellationToken cancellationToken = default)
+    public Task<CommandLineResult> GetRepositoryRootPathAsync(CancellationToken cancellationToken = default)
     {
         return _commandLine.RunAsync("git", ["rev-parse", "--show-toplevel"], cancellationToken);
     }

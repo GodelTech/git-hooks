@@ -8,16 +8,20 @@ namespace GitHooks.Infrastructure;
 public sealed class HookFileManager : IHookFileManager
 {
     /// <inheritdoc/>
-    public async Task<HookFileCreationResult> CreateHookFilesAsync(string hooksPath, IReadOnlyCollection<string> hookNames, bool overwrite, CancellationToken cancellationToken = default)
+    public async Task<HookFileCreationResult> CreateHookFilesAsync(string repositoryRootPath, string hooksPath, IReadOnlyCollection<string> hookNames, bool overwrite, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(hooksPath))
         {
             return HookFileCreationResult.Failure("hooks-path cannot be empty.");
         }
 
+        // Resolve hooksPath relative to the repository root so the tool behaves consistently
+        // regardless of which subfolder it is invoked from.
+        var resolvedHooksPath = Path.GetFullPath(hooksPath, repositoryRootPath);
+
         try
         {
-            _ = Directory.CreateDirectory(hooksPath);
+            _ = Directory.CreateDirectory(resolvedHooksPath);
 
             var createdHooks = new List<string>(hookNames.Count);
 
@@ -25,8 +29,8 @@ public sealed class HookFileManager : IHookFileManager
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var hookFilePath = Path.Combine(hooksPath, hookName);
-                var yamlFilePath = Path.Combine(hooksPath, $"{hookName}.yaml");
+                var hookFilePath = Path.Combine(resolvedHooksPath, hookName);
+                var yamlFilePath = Path.Combine(resolvedHooksPath, $"{hookName}.yaml");
 
                 if (File.Exists(hookFilePath) && !overwrite)
                 {
@@ -38,12 +42,15 @@ public sealed class HookFileManager : IHookFileManager
                     return HookFileCreationResult.Failure($"Hook file already exists: {yamlFilePath}. Use --force to overwrite.");
                 }
 
+                // BuildHookTemplate receives the original (relative) hooksPath so the generated
+                // bash script's --file argument stays relative to the repository root, which is
+                // the working directory when Git invokes the hook.
                 await File.WriteAllTextAsync(hookFilePath, BuildHookTemplate(hooksPath, hookName), new UTF8Encoding(false), cancellationToken);
                 await File.WriteAllTextAsync(yamlFilePath, BuildYamlTemplate(hookName), new UTF8Encoding(false), cancellationToken);
                 createdHooks.Add(hookName);
             }
 
-            return HookFileCreationResult.Success(createdHooks);
+            return HookFileCreationResult.Success(createdHooks, resolvedHooksPath);
         }
         catch (OperationCanceledException)
         {

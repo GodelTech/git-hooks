@@ -31,19 +31,19 @@ public sealed class RunHandler(
             return 1;
         }
 
-        var repositoryRootResult = await _gitCommandLine.GetTopLevelAsync(cancellationToken);
+        var repositoryRootPathResult = await _gitCommandLine.GetRepositoryRootPathAsync(cancellationToken);
 
-        if (!repositoryRootResult.IsSuccess)
+        if (!repositoryRootPathResult.IsSuccess)
         {
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to resolve repository root path: {repositoryRootResult.Error.Trim()}");
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to resolve repository root path: {repositoryRootPathResult.Error.Trim()}");
             return 1;
         }
 
-        var repositoryRootPath = repositoryRootResult.Output.Trim();
+        var repositoryRootPath = repositoryRootPathResult.Output.Trim();
 
         if (string.IsNullOrWhiteSpace(repositoryRootPath))
         {
-            _console.MarkupLine("[red][[ERROR]][/] Failed to resolve repository root path.");
+            _console.MarkupLine("[red][[ERROR]][/] Git returned an empty repository root path.");
             return 1;
         }
 
@@ -62,12 +62,7 @@ public sealed class RunHandler(
         {
             yamlContent = await File.ReadAllTextAsync(absoluteFilePath, cancellationToken);
         }
-        catch (IOException ex)
-        {
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to read YAML file: {Markup.Escape(ex.Message)}");
-            return 1;
-        }
-        catch (UnauthorizedAccessException ex)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to read YAML file: {Markup.Escape(ex.Message)}");
             return 1;
