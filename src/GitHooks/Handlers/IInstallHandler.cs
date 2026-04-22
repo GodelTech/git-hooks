@@ -1,4 +1,4 @@
-using GitHooks.Infrastructure;
+using GitHooks.Infrastructure.Git;
 
 namespace GitHooks.Handlers;
 
@@ -17,4 +17,3 @@ public interface IInstallHandler
     /// <returns>A task that represents the asynchronous operation, returning an exit code.</returns>
     public Task<int> HandleAsync(GitConfigScope scope, string hooksPath, bool force, CancellationToken cancellationToken = default);
 }
-

@@ -56,4 +56,3 @@ public class CommandLineResult
         return new CommandLineResult(string.Empty, ex.Message, 1);
     }
 }
-

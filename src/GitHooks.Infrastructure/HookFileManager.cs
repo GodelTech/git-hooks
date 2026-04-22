@@ -74,6 +74,7 @@ public sealed class HookFileManager : IHookFileManager
             dotnet run --project "src/GitHooks" --no-launch-profile -- run --file "{hooksPath}/{hookName}.yaml"
 
             exit 0
+
             """;
     }
 
@@ -87,7 +88,7 @@ public sealed class HookFileManager : IHookFileManager
             steps:
               - name: example
                 run: echo "Running {hookName} hook"
+
             """;
     }
 }
-

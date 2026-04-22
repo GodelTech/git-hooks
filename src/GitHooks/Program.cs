@@ -3,6 +3,7 @@ using System.CommandLine;
 using GitHooks.Commands;
 using GitHooks.Handlers;
 using GitHooks.Infrastructure;
+using GitHooks.Infrastructure.Git;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -73,4 +74,3 @@ internal sealed class Program
         return services.BuildServiceProvider();
     }
 }
-

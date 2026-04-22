@@ -1,4 +1,4 @@
-using GitHooks.Infrastructure;
+using GitHooks.Infrastructure.Git;
 
 using Spectre.Console;
 
@@ -51,4 +51,3 @@ public sealed class UninstallHandler(
         return 0;
     }
 }
-

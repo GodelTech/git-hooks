@@ -1,4 +1,4 @@
-using GitHooks.Infrastructure;
+using GitHooks.Infrastructure.Git;
 
 using Spectre.Console;
 
@@ -82,4 +82,3 @@ public sealed class RunHandler(
         return 0;
     }
 }
-

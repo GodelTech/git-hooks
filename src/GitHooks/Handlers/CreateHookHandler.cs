@@ -1,4 +1,5 @@
 using GitHooks.Infrastructure;
+using GitHooks.Infrastructure.Git;
 
 using Spectre.Console;
 
@@ -95,4 +96,3 @@ public sealed class CreateHookHandler(
             .Distinct(StringComparer.Ordinal)];
     }
 }
-

@@ -1,7 +1,7 @@
 using System.CommandLine;
 
 using GitHooks.Handlers;
-using GitHooks.Infrastructure;
+using GitHooks.Infrastructure.Git;
 
 namespace GitHooks.Commands;
 
@@ -16,15 +16,6 @@ namespace GitHooks.Commands;
 public sealed class CreateCommand(ICreateHookHandler createHookHandler)
     : CommandBase("create", $"Create git hook files in the {GitHooksDefaults.HooksPath}/ directory.")
 {
-    private static readonly string[] DefaultHooks =
-    [
-        "pre-commit",
-        "commit-msg",
-        "pre-push",
-        "prepare-commit-msg",
-        "post-commit"
-    ];
-
     private readonly ICreateHookHandler _createHookHandler = createHookHandler;
 
     /// <inheritdoc/>
@@ -83,7 +74,6 @@ public sealed class CreateCommand(ICreateHookHandler createHookHandler)
             .SelectMany(value => value.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
             .ToArray();
 
-        return hooks.Length > 0 ? hooks : DefaultHooks;
+        return hooks.Length > 0 ? hooks : [.. GitHooksDefaults.CommitHooks, .. GitHooksDefaults.PushHooks];
     }
 }
-

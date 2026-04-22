@@ -47,4 +47,3 @@ public sealed class HookFileCreationResult
         return new HookFileCreationResult(false, [], error);
     }
 }
-

@@ -170,4 +170,3 @@ Follow [C# Development Guidelines](.github/instructions/csharp.instructions.md):
 - **Fail-Fast Validation**: Check preconditions early; return meaningful exit codes
 - **Idempotent Operations**: Setting same value twice should succeed
 - **Reusable Abstractions**: `GitHooks.Infrastructure` library can be consumed separately
-
