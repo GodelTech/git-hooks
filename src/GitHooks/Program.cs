@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 
 using GitHooks.Infrastructure;
 using GitHooks.Commands;
@@ -66,7 +66,7 @@ internal sealed class Program
         _ = services.AddTransient<IRunHandler, RunHandler>();
 
         // add services:
-        _ = services.AddTransient<ICommandLineRunner, CommandLineRunner>();
+        _ = services.AddTransient<ICommandLine, CommandLine>();
         _ = services.AddTransient<IGitCommandLine, GitCommandLine>();
         _ = services.AddTransient<IHookFileManager, HookFileManager>();
 

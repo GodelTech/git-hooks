@@ -1,12 +1,12 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace GitHooks.Infrastructure;
 
 /// <summary>
-/// Default implementation of <see cref="ICommandLineRunner"/> that runs external processes.
+/// Default implementation of <see cref="ICommandLine"/> that runs external processes.
 /// </summary>
-public sealed class CommandLineRunner : ICommandLineRunner
+public sealed class CommandLine : ICommandLine
 {
     /// <inheritdoc/>
     /// <remarks>

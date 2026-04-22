@@ -17,7 +17,7 @@ Commands (InstallCommand, UninstallCommand)
          ↓
 Handlers (InstallHandler, UninstallHandler) ← Business Logic
          ↓
-Abstractions (IGitCommandLine, ICommandLineRunner)
+Abstractions (IGitCommandLine, ICommandLine)
          ↓
 Infrastructure (Git Process Execution)
 ```
