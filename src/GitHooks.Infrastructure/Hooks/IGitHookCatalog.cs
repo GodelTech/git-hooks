@@ -1,4 +1,4 @@
-namespace GitHooks.Infrastructure.GitHooks;
+namespace GitHooks.Infrastructure.Hooks;
 
 /// <summary>
 /// Provides a read-only catalog of well-known Git hooks grouped by lifecycle category.

@@ -1,4 +1,4 @@
-namespace GitHooks.Infrastructure.GitHooks;
+namespace GitHooks.Infrastructure.Hooks;
 
 /// <summary>
 /// Default implementation of <see cref="IGitHookCatalog"/> containing metadata for all

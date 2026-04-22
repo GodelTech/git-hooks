@@ -6,15 +6,15 @@ using GitHooks.Infrastructure.Git;
 namespace GitHooks.Commands;
 
 /// <summary>
-/// Command to create git hook files in a hooks directory.
+/// Command to create git hook scaffold files in a hooks directory.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="CreateCommand"/> class.
 /// </remarks>
-/// <param name="createHookHandler">The handler that creates hook files.</param>
+/// <param name="createHookHandler">The handler that creates hook scaffold files.</param>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1010:Collections should implement generic interface", Justification = "Inherited from System.CommandLine.Command base class")]
 public sealed class CreateCommand(ICreateHookHandler createHookHandler)
-    : CommandBase("create", $"Create git hook files in the {GitHooksDefaults.HooksPath}/ directory.")
+    : CommandBase("create", $"Create git hook scaffold files in the {GitHooksDefaults.HooksPath}/ directory.")
 {
     private readonly ICreateHookHandler _createHookHandler = createHookHandler;
 
@@ -33,7 +33,7 @@ public sealed class CreateCommand(ICreateHookHandler createHookHandler)
             "--hooks-path"
         )
         {
-            Description = $"Directory where hook files are created. Default: {GitHooksDefaults.HooksPath}",
+            Description = $"Directory where hook scaffold files are created. Default: {GitHooksDefaults.HooksPath}",
             DefaultValueFactory = _ => GitHooksDefaults.HooksPath
         };
 

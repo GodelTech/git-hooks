@@ -1,4 +1,4 @@
-namespace GitHooks.Infrastructure.GitHooks;
+namespace GitHooks.Infrastructure.Hooks;
 
 /// <summary>
 /// Represents the outcome of validating and normalizing user-provided hook names.

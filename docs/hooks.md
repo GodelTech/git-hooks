@@ -60,7 +60,7 @@ Behavior:
 - Default hooks path is `.githooks`
 - Default hook set is `pre-commit`, `commit-msg`, `pre-push`, `prepare-commit-msg`, and `post-commit`
 - If a hook file already exists, create fails unless `--force` is provided
-- Generated hook files resolve `{hook-name}.yaml` from the repository root so they do not depend on the current working directory
+- Generated hook scaffold files resolve `{hook-name}.yaml` from the repository root so they do not depend on the current working directory
 
 ## Uninstall
 
@@ -87,7 +87,7 @@ Use `local` for repository-specific hooks and `global` for personal defaults.
 
 ## Single repository workflow
 
-1. Create hook files in the repository hook directory.
+1. Create hook scaffold files in the repository hook directory.
 2. Run install for local scope.
 3. Customize generated hook scripts as needed.
 

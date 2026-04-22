@@ -1,5 +1,6 @@
 using GitHooks.Infrastructure.Git;
-using GitHooks.Infrastructure.GitHooks;
+using GitHooks.Infrastructure.Hooks;
+using GitHooks.Infrastructure.Scaffold;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,8 +17,8 @@ public static class ServiceCollectionExtensions
     /// <list type="bullet">
     ///   <item><see cref="ICommandLine"/> → <see cref="CommandLine"/> (transient)</item>
     ///   <item><see cref="IGitCommandLine"/> → <see cref="GitCommandLine"/> (transient)</item>
-    ///   <item><see cref="IHookFileManager"/> → <see cref="HookFileManager"/> (transient)</item>
     ///   <item><see cref="IGitHookCatalog"/> → <see cref="GitHookCatalog"/> (singleton)</item>
+    ///   <item><see cref="IGitHookScaffolder"/> → <see cref="GitHookScaffolder"/> (transient)</item>
     /// </list>
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
@@ -26,8 +27,8 @@ public static class ServiceCollectionExtensions
     {
         _ = services.AddTransient<ICommandLine, CommandLine>();
         _ = services.AddTransient<IGitCommandLine, GitCommandLine>();
-        _ = services.AddTransient<IHookFileManager, HookFileManager>();
         _ = services.AddSingleton<IGitHookCatalog, GitHookCatalog>();
+        _ = services.AddTransient<IGitHookScaffolder, GitHookScaffolder>();
 
         return services;
     }

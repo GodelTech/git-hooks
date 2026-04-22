@@ -1,4 +1,4 @@
-namespace GitHooks.Infrastructure.GitHooks;
+namespace GitHooks.Infrastructure.Hooks;
 
 /// <summary>
 /// Represents a single Git hook with its metadata.

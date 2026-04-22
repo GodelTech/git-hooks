@@ -1,20 +1,20 @@
 using System.Text;
 
-using GitHooks.Infrastructure.GitHooks;
+using GitHooks.Infrastructure.Hooks;
 
-namespace GitHooks.Infrastructure;
+namespace GitHooks.Infrastructure.Scaffold;
 
 /// <summary>
-/// Default implementation of <see cref="IHookFileManager"/>.
+/// Default implementation of <see cref="IGitHookScaffolder"/>.
 /// </summary>
-public sealed class HookFileManager : IHookFileManager
+public sealed class GitHookScaffolder : IGitHookScaffolder
 {
     /// <inheritdoc/>
-    public async Task<HookFileCreationResult> CreateHookFilesAsync(string repositoryRootPath, string hooksPath, IReadOnlyCollection<GitHook> hooks, bool overwrite, CancellationToken cancellationToken = default)
+    public async Task<GitHookScaffoldResult> CreateScaffoldAsync(string repositoryRootPath, string hooksPath, IReadOnlyCollection<GitHook> hooks, bool overwrite, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(hooksPath))
         {
-            return HookFileCreationResult.Failure("hooks-path cannot be empty.");
+            return GitHookScaffoldResult.Failure("hooks-path cannot be empty.");
         }
 
         // Resolve hooksPath relative to the repository root so the tool behaves consistently
@@ -25,7 +25,7 @@ public sealed class HookFileManager : IHookFileManager
         {
             _ = Directory.CreateDirectory(resolvedHooksPath);
 
-            var createdHooks = new List<string>(hooks.Count);
+            var createdHooks = new List<GitHook>(hooks.Count);
 
             foreach (var hook in hooks)
             {
@@ -36,12 +36,12 @@ public sealed class HookFileManager : IHookFileManager
 
                 if (File.Exists(hookFilePath) && !overwrite)
                 {
-                    return HookFileCreationResult.Failure($"Hook file already exists: {hookFilePath}.");
+                    return GitHookScaffoldResult.Failure($"Scaffold file already exists: {hookFilePath}.");
                 }
 
                 if (File.Exists(yamlFilePath) && !overwrite)
                 {
-                    return HookFileCreationResult.Failure($"Hook file already exists: {yamlFilePath}.");
+                    return GitHookScaffoldResult.Failure($"Scaffold file already exists: {yamlFilePath}.");
                 }
 
                 // BuildHookTemplate receives the original (relative) hooksPath so the generated
@@ -49,10 +49,10 @@ public sealed class HookFileManager : IHookFileManager
                 // the working directory when Git invokes the hook.
                 await File.WriteAllTextAsync(hookFilePath, BuildHookTemplate(hooksPath, hook.Name), new UTF8Encoding(false), cancellationToken);
                 await File.WriteAllTextAsync(yamlFilePath, BuildYamlTemplate(hook), new UTF8Encoding(false), cancellationToken);
-                createdHooks.Add(hook.Name);
+                createdHooks.Add(hook);
             }
 
-            return HookFileCreationResult.Success(createdHooks, resolvedHooksPath);
+            return GitHookScaffoldResult.Success(createdHooks, resolvedHooksPath);
         }
         catch (OperationCanceledException)
         {
@@ -66,7 +66,7 @@ public sealed class HookFileManager : IHookFileManager
             or System.Security.SecurityException
         )
         {
-            return HookFileCreationResult.Failure($"Failed to create hook files: {ex.Message}");
+            return GitHookScaffoldResult.Failure($"Failed to create hook scaffold files: {ex.Message}");
         }
     }
 

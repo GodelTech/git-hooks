@@ -1,6 +1,7 @@
 using GitHooks.Infrastructure;
 using GitHooks.Infrastructure.Git;
-using GitHooks.Infrastructure.GitHooks;
+using GitHooks.Infrastructure.Hooks;
+using GitHooks.Infrastructure.Scaffold;
 
 using Spectre.Console;
 
@@ -12,12 +13,12 @@ namespace GitHooks.Handlers;
 public sealed class CreateHookHandler(
     IGitCommandLine gitCommandLine,
     IGitHookCatalog gitHookCatalog,
-    IHookFileManager hookFileManager,
+    IGitHookScaffolder gitHookScaffolder,
     IAnsiConsole console) : ICreateHookHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
     private readonly IGitHookCatalog _gitHookCatalog = gitHookCatalog;
-    private readonly IHookFileManager _hookFileManager = hookFileManager;
+    private readonly IGitHookScaffolder _gitHookScaffolder = gitHookScaffolder;
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
@@ -60,7 +61,7 @@ public sealed class CreateHookHandler(
             return 1;
         }
 
-        var creationResult = await _hookFileManager.CreateHookFilesAsync(
+        var creationResult = await _gitHookScaffolder.CreateScaffoldAsync(
             repositoryRootPath,
             hooksPath,
             hookValidationResult.SupportedHooks,
@@ -81,7 +82,7 @@ public sealed class CreateHookHandler(
         }
 
         _console.MarkupLineInterpolated($"[green][[SUCCESS]][/] Created {creationResult.CreatedHooks.Count} hook file(s) in: [blue]{hooksPath}[/] ([grey]{creationResult.ResolvedHooksPath}[/])");
-        _console.MarkupLineInterpolated($"[green][[OK]][/] Hooks: [blue]{string.Join(", ", creationResult.CreatedHooks)}[/]");
+        _console.MarkupLineInterpolated($"[green][[OK]][/] Hooks: [blue]{string.Join(", ", creationResult.CreatedHooks.Select(h => h.Name))}[/]");
 
         return 0;
     }

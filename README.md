@@ -32,7 +32,7 @@ For a full hook list, see `docs/git-hooks-reference.md` and Git docs: https://gi
 githooks install
 ```
 
-### Create default hook files
+### Create default hook scaffold files
 
 ```bash
 githooks create

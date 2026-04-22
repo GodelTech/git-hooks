@@ -1,4 +1,4 @@
-namespace GitHooks.Infrastructure.GitHooks;
+namespace GitHooks.Infrastructure.Hooks;
 
 /// <summary>
 /// Typed convenience extension methods for <see cref="IGitHookCatalog"/>.

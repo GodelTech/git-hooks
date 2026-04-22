@@ -3,15 +3,15 @@ using GitHooks.Infrastructure.Git;
 namespace GitHooks.Handlers;
 
 /// <summary>
-/// Defines a handler for creating git hook files.
+/// Defines a handler for creating git hook scaffold files.
 /// </summary>
 public interface ICreateHookHandler
 {
     /// <summary>
-    /// Creates git hook files in the configured hooks directory.
+    /// Creates git hook scaffold files in the configured hooks directory.
     /// </summary>
     /// <param name="scope">The git configuration scope used for repository validation.</param>
-    /// <param name="hooksPath">The directory where hook files should be created.</param>
+    /// <param name="hooksPath">The directory where hook scaffold files should be created.</param>
     /// <param name="hooks">The hook names to create.</param>
     /// <param name="force">A value indicating whether existing files should be overwritten.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
