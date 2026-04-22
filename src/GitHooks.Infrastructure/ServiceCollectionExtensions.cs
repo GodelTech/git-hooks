@@ -1,3 +1,4 @@
+using GitHooks.Infrastructure.Cli;
 using GitHooks.Infrastructure.Git;
 using GitHooks.Infrastructure.Hooks;
 using GitHooks.Infrastructure.Scaffold;

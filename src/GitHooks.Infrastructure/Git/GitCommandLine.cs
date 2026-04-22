@@ -1,3 +1,5 @@
+using GitHooks.Infrastructure.Cli;
+
 namespace GitHooks.Infrastructure.Git;
 
 /// <summary>

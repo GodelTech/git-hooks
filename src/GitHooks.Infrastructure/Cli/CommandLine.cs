@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace GitHooks.Infrastructure;
+namespace GitHooks.Infrastructure.Cli;
 
 /// <summary>
 /// Default implementation of <see cref="ICommandLine"/> that runs external processes.

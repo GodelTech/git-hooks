@@ -1,4 +1,4 @@
-namespace GitHooks.Infrastructure;
+namespace GitHooks.Infrastructure.Cli;
 
 /// <summary>
 /// Represents the result of a command-line process execution.

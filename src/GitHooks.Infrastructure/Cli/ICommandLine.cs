@@ -1,4 +1,4 @@
-namespace GitHooks.Infrastructure;
+namespace GitHooks.Infrastructure.Cli;
 
 /// <summary>
 /// Defines a generic command-line process.
