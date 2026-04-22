@@ -38,6 +38,9 @@ public sealed class GitHookCatalog : IGitHookCatalog
         new("post-index-change",  GitHookCategory.Checkout, "Runs after the staging area (index) is written to disk. Informational; cannot abort.",             CanAbort: false),
     ];
 
+    // Precomputed lookup for fast hook-name validation and metadata resolution.
+    private static readonly Dictionary<string, GitHook> _hooksByName = _all.ToDictionary(hook => hook.Name, StringComparer.Ordinal);
+
     /// <summary>
     /// A shared singleton instance for use outside of dependency injection containers.
     /// </summary>
@@ -83,5 +86,26 @@ public sealed class GitHookCatalog : IGitHookCatalog
     public IReadOnlyCollection<GitHook> GetCheckoutHooks()
     {
         return GetHooks(GitHookCategory.Checkout);
+    }
+
+    /// <inheritdoc/>
+    public GitHookResolutionResult ResolveHooks(IReadOnlyCollection<string> hooks)
+    {
+        var normalizedHooks = hooks
+            .Select(hook => hook.Trim().ToLowerInvariant())
+            .Where(hook => !string.IsNullOrWhiteSpace(hook))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+
+        var supportedHooks = normalizedHooks
+            .Where(_hooksByName.ContainsKey)
+            .Select(hook => _hooksByName[hook])
+            .ToArray();
+
+        var invalidHooks = normalizedHooks
+            .Where(hook => !_hooksByName.ContainsKey(hook))
+            .ToArray();
+
+        return new GitHookResolutionResult(supportedHooks, invalidHooks);
     }
 }

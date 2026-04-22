@@ -62,4 +62,14 @@ public interface IGitHookCatalog
     /// </summary>
     /// <returns><c>post-checkout</c>, <c>post-index-change</c>.</returns>
     public IReadOnlyCollection<GitHook> GetCheckoutHooks();
+
+    /// <summary>
+    /// Resolves hook names provided by a caller into known hooks and invalid names.
+    /// </summary>
+    /// <param name="hooks">Raw hook names from user input or configuration.</param>
+    /// <returns>
+    /// A <see cref="GitHookResolutionResult"/> that separates normalized supported hooks
+    /// as <see cref="GitHook"/> models from normalized unsupported hook names.
+    /// </returns>
+    public GitHookResolutionResult ResolveHooks(IReadOnlyCollection<string> hooks);
 }

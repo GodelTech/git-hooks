@@ -51,22 +51,32 @@ public sealed class CreateHookHandler(
             return 1;
         }
 
-        var normalizedHooks = NormalizeHooks(hooks);
-        var supportedHookNames = _gitHookCatalog.GetAllHooks().Select(h => h.Name).ToHashSet(StringComparer.Ordinal);
-        var invalidHooks = normalizedHooks.Where(hook => !supportedHookNames.Contains(hook)).ToArray();
+        var hookValidationResult = _gitHookCatalog.ResolveHooks(hooks);
 
-        if (invalidHooks.Length > 0)
+        if (!hookValidationResult.IsValid)
         {
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Unsupported hook name(s): [blue]{string.Join(", ", invalidHooks)}[/].");
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Unsupported hook name(s): [blue]{string.Join(", ", hookValidationResult.InvalidHooks)}[/].");
             _console.MarkupLine("[yellow][[INFO]][/] Check the full list in [blue]docs/git-hooks-reference.md[/].");
             return 1;
         }
 
-        var creationResult = await _hookFileManager.CreateHookFilesAsync(repositoryRootPath, hooksPath, normalizedHooks, force, cancellationToken);
+        var creationResult = await _hookFileManager.CreateHookFilesAsync(
+            repositoryRootPath,
+            hooksPath,
+            hookValidationResult.SupportedHooks,
+            force,
+            cancellationToken
+        );
 
         if (!creationResult.IsSuccess)
         {
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] {creationResult.Error}");
+
+            if (!force)
+            {
+                _console.MarkupLine("[yellow][[INFO]][/] Use [blue]--force[/] to overwrite existing files.");
+            }
+
             return 1;
         }
 
@@ -74,13 +84,5 @@ public sealed class CreateHookHandler(
         _console.MarkupLineInterpolated($"[green][[OK]][/] Hooks: [blue]{string.Join(", ", creationResult.CreatedHooks)}[/]");
 
         return 0;
-    }
-
-    private static string[] NormalizeHooks(IReadOnlyCollection<string> hooks)
-    {
-        return [.. hooks
-            .Select(hook => hook.Trim().ToLowerInvariant())
-            .Where(hook => !string.IsNullOrWhiteSpace(hook))
-            .Distinct(StringComparer.Ordinal)];
     }
 }
