@@ -1,4 +1,4 @@
-﻿namespace GitHooks.Tests;
+namespace GitHooks.Tests;
 
 public class UnitTest1
 {

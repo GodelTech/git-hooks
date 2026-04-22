@@ -1,4 +1,4 @@
-﻿namespace GitHooks.Infrastructure;
+namespace GitHooks.Infrastructure;
 
 /// <summary>
 /// Specifies the git configuration scope for reading and writing settings.

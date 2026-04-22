@@ -1,4 +1,4 @@
-﻿namespace GitHooks.Infrastructure;
+namespace GitHooks.Infrastructure;
 
 /// <summary>
 /// Defines file-system operations for creating git hook files.

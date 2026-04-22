@@ -1,4 +1,4 @@
-﻿namespace GitHooks.Infrastructure;
+namespace GitHooks.Infrastructure;
 
 /// <summary>
 /// Represents the result of creating hook files.

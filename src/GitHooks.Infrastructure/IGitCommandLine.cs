@@ -1,4 +1,4 @@
-﻿namespace GitHooks.Infrastructure;
+namespace GitHooks.Infrastructure;
 
 /// <summary>
 /// Defines a command-line wrapper for Git operations.

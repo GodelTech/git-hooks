@@ -1,7 +1,7 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 
-using GitHooks.Infrastructure;
 using GitHooks.Handlers;
+using GitHooks.Infrastructure;
 
 namespace GitHooks.Commands;
 

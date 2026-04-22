@@ -1,4 +1,4 @@
-﻿namespace GitHooks.Infrastructure;
+namespace GitHooks.Infrastructure;
 
 /// <summary>
 /// Extension methods for <see cref="GitConfigScope"/>.

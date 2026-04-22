@@ -1,4 +1,4 @@
-﻿using GitHooks.Infrastructure;
+using GitHooks.Infrastructure;
 
 namespace GitHooks;
 
