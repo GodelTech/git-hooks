@@ -7,7 +7,7 @@ using Spectre.Console;
 namespace GitHooks.Commands;
 
 /// <summary>
-/// Command to read and display a hook YAML file with repository path context.
+/// Command to parse and validate a hook YAML file with repository path context.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="RunCommand"/> class.
@@ -16,7 +16,7 @@ namespace GitHooks.Commands;
 /// <param name="console">The console used for command-level validation output.</param>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1010:Collections should implement generic interface", Justification = "Inherited from System.CommandLine.Command base class")]
 public sealed class RunCommand(IRunHandler runHandler, IAnsiConsole console)
-    : CommandBase("run", "Read a hook YAML file and display repository path details.")
+    : CommandBase("run", "Parse and validate a hook YAML file and display repository path details.")
 {
     private readonly IRunHandler _runHandler = runHandler;
     private readonly IAnsiConsole _console = console;

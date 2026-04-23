@@ -1,0 +1,41 @@
+parameters:
+  - name: enableBuildDebug
+    displayName: 'Enable build debug'
+    type: boolean
+    default: true
+
+  - name: vmImage
+    displayName: 'Pool VM image'
+    type: string
+    default: 'ubuntu-latest'
+    values:
+      - windows-latest
+      - ubuntu-latest
+      - macOS-latest
+
+  - name: organization
+    displayName: 'Azure DevOps organization'
+    type: string
+    default: 'godeltech'
+
+steps:
+  - task: message-body
+    name: CommitMessageBody
+    displayName: 'Set commit message'
+    enabled: true
+    continueOnError: false
+    inputs:
+      requireBlankLine: ${{ parameters.requireBodyBlankLine }}
+      maxLineLength: ${{ parameters.bodyMaxLineLength }}
+
+  - task: Bash@3
+    displayName: 'Set version meters'
+    inputs:
+      targetType: 'inline'
+      script: |
+        echo "##vso[task.setvariable variable=commitFormat]%s%n%b"
+
+  - pwsh: |
+      Write-Host "Commt message"
+      Write-Host "##vso[task.setvariable variable=commitFormat]$($env:commitFormat)"
+    displayName: 'Set version meters (PowerShell)'

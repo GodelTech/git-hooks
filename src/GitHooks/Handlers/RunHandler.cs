@@ -1,4 +1,5 @@
 using GitHooks.Infrastructure.Git;
+using GitHooks.Pipelines;
 
 using Spectre.Console;
 
@@ -9,9 +10,11 @@ namespace GitHooks.Handlers;
 /// </summary>
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
+    IYamlPipelineParser yamlPipelineParser,
     IAnsiConsole console) : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
+    private readonly IYamlPipelineParser _yamlPipelineParser = yamlPipelineParser;
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
@@ -68,11 +71,24 @@ public sealed class RunHandler(
             return 1;
         }
 
+        var parseResult = _yamlPipelineParser.Parse(yamlContent);
+
+        if (!parseResult.IsSuccess || parseResult.Pipeline is null)
+        {
+            _console.MarkupLine("[red][[ERROR]][/] YAML validation failed.");
+            foreach (var diagnostic in parseResult.Diagnostics)
+            {
+                _console.MarkupLineInterpolated($"[red]- {Markup.Escape(diagnostic.Path)}[/]: {Markup.Escape(diagnostic.Message)}");
+            }
+
+            return 1;
+        }
+
         _console.MarkupLineInterpolated($"[green][[OK]][/] Started from: [blue]{Markup.Escape(startupWorkingDirectory)}[/]");
         _console.MarkupLineInterpolated($"[green][[OK]][/] Repository root: [blue]{Markup.Escape(repositoryRootPath)}[/]");
         _console.MarkupLineInterpolated($"[green][[OK]][/] YAML relative path: [blue]{Markup.Escape(relativeFilePath)}[/]");
-        _console.MarkupLine("[green][[OK]][/] YAML content:");
-        _console.WriteLine(yamlContent);
+        _console.MarkupLineInterpolated($"[green][[OK]][/] Parsed [blue]{parseResult.Pipeline.Parameters.Count}[/] parameter(s) and [blue]{parseResult.Pipeline.Steps.Count}[/] step(s).");
+        _console.MarkupLine("[green][[OK]][/] YAML validation passed.");
 
         return 0;
     }

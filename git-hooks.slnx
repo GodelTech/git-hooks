@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/GitHooks.Infrastructure/GitHooks.Infrastructure.csproj" Id="f3c7d8d3-8e11-4208-b80c-0310bde43317" />
+    <Project Path="src/GitHooks.Pipelines/GitHooks.Pipelines.csproj" Id="96afd68d-588e-4d21-bda8-f4ce16f3a370" />
     <Project Path="src/GitHooks.Templates/GitHooks.Templates.csproj" Id="ee3c1915-89aa-4acc-810b-3a3c95339015" />
     <Project Path="src/GitHooks/GitHooks.csproj" />
   </Folder>
