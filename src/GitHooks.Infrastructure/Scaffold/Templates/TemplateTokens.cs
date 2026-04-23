@@ -1,4 +1,4 @@
-namespace GitHooks.Infrastructure.Scaffold;
+namespace GitHooks.Infrastructure.Scaffold.Templates;
 
 /// <summary>
 /// Placeholder token constants used in hook scaffold templates.

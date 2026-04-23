@@ -1,4 +1,4 @@
-namespace GitHooks.Infrastructure.Templates;
+namespace GitHooks.Templates;
 
 /// <summary>
 /// Provides template content to consumers.

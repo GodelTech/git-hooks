@@ -1,4 +1,4 @@
-namespace GitHooks.Infrastructure.Templates;
+namespace GitHooks.Templates;
 
 /// <summary>
 /// Base implementation of <see cref="ITemplateProvider"/> that loads template text from an embedded resource.
@@ -37,7 +37,7 @@ public abstract class EmbeddedTemplateProviderBase : ITemplateProvider
     /// </exception>
     protected string LoadEmbeddedResource()
     {
-        var assembly = typeof(EmbeddedTemplateProviderBase).Assembly;
+        var assembly = GetType().Assembly;
 
         using var stream = assembly.GetManifestResourceStream(_resourceName)
             ?? throw new InvalidOperationException(

@@ -1,6 +1,4 @@
-using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 
 using GitHooks.Infrastructure.Hooks;
 using GitHooks.Infrastructure.Scaffold.Templates;
@@ -12,18 +10,10 @@ namespace GitHooks.Infrastructure.Scaffold;
 /// </summary>
 /// <param name="bashTemplateProvider">The provider used to load raw Bash hook scaffold templates.</param>
 /// <param name="yamlTemplateProvider">The provider used to load raw YAML hook scaffold templates.</param>
-public sealed partial class GitHookScaffolder(
+public sealed class GitHookScaffolder(
     IBashTemplateProvider bashTemplateProvider,
     IYamlTemplateProvider yamlTemplateProvider) : IGitHookScaffolder
 {
-    // Resolved once at startup from the infrastructure assembly's informational version attribute.
-    // Falls back to the assembly version string, then "unknown" if neither is available.
-    private static readonly string _toolVersion =
-        typeof(GitHookScaffolder).Assembly
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-        ?? typeof(GitHookScaffolder).Assembly.GetName().Version?.ToString()
-        ?? "unknown";
-
     private readonly IBashTemplateProvider _bashTemplateProvider = bashTemplateProvider;
     private readonly IYamlTemplateProvider _yamlTemplateProvider = yamlTemplateProvider;
 
@@ -66,11 +56,8 @@ public sealed partial class GitHookScaffolder(
                     return GitHookScaffoldResult.Failure($"Scaffold file already exists: {yamlFilePath}.");
                 }
 
-                // ApplyScriptTokens receives the original (relative) hooksPath so the generated
-                // bash script's --file argument stays relative to the repository root, which is
-                // the working directory when Git invokes the hook.
-                await File.WriteAllTextAsync(hookFilePath, ApplyScriptTokens(scriptTemplate, hooksPath, hook), new UTF8Encoding(false), cancellationToken);
-                await File.WriteAllTextAsync(yamlFilePath, ApplyYamlTokens(yamlTemplate, hook), new UTF8Encoding(false), cancellationToken);
+                await File.WriteAllTextAsync(hookFilePath, _bashTemplateProvider.ApplyTokens(scriptTemplate, hooksPath, hook), new UTF8Encoding(false), cancellationToken);
+                await File.WriteAllTextAsync(yamlFilePath, _yamlTemplateProvider.ApplyTokens(yamlTemplate, hook), new UTF8Encoding(false), cancellationToken);
                 createdHooks.Add(hook);
             }
 
@@ -91,55 +78,4 @@ public sealed partial class GitHookScaffolder(
             return GitHookScaffoldResult.Failure($"Failed to create hook scaffold files: {ex.Message}");
         }
     }
-
-    /// <summary>
-    /// Applies bash script tokens to the raw template and validates that no placeholder is left unresolved.
-    /// </summary>
-    private static string ApplyScriptTokens(string template, string hooksPath, GitHook hook)
-    {
-        var result = template
-            .Replace(TemplateTokens.HookName, hook.Name)
-            .Replace(TemplateTokens.HookDescription, hook.Description)
-            .Replace(TemplateTokens.HooksPath, hooksPath)
-            .Replace(TemplateTokens.Version, _toolVersion);
-
-        ValidateNoUnresolvedTokens(result);
-
-        return result;
-    }
-
-    /// <summary>
-    /// Applies YAML tokens to the raw template and validates that no placeholder is left unresolved.
-    /// </summary>
-    private static string ApplyYamlTokens(string template, GitHook hook)
-    {
-        var result = template
-            .Replace(TemplateTokens.HookName, hook.Name)
-            .Replace(TemplateTokens.HookDescription, hook.Description)
-            .Replace(TemplateTokens.Version, _toolVersion);
-
-        ValidateNoUnresolvedTokens(result);
-
-        return result;
-    }
-
-    /// <summary>
-    /// Throws if the substituted content still contains any <c>{{TOKEN}}</c> placeholder,
-    /// indicating a token was defined in a template but not handled in code.
-    /// </summary>
-    private static void ValidateNoUnresolvedTokens(string content)
-    {
-        var match = UnresolvedTokenRegex().Match(content);
-
-        if (match.Success)
-        {
-            throw new InvalidOperationException(
-                $"Template token '{match.Value}' was not resolved. " +
-                "Ensure all tokens present in the template have a corresponding substitution.");
-        }
-    }
-
-    // Matches any remaining {{UPPER_SNAKE_CASE}} placeholder after token substitution.
-    [GeneratedRegex(@"\{\{[A-Z_]+\}\}")]
-    private static partial Regex UnresolvedTokenRegex();
 }

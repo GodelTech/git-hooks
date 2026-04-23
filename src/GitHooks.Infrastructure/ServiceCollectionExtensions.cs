@@ -27,7 +27,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
-    public static IServiceCollection AddGitHooksInfrastructure(this IServiceCollection services)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         _ = services.AddTransient<ICommandLine, CommandLine>();
         _ = services.AddTransient<IGitCommandLine, GitCommandLine>();
