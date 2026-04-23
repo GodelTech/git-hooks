@@ -14,4 +14,9 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Scaffold\Templates\hook.sh" />
+    <EmbeddedResource Include="Scaffold\Templates\hook.yaml" />
+  </ItemGroup>
+
 </Project>

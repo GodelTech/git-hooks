@@ -41,10 +41,10 @@ public sealed class CreateCommand(ICreateHookHandler createHookHandler)
             "--hooks"
         )
         {
-            Description = "Hook names to create (repeat option or pass comma-separated values).",
+            Description = $"Hook names to create (repeat option or pass comma-separated values). Default: {string.Join(", ", GitHooksDefaults.CreateHooks)}",
             AllowMultipleArgumentsPerToken = true,
             CustomParser = result => [.. result.Tokens.SelectMany(t => t.Value.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))],
-            DefaultValueFactory = _ => []
+            DefaultValueFactory = _ => [.. GitHooksDefaults.CreateHooks]
         };
 
         yield return new Option<bool>(
@@ -61,7 +61,13 @@ public sealed class CreateCommand(ICreateHookHandler createHookHandler)
     {
         var scope = parseResult.GetValue<GitConfigScope>("--scope");
         var hooksPath = parseResult.GetValue<string>("--hooks-path") ?? GitHooksDefaults.HooksPath;
-        var hooks = parseResult.GetValue<string[]>("--hooks") ?? [];
+        var hooks = parseResult.GetValue<string[]>("--hooks");
+
+        if (hooks is null || hooks.Length == 0)
+        {
+            hooks = [.. GitHooksDefaults.CreateHooks];
+        }
+
         var force = parseResult.GetValue<bool>("--force");
 
         return _createHookHandler.HandleAsync(scope, hooksPath, hooks, force, cancellationToken);

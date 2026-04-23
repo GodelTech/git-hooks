@@ -2,6 +2,7 @@ using GitHooks.Infrastructure.Cli;
 using GitHooks.Infrastructure.Git;
 using GitHooks.Infrastructure.Hooks;
 using GitHooks.Infrastructure.Scaffold;
+using GitHooks.Infrastructure.Scaffold.Templates;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +20,8 @@ public static class ServiceCollectionExtensions
     ///   <item><see cref="ICommandLine"/> → <see cref="CommandLine"/> (transient)</item>
     ///   <item><see cref="IGitCommandLine"/> → <see cref="GitCommandLine"/> (transient)</item>
     ///   <item><see cref="IGitHookCatalog"/> → <see cref="GitHookCatalog"/> (singleton)</item>
+    ///   <item><see cref="IBashTemplateProvider"/> → <see cref="BashTemplateProvider"/> (singleton)</item>
+    ///   <item><see cref="IYamlTemplateProvider"/> → <see cref="YamlTemplateProvider"/> (singleton)</item>
     ///   <item><see cref="IGitHookScaffolder"/> → <see cref="GitHookScaffolder"/> (transient)</item>
     /// </list>
     /// </summary>
@@ -29,6 +32,8 @@ public static class ServiceCollectionExtensions
         _ = services.AddTransient<ICommandLine, CommandLine>();
         _ = services.AddTransient<IGitCommandLine, GitCommandLine>();
         _ = services.AddSingleton<IGitHookCatalog, GitHookCatalog>();
+        _ = services.AddSingleton<IBashTemplateProvider, BashTemplateProvider>();
+        _ = services.AddSingleton<IYamlTemplateProvider, YamlTemplateProvider>();
         _ = services.AddTransient<IGitHookScaffolder, GitHookScaffolder>();
 
         return services;
