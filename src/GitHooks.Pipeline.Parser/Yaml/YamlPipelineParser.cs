@@ -1,11 +1,11 @@
 using GitHooks.Pipeline.Contracts;
-using GitHooks.Pipeline.Parser.Parsing.Yaml.Mapping;
-using GitHooks.Pipeline.Parser.Parsing.Yaml.Validation;
+using GitHooks.Pipeline.Parser.Yaml.Mapping;
+using GitHooks.Pipeline.Parser.Yaml.Validation;
 
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace GitHooks.Pipeline.Parser.Parsing.Yaml;
+namespace GitHooks.Pipeline.Parser.Yaml;
 
 /// <summary>
 /// Strict YAML parser for hook pipeline definitions.

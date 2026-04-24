@@ -1,6 +1,6 @@
 using YamlDotNet.Serialization;
 
-namespace GitHooks.Pipeline.Parser.Parsing.Yaml;
+namespace GitHooks.Pipeline.Parser.Yaml;
 
 internal sealed class PipelineYamlDto
 {

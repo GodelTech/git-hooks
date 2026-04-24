@@ -4,7 +4,7 @@ using YamlDotNet.Core;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 
-namespace GitHooks.Pipeline.Parser.Parsing.Yaml.Validation;
+namespace GitHooks.Pipeline.Parser.Yaml.Validation;
 
 /// <summary>
 /// Validates YAML text structure and deserializes it into the internal DTO model.

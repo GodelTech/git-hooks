@@ -1,5 +1,5 @@
 using GitHooks.Pipeline.Contracts;
-using GitHooks.Pipeline.Parser.Parsing.Yaml;
+using GitHooks.Pipeline.Parser.Yaml;
 
 using Microsoft.Extensions.DependencyInjection;
 
