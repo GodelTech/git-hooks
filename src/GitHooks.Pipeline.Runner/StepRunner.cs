@@ -57,11 +57,8 @@ public sealed class StepRunner(IAnsiConsole console) : IStepRunner
 
     private static string ResolveDisplayName(PipelineStep step, int stepNumber)
     {
-        if (!string.IsNullOrWhiteSpace(step.DisplayName))
-        {
-            return step.DisplayName;
-        }
-
-        return $"Step #{stepNumber}";
+        return !string.IsNullOrWhiteSpace(step.DisplayName)
+            ? step.DisplayName
+            : $"Step #{stepNumber}";
     }
 }
