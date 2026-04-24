@@ -1,4 +1,4 @@
-namespace GitHooks.Pipelines.Contracts;
+namespace GitHooks.Pipeline.Contracts;
 
 /// <summary>
 /// Represents a single parser or validation error with location information.

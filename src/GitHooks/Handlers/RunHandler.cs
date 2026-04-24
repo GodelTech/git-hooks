@@ -1,5 +1,5 @@
 using GitHooks.Infrastructure.Git;
-using GitHooks.Pipelines.Contracts;
+using GitHooks.Pipeline.Contracts;
 
 using Spectre.Console;
 
@@ -11,10 +11,12 @@ namespace GitHooks.Handlers;
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
     IYamlPipelineParser yamlPipelineParser,
+    IStepPreviewRunner stepPreviewRunner,
     IAnsiConsole console) : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
     private readonly IYamlPipelineParser _yamlPipelineParser = yamlPipelineParser;
+    private readonly IStepPreviewRunner _stepPreviewRunner = stepPreviewRunner;
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
@@ -89,7 +91,8 @@ public sealed class RunHandler(
         _console.MarkupLineInterpolated($"[green][[OK]][/] YAML relative path: [blue]{Markup.Escape(relativeFilePath)}[/]");
         _console.MarkupLineInterpolated($"[green][[OK]][/] Parsed [blue]{parseResult.Pipeline.Parameters.Count}[/] parameter(s) and [blue]{parseResult.Pipeline.Steps.Count}[/] step(s).");
         _console.MarkupLine("[green][[OK]][/] YAML validation passed.");
+        _console.MarkupLine("[green][[OK]][/] Running MVP preview mode (display only).");
 
-        return 0;
+        return await _stepPreviewRunner.PreviewAsync(parseResult.Pipeline, cancellationToken);
     }
 }

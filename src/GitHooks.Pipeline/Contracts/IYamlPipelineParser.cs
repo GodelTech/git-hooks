@@ -1,4 +1,4 @@
-namespace GitHooks.Pipelines.Contracts;
+namespace GitHooks.Pipeline.Contracts;
 
 /// <summary>
 /// Parses YAML pipeline definitions into strongly typed domain models.

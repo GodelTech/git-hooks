@@ -1,8 +1,8 @@
 using System.Globalization;
 
-using GitHooks.Pipelines.Domain;
+using GitHooks.Pipeline.Domain;
 
-namespace GitHooks.Pipelines.Parsing.Yaml.Mapping;
+namespace GitHooks.Pipeline.Parser.Parsing.Yaml.Mapping;
 
 /// <summary>
 /// Maps validated YAML DTOs to pipeline domain models.

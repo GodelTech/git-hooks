@@ -1,4 +1,4 @@
-namespace GitHooks.Pipelines.Domain;
+namespace GitHooks.Pipeline.Domain;
 
 /// <summary>
 /// Enumerates supported step kinds.

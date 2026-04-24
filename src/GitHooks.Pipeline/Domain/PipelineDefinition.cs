@@ -1,4 +1,4 @@
-namespace GitHooks.Pipelines.Domain;
+namespace GitHooks.Pipeline.Domain;
 
 /// <summary>
 /// Represents a fully parsed and validated hook pipeline.

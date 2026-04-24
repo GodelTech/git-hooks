@@ -1,6 +1,6 @@
-using GitHooks.Pipelines.Contracts;
+using GitHooks.Pipeline.Contracts;
 
-namespace GitHooks.Pipelines.Parsing.Yaml.Validation;
+namespace GitHooks.Pipeline.Parser.Parsing.Yaml.Validation;
 
 /// <summary>
 /// Validates semantic invariants of a deserialized pipeline YAML document.

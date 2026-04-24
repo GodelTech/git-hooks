@@ -1,6 +1,6 @@
-using GitHooks.Pipelines.Domain;
+using GitHooks.Pipeline.Domain;
 
-namespace GitHooks.Pipelines.Contracts;
+namespace GitHooks.Pipeline.Contracts;
 
 /// <summary>
 /// Represents the result of YAML pipeline parsing.
