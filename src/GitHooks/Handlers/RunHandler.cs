@@ -1,5 +1,5 @@
 using GitHooks.Infrastructure.Git;
-using GitHooks.Pipelines;
+using GitHooks.Pipelines.Contracts;
 
 using Spectre.Console;
 
@@ -76,9 +76,9 @@ public sealed class RunHandler(
         if (!parseResult.IsSuccess || parseResult.Pipeline is null)
         {
             _console.MarkupLine("[red][[ERROR]][/] YAML validation failed.");
-            foreach (var diagnostic in parseResult.Diagnostics)
+            foreach (var error in parseResult.Errors)
             {
-                _console.MarkupLineInterpolated($"[red]- {Markup.Escape(diagnostic.Path)}[/]: {Markup.Escape(diagnostic.Message)}");
+                _console.MarkupLineInterpolated($"{Markup.Escape(absoluteFilePath)}({error.Line},{error.Column}): [red]error[/]: {Markup.Escape(error.Message)}");
             }
 
             return 1;

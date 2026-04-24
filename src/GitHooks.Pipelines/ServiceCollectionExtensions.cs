@@ -1,3 +1,6 @@
+using GitHooks.Pipelines.Contracts;
+using GitHooks.Pipelines.Parsing.Yaml;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GitHooks.Pipelines;

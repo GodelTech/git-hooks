@@ -1,0 +1,7 @@
+parameters:
+  - name: version
+    type: string
+    displayName: Version Number
+    default: "1.0.0"
+
+# Missing steps section - should trigger semantic validation error
