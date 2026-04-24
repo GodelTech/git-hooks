@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
     public static IServiceCollection AddPipelineRunner(this IServiceCollection services)
     {
-        _ = services.AddTransient<IStepPreviewRunner, StepPreviewRunner>();
+        _ = services.AddTransient<IStepRunner, StepRunner>();
 
         return services;
     }

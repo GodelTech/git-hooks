@@ -11,12 +11,12 @@ namespace GitHooks.Handlers;
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
     IYamlPipelineParser yamlPipelineParser,
-    IStepPreviewRunner stepPreviewRunner,
+    IStepRunner stepRunner,
     IAnsiConsole console) : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
     private readonly IYamlPipelineParser _yamlPipelineParser = yamlPipelineParser;
-    private readonly IStepPreviewRunner _stepPreviewRunner = stepPreviewRunner;
+    private readonly IStepRunner _stepRunner = stepRunner;
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
@@ -93,6 +93,6 @@ public sealed class RunHandler(
         _console.MarkupLine("[green][[OK]][/] YAML validation passed.");
         _console.MarkupLine("[green][[OK]][/] Running MVP preview mode (display only).");
 
-        return await _stepPreviewRunner.PreviewAsync(parseResult.Pipeline, cancellationToken);
+        return await _stepRunner.RunAsync(parseResult.Pipeline, cancellationToken);
     }
 }

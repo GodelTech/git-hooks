@@ -8,12 +8,12 @@ namespace GitHooks.Pipeline.Runner;
 /// <summary>
 /// Displays pipeline steps for the MVP task runner flow.
 /// </summary>
-public sealed class StepPreviewRunner(IAnsiConsole console) : IStepPreviewRunner
+public sealed class StepRunner(IAnsiConsole console) : IStepRunner
 {
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
-    public Task<int> PreviewAsync(PipelineDefinition pipeline, CancellationToken cancellationToken = default)
+    public Task<int> RunAsync(PipelineDefinition pipeline, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(pipeline);
 
