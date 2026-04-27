@@ -1,3 +1,6 @@
+using GitHooks.Pipeline.Compilation;
+using GitHooks.Pipeline.Contracts;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GitHooks.Pipeline;
@@ -15,6 +18,8 @@ public static class ServiceCollectionExtensions
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
     public static IServiceCollection AddPipeline(this IServiceCollection services)
     {
+        _ = services.AddTransient<IPipelineCompiler, PipelineCompiler>();
+
         return services;
     }
 }

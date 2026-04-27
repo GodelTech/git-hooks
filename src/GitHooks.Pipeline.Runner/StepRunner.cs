@@ -13,21 +13,21 @@ public sealed class StepRunner(IAnsiConsole console) : IStepRunner
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
-    public Task<int> RunAsync(PipelineDefinition pipeline, CancellationToken cancellationToken = default)
+    public Task<int> RunAsync(PipelineExecutionPlan plan, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(pipeline);
+        ArgumentNullException.ThrowIfNull(plan);
 
         var shown = 0;
         var skipped = 0;
 
-        for (var index = 0; index < pipeline.Steps.Count; index++)
+        for (var index = 0; index < plan.Steps.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var step = pipeline.Steps[index];
-            var stepNumber = index + 1;
+            var step = plan.Steps[index];
+            var stepNumber = step.Order;
 
-            if (!IsEnabled(step.Enabled))
+            if (!step.Enabled)
             {
                 skipped++;
                 _console.MarkupLineInterpolated($"[yellow][[SKIP]][/] [[{stepNumber}]] [grey]Step #{stepNumber}[/] ({step.Kind})");
@@ -35,30 +35,19 @@ public sealed class StepRunner(IAnsiConsole console) : IStepRunner
             }
 
             shown++;
-            var displayName = ResolveDisplayName(step, stepNumber);
+            var displayName = ResolveDisplayName(step.DisplayName, stepNumber);
             _console.MarkupLineInterpolated($"[green][[STEP]][/] [[{stepNumber}]] [blue]{Markup.Escape(displayName)}[/] ({step.Kind})");
         }
 
-        _console.MarkupLineInterpolated($"[green][[OK]][/] Summary: total [blue]{pipeline.Steps.Count}[/], shown [blue]{shown}[/], skipped [blue]{skipped}[/].");
+        _console.MarkupLineInterpolated($"[green][[OK]][/] Summary: total [blue]{plan.Steps.Count}[/], shown [blue]{shown}[/], skipped [blue]{skipped}[/].");
 
         return Task.FromResult(0);
     }
 
-    private static bool IsEnabled(string? enabled)
+    private static string ResolveDisplayName(string? displayName, int stepNumber)
     {
-        return enabled switch
-        {
-            null => true,
-            _ when string.IsNullOrWhiteSpace(enabled) => true,
-            _ when bool.TryParse(enabled, out var value) => value,
-            _ => true,
-        };
-    }
-
-    private static string ResolveDisplayName(PipelineStep step, int stepNumber)
-    {
-        return !string.IsNullOrWhiteSpace(step.DisplayName)
-            ? step.DisplayName
+        return !string.IsNullOrWhiteSpace(displayName)
+            ? displayName
             : $"Step #{stepNumber}";
     }
 }
