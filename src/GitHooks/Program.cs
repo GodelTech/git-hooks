@@ -3,9 +3,6 @@ using System.CommandLine;
 using GitHooks.Commands;
 using GitHooks.Handlers;
 using GitHooks.Infrastructure;
-using GitHooks.Pipeline;
-using GitHooks.Pipeline.Parser;
-using GitHooks.Pipeline.Runner;
 using GitHooks.Templates;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -72,9 +69,6 @@ internal sealed class Program
         // add services:
         _ = services.AddTemplates();
         _ = services.AddInfrastructure();
-        _ = services.AddPipeline();
-        _ = services.AddPipelineParser();
-        _ = services.AddPipelineRunner();
 
         return services.BuildServiceProvider();
     }

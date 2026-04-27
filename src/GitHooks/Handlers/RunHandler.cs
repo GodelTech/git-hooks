@@ -1,31 +1,19 @@
 using GitHooks.Infrastructure.Git;
-using GitHooks.Pipeline.Contracts;
 
 using Spectre.Console;
 
 namespace GitHooks.Handlers;
 
-/// <summary>
-/// Default implementation of <see cref="IRunHandler"/>.
-/// </summary>
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
-    IYamlPipelineParser yamlPipelineParser,
-    IPipelineCompiler pipelineCompiler,
-    IStepRunner stepRunner,
     IAnsiConsole console) : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
-    private readonly IYamlPipelineParser _yamlPipelineParser = yamlPipelineParser;
-    private readonly IPipelineCompiler _pipelineCompiler = pipelineCompiler;
-    private readonly IStepRunner _stepRunner = stepRunner;
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
     public async Task<int> HandleAsync(string filePath, CancellationToken cancellationToken = default)
     {
-        var startupWorkingDirectory = Environment.CurrentDirectory;
-
         if (!await _gitCommandLine.IsAvailableAsync(cancellationToken))
         {
             _console.MarkupLine("[red][[ERROR]][/] Git not found in PATH. Install Git and retry.");
@@ -75,45 +63,6 @@ public sealed class RunHandler(
             return 1;
         }
 
-        var parseResult = _yamlPipelineParser.Parse(yamlContent);
-
-        if (!parseResult.IsSuccess || parseResult.Pipeline is null)
-        {
-            _console.MarkupLine("[red][[ERROR]][/] YAML validation failed.");
-            foreach (var error in parseResult.Errors)
-            {
-                _console.MarkupLineInterpolated($"{Markup.Escape(absoluteFilePath)}({error.Line},{error.Column}): [red]error[/]: {Markup.Escape(error.Message)}");
-            }
-
-            return 1;
-        }
-
-        var compileRequest = new CompileRequest(
-            Pipeline: parseResult.Pipeline,
-            QueueParameters: new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase),
-            SourcePath: absoluteFilePath);
-
-        var compileResult = _pipelineCompiler.Compile(compileRequest);
-
-        if (!compileResult.IsSuccess || compileResult.Plan is null)
-        {
-            _console.MarkupLine("[red][[ERROR]][/] Pipeline compilation failed.");
-            foreach (var error in compileResult.Errors)
-            {
-                _console.MarkupLineInterpolated($"{Markup.Escape(absoluteFilePath)}({error.Line},{error.Column}): [red]error[/]: {Markup.Escape(error.Message)}");
-            }
-
-            return 1;
-        }
-
-        _console.MarkupLineInterpolated($"[green][[OK]][/] Started from: [blue]{Markup.Escape(startupWorkingDirectory)}[/]");
-        _console.MarkupLineInterpolated($"[green][[OK]][/] Repository root: [blue]{Markup.Escape(repositoryRootPath)}[/]");
-        _console.MarkupLineInterpolated($"[green][[OK]][/] YAML relative path: [blue]{Markup.Escape(relativeFilePath)}[/]");
-        _console.MarkupLineInterpolated($"[green][[OK]][/] Parsed [blue]{parseResult.Pipeline.Parameters.Count}[/] parameter(s) and [blue]{parseResult.Pipeline.Steps.Count}[/] step(s).");
-        _console.MarkupLineInterpolated($"[green][[OK]][/] Compiled [blue]{compileResult.Plan.Parameters.Count}[/] parameter value(s) and [blue]{compileResult.Plan.Steps.Count}[/] executable step(s).");
-        _console.MarkupLine("[green][[OK]][/] YAML validation passed.");
-        _console.MarkupLine("[green][[OK]][/] Running steps.");
-
-        return await _stepRunner.RunAsync(compileResult.Plan, cancellationToken);
+        return await Task.FromResult(0);
     }
 }
