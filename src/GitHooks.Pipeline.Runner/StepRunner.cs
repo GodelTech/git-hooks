@@ -6,7 +6,7 @@ using Spectre.Console;
 namespace GitHooks.Pipeline.Runner;
 
 /// <summary>
-/// Displays pipeline steps for the MVP task runner flow.
+/// Displays pipeline steps for the task runner flow.
 /// </summary>
 public sealed class StepRunner(IAnsiConsole console) : IStepRunner
 {

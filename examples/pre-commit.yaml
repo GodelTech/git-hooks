@@ -29,7 +29,7 @@ steps:
       maxLineLength: ${{ parameters.bodyMaxLineLength }}
 
   - task: Bash@3
-    displayName: 'Set version meters'
+    displayName: ${{ parameters.organization }}
     inputs:
       targetType: 'inline'
       script: |

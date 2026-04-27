@@ -91,7 +91,7 @@ public sealed class RunHandler(
         _console.MarkupLineInterpolated($"[green][[OK]][/] YAML relative path: [blue]{Markup.Escape(relativeFilePath)}[/]");
         _console.MarkupLineInterpolated($"[green][[OK]][/] Parsed [blue]{parseResult.Pipeline.Parameters.Count}[/] parameter(s) and [blue]{parseResult.Pipeline.Steps.Count}[/] step(s).");
         _console.MarkupLine("[green][[OK]][/] YAML validation passed.");
-        _console.MarkupLine("[green][[OK]][/] Running MVP preview mode (display only).");
+        _console.MarkupLine("[green][[OK]][/] Running steps.");
 
         return await _stepRunner.RunAsync(parseResult.Pipeline, cancellationToken);
     }
