@@ -35,7 +35,7 @@
       "args": [
         "run",
         "--file",
-        "examples/pre-commit.yaml"
+        "examples/pipeline-minimal.yaml"
       ],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal"

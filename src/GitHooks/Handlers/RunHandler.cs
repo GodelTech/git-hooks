@@ -1,4 +1,8 @@
 using GitHooks.Infrastructure.Git;
+using GitHooks.Pipeline;
+using GitHooks.Pipeline.Execution;
+using GitHooks.Pipeline.Parsing;
+using GitHooks.Pipeline.Transformation;
 
 using Spectre.Console;
 
@@ -6,9 +10,15 @@ namespace GitHooks.Handlers;
 
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
+    IPipelineParser pipelineParser,
+    ITemplateExpander templateExpander,
+    IPipelineRunner pipelineRunner,
     IAnsiConsole console) : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
+    private readonly IPipelineParser _pipelineParser = pipelineParser;
+    private readonly ITemplateExpander _templateExpander = templateExpander;
+    private readonly IPipelineRunner _pipelineRunner = pipelineRunner;
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
@@ -50,7 +60,6 @@ public sealed class RunHandler(
             return 1;
         }
 
-        var relativeFilePath = Path.GetRelativePath(repositoryRootPath, absoluteFilePath);
         string yamlContent;
 
         try
@@ -63,6 +72,31 @@ public sealed class RunHandler(
             return 1;
         }
 
-        return await Task.FromResult(0);
+        try
+        {
+            // Stage 1: Parse YAML to typed AST.
+            var pipeline = _pipelineParser.Parse(yamlContent, absoluteFilePath);
+
+            // Stage 2: Expand template steps recursively.
+            var expanded = await _templateExpander.ExpandAsync(pipeline, absoluteFilePath, cancellationToken);
+
+            // Stage 3: Execute expanded script steps.
+            var result = await _pipelineRunner.RunAsync(expanded, cancellationToken);
+
+            if (!result.IsSuccess)
+            {
+                var failedStep = result.FailedStepIndex.HasValue ? $" at step {result.FailedStepIndex.Value}" : string.Empty;
+                _console.MarkupLineInterpolated($"[red][[ERROR]][/] Pipeline execution failed{failedStep}: {Markup.Escape(result.ErrorMessage ?? "Unknown error.")}");
+                return 1;
+            }
+
+            _console.MarkupLine("[green][[SUCCESS]][/] Pipeline completed successfully.");
+            return 0;
+        }
+        catch (PipelineException ex)
+        {
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {Markup.Escape(ex.Message)}");
+            return 1;
+        }
     }
 }
