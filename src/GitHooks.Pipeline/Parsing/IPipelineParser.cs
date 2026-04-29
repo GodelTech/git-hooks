@@ -1,4 +1,6 @@
-using GitHooks.Pipeline.Ast;
+using GitHooks.Pipeline.Domain.Model;
+
+using PipelineModel = GitHooks.Pipeline.Domain.Model.PipelineOld;
 
 namespace GitHooks.Pipeline.Parsing;
 
@@ -8,10 +10,10 @@ namespace GitHooks.Pipeline.Parsing;
 public interface IPipelineParser
 {
     /// <summary>
-    /// Parses YAML text into a <see cref="PipelineNode"/>.
+    /// Parses YAML text into a <see cref="PipelineModel"/>.
     /// </summary>
     /// <param name="yamlContent">The YAML content to parse.</param>
     /// <param name="sourceName">A source identifier for diagnostics (typically file path).</param>
     /// <returns>The parsed pipeline AST.</returns>
-    public PipelineNode Parse(string yamlContent, string sourceName);
+    public PipelineModel Parse(string yamlContent, string sourceName);
 }

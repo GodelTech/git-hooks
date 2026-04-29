@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+
+    <AssemblyName>GitHooks.Workflow.Application</AssemblyName>
+    <RootNamespace>GitHooks.Workflow.Application</RootNamespace>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GitHooks.Workflow.Domain\GitHooks.Workflow.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

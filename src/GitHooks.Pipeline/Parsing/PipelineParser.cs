@@ -1,4 +1,7 @@
-using GitHooks.Pipeline.Ast;
+using GitHooks.Pipeline.Domain;
+using GitHooks.Pipeline.Domain.Model;
+
+using PipelineModel = GitHooks.Pipeline.Domain.Model.PipelineOld;
 
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -14,9 +17,10 @@ public sealed class PipelineParser : IPipelineParser
 
     private Parser? _parser;
     private string _sourceName = string.Empty;
+    private int _nextStepId;
 
     /// <inheritdoc/>
-    public PipelineNode Parse(string yamlContent, string sourceName)
+    public PipelineModel Parse(string yamlContent, string sourceName)
     {
         if (string.IsNullOrWhiteSpace(yamlContent))
         {
@@ -32,12 +36,13 @@ public sealed class PipelineParser : IPipelineParser
         {
             _sourceName = sourceName;
             _parser = new Parser(new StringReader(yamlContent));
+            _nextStepId = 0;
 
             _ = Consume<StreamStart>();
             _ = Consume<DocumentStart>();
 
             var rootStart = Consume<MappingStart>().Start;
-            IReadOnlyList<StepNode>? steps = null;
+            IReadOnlyList<Step>? steps = null;
 
             while (!Accept<MappingEnd>())
             {
@@ -61,7 +66,7 @@ public sealed class PipelineParser : IPipelineParser
                 throw new PipelineException($"{_sourceName}: missing required root key 'steps'.");
             }
 
-            return new PipelineNode(rootStart, steps);
+            return new PipelineModel(ToSourceLocation(rootStart), steps);
         }
         catch (PipelineException)
         {
@@ -148,10 +153,10 @@ public sealed class PipelineParser : IPipelineParser
         }
     }
 
-    private List<StepNode> ParseSteps()
+    private List<Step> ParseSteps()
     {
         var sequenceStart = Consume<SequenceStart>().Start;
-        var steps = new List<StepNode>();
+        var steps = new List<Step>();
 
         while (!Accept<SequenceEnd>())
         {
@@ -168,10 +173,11 @@ public sealed class PipelineParser : IPipelineParser
         return steps;
     }
 
-    private StepNode ParseStep()
+    private Step ParseStep()
     {
         var mappingStart = Consume<MappingStart>();
         var parsedStep = new ParsedStep(null, null, new Dictionary<string, string>(StringComparer.Ordinal));
+        var location = ToSourceLocation(mappingStart.Start);
 
         while (!Accept<MappingEnd>())
         {
@@ -217,12 +223,12 @@ public sealed class PipelineParser : IPipelineParser
 
         if (parsedStep.Script is not null)
         {
-            return new ScriptStepNode(mappingStart.Start, parsedStep.Script);
+            return new ScriptStep(CreateStepId(), location, parsedStep.Script);
         }
 
         if (parsedStep.Template is not null)
         {
-            return new TemplateStepNode(mappingStart.Start, parsedStep.Template, parsedStep.Parameters);
+            return new TemplateStep(CreateStepId(), location, parsedStep.Template, parsedStep.Parameters);
         }
 
         throw new PipelineException($"{_sourceName}: step at line {mappingStart.Start.Line}, column {mappingStart.Start.Column} must contain either 'script'/'run' or 'template'.");
@@ -250,5 +256,18 @@ public sealed class PipelineParser : IPipelineParser
         {
             throw new InvalidOperationException("Parser is not initialized.");
         }
+    }
+
+    // The parser is the only place that knows YamlDotNet Mark; map it to a domain value object here.
+    private static SourceLocation ToSourceLocation(Mark mark)
+    {
+        return new SourceLocation(mark.Line, mark.Column);
+    }
+
+    private StepId CreateStepId()
+    {
+        // Keep parser-generated IDs stable and 1-based based on source order.
+        _nextStepId++;
+        return StepId.FromIndex(_nextStepId);
     }
 }

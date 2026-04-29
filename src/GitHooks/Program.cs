@@ -1,15 +1,16 @@
-using System.CommandLine;
-
 using GitHooks.Commands;
 using GitHooks.Handlers;
 using GitHooks.Infrastructure;
 using GitHooks.Pipeline;
 using GitHooks.Templates;
+using GitHooks.Workflow.Infrastructure.DependencyInjection;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using Spectre.Console;
+
+using System.CommandLine;
 
 namespace GitHooks;
 
@@ -71,6 +72,9 @@ internal sealed class Program
         _ = services.AddTemplates();
         _ = services.AddInfrastructure();
         _ = services.AddPipeline();
+
+        // add workflow
+        _ = services.AddYamlPipelineParsing();
 
         return services.BuildServiceProvider();
     }

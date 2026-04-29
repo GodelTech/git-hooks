@@ -1,4 +1,4 @@
-namespace GitHooks.Pipeline;
+namespace GitHooks.Pipeline.Domain;
 
 /// <summary>
 /// Represents an error that occurs while parsing, expanding, or executing a pipeline.

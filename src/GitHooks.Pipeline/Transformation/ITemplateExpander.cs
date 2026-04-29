@@ -1,4 +1,6 @@
-using GitHooks.Pipeline.Ast;
+using GitHooks.Pipeline.Domain.Model;
+
+using PipelineModel = GitHooks.Pipeline.Domain.Model.PipelineOld;
 
 namespace GitHooks.Pipeline.Transformation;
 
@@ -13,6 +15,6 @@ public interface ITemplateExpander
     /// <param name="pipeline">The pipeline AST to expand.</param>
     /// <param name="pipelineFilePath">The source file path used for relative template resolution.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>A new expanded pipeline AST.</returns>
-    public Task<PipelineNode> ExpandAsync(PipelineNode pipeline, string pipelineFilePath, CancellationToken cancellationToken = default);
+    /// <returns>A new expanded pipeline.</returns>
+    public Task<PipelineModel> ExpandAsync(PipelineModel pipeline, string pipelineFilePath, CancellationToken cancellationToken = default);
 }

@@ -1,7 +1,10 @@
 using System.Text.RegularExpressions;
 
-using GitHooks.Pipeline.Ast;
+using GitHooks.Pipeline.Domain;
+using GitHooks.Pipeline.Domain.Model;
 using GitHooks.Pipeline.Parsing;
+
+using PipelineModel = GitHooks.Pipeline.Domain.Model.PipelineOld;
 
 namespace GitHooks.Pipeline.Transformation;
 
@@ -13,7 +16,7 @@ public sealed partial class TemplateExpander(IPipelineParser pipelineParser) : I
     private readonly IPipelineParser _pipelineParser = pipelineParser;
 
     /// <inheritdoc/>
-    public async Task<PipelineNode> ExpandAsync(PipelineNode pipeline, string pipelineFilePath, CancellationToken cancellationToken = default)
+    public async Task<PipelineModel> ExpandAsync(PipelineModel pipeline, string pipelineFilePath, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(pipelineFilePath))
         {
@@ -24,28 +27,28 @@ public sealed partial class TemplateExpander(IPipelineParser pipelineParser) : I
         var expansionStack = new Stack<string>();
         var expandedSteps = await ExpandStepsAsync(pipeline.Steps, pipelineFilePath, currentScope, expansionStack, cancellationToken);
 
-        return new PipelineNode(pipeline.Start, expandedSteps);
+        return new PipelineModel(pipeline.Location, expandedSteps);
     }
 
-    private async Task<IReadOnlyList<StepNode>> ExpandStepsAsync(
-        IReadOnlyList<StepNode> steps,
+    private async Task<IReadOnlyList<Step>> ExpandStepsAsync(
+        IReadOnlyList<Step> steps,
         string currentFilePath,
         IReadOnlyDictionary<string, string> currentScope,
         Stack<string> expansionStack,
         CancellationToken cancellationToken)
     {
-        var expanded = new List<StepNode>();
+        var expanded = new List<Step>();
 
         foreach (var step in steps)
         {
             switch (step)
             {
-                case ScriptStepNode scriptStep:
+                case ScriptStep scriptStep:
                     var script = SubstituteParameters(scriptStep.Script, currentScope, currentFilePath);
-                    expanded.Add(new ScriptStepNode(scriptStep.Start, script));
+                    expanded.Add(new ScriptStep(scriptStep.Id, scriptStep.Location, script));
                     break;
 
-                case TemplateStepNode templateStep:
+                case TemplateStep templateStep:
                     var resolvedTemplatePath = ResolveTemplatePath(currentFilePath, templateStep.TemplatePath);
 
                     if (expansionStack.Contains(resolvedTemplatePath, StringComparer.OrdinalIgnoreCase))

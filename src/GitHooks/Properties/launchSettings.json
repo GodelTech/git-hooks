@@ -7,7 +7,7 @@
     },
     "run --file": {
       "commandName": "Project",
-      "commandLineArgs": "run --file examples/commit-msg.yaml",
+      "commandLineArgs": "run --file examples/simple.yaml",
       "workingDirectory": "$(SolutionDir)"
     },
     "uninstall": {

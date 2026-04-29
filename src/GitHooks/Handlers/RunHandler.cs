@@ -1,8 +1,10 @@
 using GitHooks.Infrastructure.Git;
-using GitHooks.Pipeline;
+using GitHooks.Pipeline.Domain;
 using GitHooks.Pipeline.Execution;
-using GitHooks.Pipeline.Parsing;
 using GitHooks.Pipeline.Transformation;
+
+using IPipelineParser = GitHooks.Workflow.Application.Parsing.IPipelineParser;
+using IPipelineParserOld = GitHooks.Pipeline.Parsing.IPipelineParser;
 
 using Spectre.Console;
 
@@ -11,12 +13,14 @@ namespace GitHooks.Handlers;
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
     IPipelineParser pipelineParser,
+    IPipelineParserOld pipelineParserOld,
     ITemplateExpander templateExpander,
     IPipelineRunner pipelineRunner,
     IAnsiConsole console) : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
     private readonly IPipelineParser _pipelineParser = pipelineParser;
+    private readonly IPipelineParserOld _pipelineParserOld = pipelineParserOld;
     private readonly ITemplateExpander _templateExpander = templateExpander;
     private readonly IPipelineRunner _pipelineRunner = pipelineRunner;
     private readonly IAnsiConsole _console = console;
@@ -72,10 +76,14 @@ public sealed class RunHandler(
             return 1;
         }
 
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
+        var a = _pipelineParser.Parse(yamlContent, absoluteFilePath);
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
+
         try
         {
             // Stage 1: Parse YAML to typed AST.
-            var pipeline = _pipelineParser.Parse(yamlContent, absoluteFilePath);
+            var pipeline = _pipelineParserOld.Parse(yamlContent, absoluteFilePath);
 
             // Stage 2: Expand template steps recursively.
             var expanded = await _templateExpander.ExpandAsync(pipeline, absoluteFilePath, cancellationToken);
@@ -85,7 +93,7 @@ public sealed class RunHandler(
 
             if (!result.IsSuccess)
             {
-                var failedStep = result.FailedStepIndex.HasValue ? $" at step {result.FailedStepIndex.Value}" : string.Empty;
+                var failedStep = result.FailedStepId.HasValue ? $" at step {result.FailedStepId.Value}" : string.Empty;
                 _console.MarkupLineInterpolated($"[red][[ERROR]][/] Pipeline execution failed{failedStep}: {Markup.Escape(result.ErrorMessage ?? "Unknown error.")}");
                 return 1;
             }

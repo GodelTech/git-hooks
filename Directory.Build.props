@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- TODO: enable XML doc -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <!-- CS1591: Missing XML doc comment -->
     <WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
   </PropertyGroup>

@@ -1,0 +1,6 @@
+steps:
+  - script: echo Hello 1
+  - script: echo Hello 2
+    displayName: Hello 2
+  - script: echo Hello 3
+    otherField: Other Field

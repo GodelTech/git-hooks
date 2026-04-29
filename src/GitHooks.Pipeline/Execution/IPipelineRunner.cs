@@ -1,4 +1,7 @@
-using GitHooks.Pipeline.Ast;
+using GitHooks.Pipeline.Domain.Execution;
+using GitHooks.Pipeline.Domain.Model;
+
+using PipelineModel = GitHooks.Pipeline.Domain.Model.PipelineOld;
 
 namespace GitHooks.Pipeline.Execution;
 
@@ -13,5 +16,5 @@ public interface IPipelineRunner
     /// <param name="pipeline">The expanded pipeline to execute.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A result describing the execution outcome.</returns>
-    public Task<PipelineRunResult> RunAsync(PipelineNode pipeline, CancellationToken cancellationToken = default);
+    public Task<PipelineResult> RunAsync(PipelineModel pipeline, CancellationToken cancellationToken = default);
 }

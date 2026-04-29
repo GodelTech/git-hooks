@@ -1,6 +1,9 @@
 using System.Diagnostics;
 
-using GitHooks.Pipeline.Ast;
+using GitHooks.Pipeline.Domain.Execution;
+using GitHooks.Pipeline.Domain.Model;
+
+using PipelineModel = GitHooks.Pipeline.Domain.Model.PipelineOld;
 
 namespace GitHooks.Pipeline.Execution;
 
@@ -10,13 +13,13 @@ namespace GitHooks.Pipeline.Execution;
 public sealed class PipelineRunner : IPipelineRunner
 {
     /// <inheritdoc/>
-    public async Task<PipelineRunResult> RunAsync(PipelineNode pipeline, CancellationToken cancellationToken = default)
+    public async Task<PipelineResult> RunAsync(PipelineModel pipeline, CancellationToken cancellationToken = default)
     {
         for (var i = 0; i < pipeline.Steps.Count; i++)
         {
-            if (pipeline.Steps[i] is not ScriptStepNode scriptStep)
+            if (pipeline.Steps[i] is not ScriptStep scriptStep)
             {
-                return PipelineRunResult.Failure(i + 1, $"Step type '{pipeline.Steps[i].GetType().Name}' is not executable.");
+                return PipelineResult.Failure(i + 1, $"Step type '{pipeline.Steps[i].GetType().Name}' is not executable.");
             }
 
             Console.WriteLine($"[PIPELINE] Step {i + 1}: {scriptStep.Script}");
@@ -24,7 +27,7 @@ public sealed class PipelineRunner : IPipelineRunner
 
             if (!result.IsSuccess)
             {
-                return PipelineRunResult.Failure(i + 1, result.ErrorMessage);
+                return PipelineResult.Failure(i + 1, result.ErrorMessage);
             }
 
             if (!string.IsNullOrWhiteSpace(result.Output))
@@ -33,7 +36,7 @@ public sealed class PipelineRunner : IPipelineRunner
             }
         }
 
-        return PipelineRunResult.Success();
+        return PipelineResult.Success();
     }
 
     private static async Task<ScriptExecutionResult> ExecuteScriptAsync(string script, CancellationToken cancellationToken)
