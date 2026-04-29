@@ -1,10 +1,6 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/GitHooks.Infrastructure/GitHooks.Infrastructure.csproj" Id="f3c7d8d3-8e11-4208-b80c-0310bde43317" />
-    <Project Path="src/GitHooks.Pipeline.Application/GitHooks.Pipeline.Application.csproj" Id="29e65b53-f5b9-4bb8-a121-53a2480cdd96" />
-    <Project Path="src/GitHooks.Pipeline.Domain/GitHooks.Pipeline.Domain.csproj" Id="92ea1283-1167-4ee3-970e-914bc90ab648" />
-    <Project Path="src/GitHooks.Pipeline.Infrastructure/GitHooks.Pipeline.Infrastructure.csproj" Id="6a47f54b-12f7-48f1-bf07-59565857ea80" />
-    <Project Path="src/GitHooks.Pipeline/GitHooks.Pipeline.csproj" Id="62c545ab-521b-4790-b335-3e0e9083eded" />
     <Project Path="src/GitHooks.Templates/GitHooks.Templates.csproj" Id="ee3c1915-89aa-4acc-810b-3a3c95339015" />
     <Project Path="src/GitHooks.Workflow.Application/GitHooks.Workflow.Application.csproj" Id="02572336-2177-4566-9e57-a650807237a3" />
     <Project Path="src/GitHooks.Workflow.Domain/GitHooks.Workflow.Domain.csproj" Id="89bfbc67-dc5e-4ed6-bf71-1678aad19362" />

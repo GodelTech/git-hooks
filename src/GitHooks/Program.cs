@@ -1,7 +1,6 @@
 using GitHooks.Commands;
 using GitHooks.Handlers;
 using GitHooks.Infrastructure;
-using GitHooks.Pipeline;
 using GitHooks.Templates;
 using GitHooks.Workflow.Infrastructure.DependencyInjection;
 
@@ -71,7 +70,6 @@ internal sealed class Program
         // add services:
         _ = services.AddTemplates();
         _ = services.AddInfrastructure();
-        _ = services.AddPipeline();
 
         // add workflow
         _ = services.AddYamlPipelineParsing();

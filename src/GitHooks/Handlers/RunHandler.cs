@@ -1,10 +1,5 @@
 using GitHooks.Infrastructure.Git;
-using GitHooks.Pipeline.Domain;
-using GitHooks.Pipeline.Execution;
-using GitHooks.Pipeline.Transformation;
-
-using IPipelineParser = GitHooks.Workflow.Application.Parsing.IPipelineParser;
-using IPipelineParserOld = GitHooks.Pipeline.Parsing.IPipelineParser;
+using GitHooks.Workflow.Application.Parsing;
 
 using Spectre.Console;
 
@@ -13,16 +8,10 @@ namespace GitHooks.Handlers;
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
     IPipelineParser pipelineParser,
-    IPipelineParserOld pipelineParserOld,
-    ITemplateExpander templateExpander,
-    IPipelineRunner pipelineRunner,
     IAnsiConsole console) : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
     private readonly IPipelineParser _pipelineParser = pipelineParser;
-    private readonly IPipelineParserOld _pipelineParserOld = pipelineParserOld;
-    private readonly ITemplateExpander _templateExpander = templateExpander;
-    private readonly IPipelineRunner _pipelineRunner = pipelineRunner;
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
@@ -80,31 +69,33 @@ public sealed class RunHandler(
         var a = _pipelineParser.Parse(yamlContent, absoluteFilePath);
 #pragma warning restore IDE0059 // Unnecessary assignment of a value
 
-        try
-        {
-            // Stage 1: Parse YAML to typed AST.
-            var pipeline = _pipelineParserOld.Parse(yamlContent, absoluteFilePath);
+        //try
+        //{
+        //    // Stage 1: Parse YAML to typed AST.
+        //    var pipeline = _pipelineParserOld.Parse(yamlContent, absoluteFilePath);
 
-            // Stage 2: Expand template steps recursively.
-            var expanded = await _templateExpander.ExpandAsync(pipeline, absoluteFilePath, cancellationToken);
+        //    // Stage 2: Expand template steps recursively.
+        //    var expanded = await _templateExpander.ExpandAsync(pipeline, absoluteFilePath, cancellationToken);
 
-            // Stage 3: Execute expanded script steps.
-            var result = await _pipelineRunner.RunAsync(expanded, cancellationToken);
+        //    // Stage 3: Execute expanded script steps.
+        //    var result = await _pipelineRunner.RunAsync(expanded, cancellationToken);
 
-            if (!result.IsSuccess)
-            {
-                var failedStep = result.FailedStepId.HasValue ? $" at step {result.FailedStepId.Value}" : string.Empty;
-                _console.MarkupLineInterpolated($"[red][[ERROR]][/] Pipeline execution failed{failedStep}: {Markup.Escape(result.ErrorMessage ?? "Unknown error.")}");
-                return 1;
-            }
+        //    if (!result.IsSuccess)
+        //    {
+        //        var failedStep = result.FailedStepId.HasValue ? $" at step {result.FailedStepId.Value}" : string.Empty;
+        //        _console.MarkupLineInterpolated($"[red][[ERROR]][/] Pipeline execution failed{failedStep}: {Markup.Escape(result.ErrorMessage ?? "Unknown error.")}");
+        //        return 1;
+        //    }
 
-            _console.MarkupLine("[green][[SUCCESS]][/] Pipeline completed successfully.");
-            return 0;
-        }
-        catch (PipelineException ex)
-        {
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {Markup.Escape(ex.Message)}");
-            return 1;
-        }
+        //    _console.MarkupLine("[green][[SUCCESS]][/] Pipeline completed successfully.");
+        //    return 0;
+        //}
+        //catch (PipelineException ex)
+        //{
+        //    _console.MarkupLineInterpolated($"[red][[ERROR]][/] {Markup.Escape(ex.Message)}");
+        //    return 1;
+        //}
+
+        return 0;
     }
 }
