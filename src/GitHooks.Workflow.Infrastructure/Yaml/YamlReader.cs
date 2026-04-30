@@ -10,21 +10,14 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
     private readonly Parser _parser = parser;
     private readonly SourceRef _source = source;
 
-    public SourceSpan CurrentSpan()
+    public static YamlReader Create(string yaml, string sourceName)
     {
-        var mark = _parser.Current?.Start;
-
-        return mark is null
-            ? SourceSpan.Unknown(_source) :
-            (mark.Value, mark.Value).ToSourceSpan(_source);
+        return new(
+            new Parser(new StringReader(yaml)),
+            new SourceRef(sourceName)
+        );
     }
 
-    public SourceSpan SpanOf(ParsingEvent start, ParsingEvent end)
-    {
-        return (start.Start, end.End).ToSourceSpan(_source);
-    }
-
-    /// <summary>Consume and return the next event of type T; throws if not present.</summary>
     public T Read<T>() where T : ParsingEvent
     {
         return !_parser.TryConsume<T>(out var evt)
@@ -32,7 +25,6 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
             : evt;
     }
 
-    /// <summary>Consume the next event of type T; throws if not present.</summary>
     public void Require<T>() where T : ParsingEvent
     {
         if (!_parser.TryConsume<T>(out _))
@@ -89,8 +81,34 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
             return;
         }
 
-        // fallback (unknown token)
-        _ = _parser.TryConsume<ParsingEvent>(out _);
+        // unknown token
+        if (!_parser.TryConsume<ParsingEvent>(out _))
+        {
+            throw Error("Unexpected token while skipping node");
+        }
+    }
+
+    public SourceSpan CurrentSpan()
+    {
+        var mark = _parser.Current?.Start;
+
+        return mark is null
+            ? SourceSpan.Unknown(_source) :
+            SpanOf(mark.Value, mark.Value);
+    }
+
+    public SourceSpan SpanOf(ParsingEvent start, ParsingEvent end)
+    {
+        return SpanOf(start.Start, end.End);
+    }
+
+    private SourceSpan SpanOf(Mark start, Mark end)
+    {
+        return new SourceSpan(
+            _source,
+            new SourceLocation(start.Line, start.Column),
+            new SourceLocation(end.Line, end.Column)
+        );
     }
 
     private YamlParseException Error(string message)
