@@ -10,5 +10,6 @@
   <Folder Name="/test/">
     <Project Path="test/GitHooks.Tests/GitHooks.Tests.csproj" Id="b3138dc6-0147-4d0f-b1ae-a14b1ca2e984" />
     <Project Path="test/GitHooks.Workflow.Domain.Tests/GitHooks.Workflow.Domain.Tests.csproj" Id="084e88d3-9597-445f-9fbc-f5351b4fc36d" />
+    <Project Path="test/GitHooks.Workflow.Infrastructure.Tests/GitHooks.Workflow.Infrastructure.Tests.csproj" Id="ceb0babf-703d-4894-87f2-340b5f788c08" />
   </Folder>
 </Solution>
