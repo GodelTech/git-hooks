@@ -51,13 +51,13 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
     public void SkipNode()
     {
         // scalar (fast path)
-        if (_parser.TryConsume<Scalar>(out _))
+        if (TryConsumeSafe<Scalar>(out _))
         {
             return;
         }
 
         // mapping
-        if (_parser.TryConsume<MappingStart>(out _))
+        if (TryConsumeSafe<MappingStart>(out _))
         {
             while (!_parser.Accept<MappingEnd>(out _))
             {
@@ -70,7 +70,7 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
         }
 
         // sequence
-        if (_parser.TryConsume<SequenceStart>(out _))
+        if (TryConsumeSafe<SequenceStart>(out _))
         {
             while (!_parser.Accept<SequenceEnd>(out _))
             {
@@ -82,9 +82,29 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
         }
 
         // unknown token
-        if (!_parser.TryConsume<ParsingEvent>(out _))
+        if (!TryConsumeSafe<ParsingEvent>(out _))
         {
             throw Error("Unexpected token while skipping node");
+        }
+    }
+
+    private bool TryConsumeSafe<T>(out T evt) where T : ParsingEvent
+    {
+        try
+        {
+            if (_parser.TryConsume<T>(out var consumed))
+            {
+                evt = consumed;
+                return true;
+            }
+
+            evt = default!;
+            return false;
+        }
+        catch (EndOfStreamException)
+        {
+            evt = default!;
+            return false;
         }
     }
 
