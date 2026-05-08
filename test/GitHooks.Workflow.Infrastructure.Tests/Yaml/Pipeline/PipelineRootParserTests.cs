@@ -15,18 +15,15 @@ public class PipelineRootParserTests
     [Fact]
     public void Parse_WithoutSteps_ThrowsYamlParseException()
     {
-        // Arrange & Act
-        static void action()
-        {
-            ParseRoot(
+        // Arrange & Act & Assert
+        var exception = Assert.Throws<YamlParseException>(
+            () => ParseRoot(
                 """
                 name: ci
                 """
-            );
-        }
+            )
+        );
 
-        // Assert
-        var exception = Assert.Throws<YamlParseException>(action);
         Assert.Equal("Pipeline must contain 'steps'", exception.Message);
     }
 

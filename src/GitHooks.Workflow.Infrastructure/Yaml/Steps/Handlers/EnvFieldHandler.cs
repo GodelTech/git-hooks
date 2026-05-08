@@ -9,6 +9,9 @@ internal sealed class EnvFieldHandler(InterpolationParser parser)
 
     public override StepFields Apply(YamlReader reader, StepFields fields)
     {
-        return fields with { Env = ReadMap(reader) };
+        return fields with
+        {
+            Env = ReadMap(reader)
+        };
     }
 }

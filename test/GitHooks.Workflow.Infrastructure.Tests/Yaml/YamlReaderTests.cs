@@ -41,10 +41,9 @@ public class YamlReaderTests
         // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
-        // Act
+        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(reader.Read<MappingStart>);
 
-        // Assert
         Assert.Equal("Expected MappingStart, got StreamStart", exception.Message);
         Assert.Equal(new SourceRef("pipeline.yml"), exception.Span.Source);
     }
@@ -80,10 +79,9 @@ public class YamlReaderTests
         // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
-        // Act
+        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(reader.Require<MappingStart>);
 
-        // Assert
         Assert.Equal("Expected MappingStart, got StreamStart", exception.Message);
         Assert.Equal(new SourceRef("pipeline.yml"), exception.Span.Source);
     }
@@ -150,10 +148,9 @@ public class YamlReaderTests
         // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
-        // Act
+        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(reader.Peek<MappingStart>);
 
-        // Assert
         Assert.Equal("Expected MappingStart, got StreamStart", exception.Message);
         Assert.Equal(new SourceRef("pipeline.yml"), exception.Span.Source);
     }
@@ -263,10 +260,9 @@ public class YamlReaderTests
         ReadEnvelopeStart(reader);
         _ = reader.ReadUnknownNode();
 
-        // Act
+        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(reader.ReadUnknownNode);
 
-        // Assert
         Assert.Contains("Unsupported token while reading unknown node", exception.Message);
         Assert.Contains(nameof(DocumentEnd), exception.Message);
     }
@@ -278,10 +274,9 @@ public class YamlReaderTests
         var reader = YamlReader.Create("value", "pipeline.yml");
         ConsumeToEnd(reader);
 
-        // Act
+        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(reader.ReadUnknownNode);
 
-        // Assert
         Assert.Equal("Unexpected token while reading unknown node, got EOF", exception.Message);
     }
 

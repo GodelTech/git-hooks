@@ -9,6 +9,9 @@ internal sealed class ParametersFieldHandler(InterpolationParser parser)
 
     public override StepFields Apply(YamlReader reader, StepFields fields)
     {
-        return fields with { Parameters = ReadMap(reader) };
+        return fields with
+        {
+            Parameters = ReadMap(reader)
+        };
     }
 }
