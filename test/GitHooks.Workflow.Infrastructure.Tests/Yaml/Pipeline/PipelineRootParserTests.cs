@@ -71,6 +71,29 @@ public class PipelineRootParserTests
         Assert.Equal("custom", value.Value);
     }
 
+    [Fact]
+    public void Parse_WithParametersBeforeSteps_ParsesRootParameters()
+    {
+        // Arrange & Act
+        var node = ParseRoot(
+            """
+            parameters:
+              - name: vmImage
+                type: string
+                default: ubuntu-latest
+            steps:
+              - script: echo hello
+            """
+        );
+
+        // Assert
+        var parameter = Assert.Single(node.Parameters);
+
+        Assert.Equal("vmImage", parameter.Name);
+        Assert.Equal(ParameterType.Text, parameter.Type);
+        Assert.Equal("ubuntu-latest", parameter.Default);
+    }
+
     private static PipelineNode ParseRoot(string yamlRoot)
     {
         var yaml = $"""

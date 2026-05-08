@@ -13,6 +13,7 @@ internal sealed class PipelineRootParser(StepsParser stepsParser)
     {
         var start = reader.Read<MappingStart>();
 
+        IReadOnlyList<ParameterNode> parameters = [];
         IReadOnlyList<StepNode>? steps = null;
         var unknownFields = new List<UnknownFieldNode>();
 
@@ -27,7 +28,11 @@ internal sealed class PipelineRootParser(StepsParser stepsParser)
 
             var key = reader.Read<Scalar>();
 
-            if (key.Value == "steps")
+            if (key.Value == "parameters")
+            {
+                parameters = PipelineParametersParser.Parse(reader);
+            }
+            else if (key.Value == "steps")
             {
                 steps = _stepsParser.Parse(reader);
             }
@@ -43,7 +48,7 @@ internal sealed class PipelineRootParser(StepsParser stepsParser)
 
         return steps is null
             ? throw new YamlParseException("Pipeline must contain 'steps'", span)
-            : new PipelineNode(steps, span)
+            : new PipelineNode(parameters, steps, span)
             {
                 UnknownFields = unknownFields
             };
