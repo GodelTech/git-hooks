@@ -4,8 +4,8 @@ using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Application.Ast;
 
-public abstract record StepNode(SourceSpan Span)
-    : AstNode(Span)
+public abstract record StepNode(IReadOnlyList<UnknownFieldNode> UnknownFields, SourceSpan Span)
+    : AstNode(UnknownFields, Span)
 {
     public string? DisplayName { get; init; }
     public ExpressionNode? Condition { get; init; }
@@ -15,7 +15,4 @@ public abstract record StepNode(SourceSpan Span)
 
     public IReadOnlyDictionary<string, InterpolatedStringNode> Env { get; init; }
         = new Dictionary<string, InterpolatedStringNode>();
-
-    public IReadOnlyList<UnknownFieldNode> UnknownFields { get; init; }
-        = [];
 }

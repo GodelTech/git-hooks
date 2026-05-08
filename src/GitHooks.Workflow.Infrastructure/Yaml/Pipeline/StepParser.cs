@@ -60,10 +60,10 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers)
         StepNode node = (fields.Script, fields.Template) switch
         {
             // Only script is defined.
-            ({ } script, null) => new ScriptStepNode(script, span),
+            ({ } script, null) => new ScriptStepNode(script, fields.UnknownFields, span),
 
             // Only template is defined.
-            (null, { } template) => new TemplateStepNode(template, fields.Parameters, span),
+            (null, { } template) => new TemplateStepNode(template, fields.Parameters, fields.UnknownFields, span),
 
             // No supported step type was provided.
             (null, null) => throw new YamlParseException(
@@ -84,8 +84,7 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers)
             Condition = fields.Condition,
             TimeoutInMinutes = fields.TimeoutInMinutes,
             WorkingDirectory = fields.WorkingDirectory,
-            Env = fields.Env,
-            UnknownFields = fields.UnknownFields
+            Env = fields.Env
         };
     }
 }

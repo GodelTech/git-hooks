@@ -5,8 +5,11 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline;
 
-internal sealed class PipelineRootParser(StepsParser stepsParser)
+internal sealed class PipelineRootParser(
+    PipelineParametersParser pipelineParametersParser,
+    StepsParser stepsParser)
 {
+    private readonly PipelineParametersParser _pipelineParametersParser = pipelineParametersParser;
     private readonly StepsParser _stepsParser = stepsParser;
 
     public PipelineNode Parse(YamlReader reader)
@@ -30,7 +33,7 @@ internal sealed class PipelineRootParser(StepsParser stepsParser)
 
             if (key.Value == "parameters")
             {
-                parameters = PipelineParametersParser.Parse(reader);
+                parameters = _pipelineParametersParser.Parse(reader);
             }
             else if (key.Value == "steps")
             {
@@ -48,9 +51,6 @@ internal sealed class PipelineRootParser(StepsParser stepsParser)
 
         return steps is null
             ? throw new YamlParseException("Pipeline must contain 'steps'", span)
-            : new PipelineNode(parameters, steps, span)
-            {
-                UnknownFields = unknownFields
-            };
+            : new PipelineNode(parameters, steps, unknownFields, span);
     }
 }

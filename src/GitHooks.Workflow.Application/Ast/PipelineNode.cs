@@ -6,9 +6,6 @@ namespace GitHooks.Workflow.Application.Ast;
 public sealed record PipelineNode(
     IReadOnlyList<ParameterNode> Parameters,
     IReadOnlyList<StepNode> Steps,
+    IReadOnlyList<UnknownFieldNode> UnknownFields,
     SourceSpan Span)
-    : AstNode(Span)
-{
-    public IReadOnlyList<UnknownFieldNode> UnknownFields { get; init; }
-        = [];
-}
+    : AstNode(UnknownFields, Span);

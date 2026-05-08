@@ -1,12 +1,15 @@
 using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Application.Ast.Unknown;
 
 using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline;
 
-internal static class PipelineParametersParser
+internal sealed class PipelineParametersParser
 {
-    public static IReadOnlyList<ParameterNode> Parse(YamlReader reader)
+#pragma warning disable CA1822 // Parser is intentionally instance-based for DI consistency with other pipeline parsers.
+    public IReadOnlyList<ParameterNode> Parse(YamlReader reader)
+#pragma warning restore CA1822
     {
         _ = reader.Read<SequenceStart>();
 
@@ -32,14 +35,14 @@ internal static class PipelineParametersParser
         var type = ParameterType.Text;
         string? defaultValue = null;
         var values = new List<string>();
+        var unknownFields = new List<UnknownFieldNode>();
 
         while (!reader.Is<MappingEnd>())
         {
             if (!reader.Is<Scalar>())
             {
-                // Non-scalar key: skip the key and its value entirely.
-                _ = reader.ReadUnknownNode();
-                _ = reader.ReadUnknownNode();
+                var keyNode = reader.ReadUnknownNode();
+                unknownFields.Add(reader.ReadUnknownField(keyNode));
                 continue;
             }
 
@@ -69,8 +72,7 @@ internal static class PipelineParametersParser
                     break;
 
                 default:
-                    // Skip unrecognised field values for forward-compatibility.
-                    _ = reader.ReadUnknownNode();
+                    unknownFields.Add(reader.ReadUnknownField(key));
                     break;
             }
         }
@@ -80,7 +82,7 @@ internal static class PipelineParametersParser
 
         return name is null
             ? throw new YamlParseException("Parameter definition must contain 'name'", span)
-            : new ParameterNode(name, displayName, type, defaultValue, values, span);
+            : new ParameterNode(name, displayName, type, defaultValue, values, unknownFields, span);
     }
 
     private static List<string> ParseValuesList(YamlReader reader)

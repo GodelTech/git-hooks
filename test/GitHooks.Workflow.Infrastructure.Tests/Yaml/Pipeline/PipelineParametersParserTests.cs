@@ -1,4 +1,5 @@
 using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Infrastructure.DependencyInjection;
 using GitHooks.Workflow.Infrastructure.Yaml;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline;
@@ -253,7 +254,7 @@ public class PipelineParametersParserTests
     }
 
     [Fact]
-    public void Parse_ParameterWithUnknownField_IgnoresUnknownField()
+    public void Parse_ParameterWithUnknownField_CapturesUnknownField()
     {
         // Arrange & Act
         var node = ParseRoot(
@@ -268,8 +269,13 @@ public class PipelineParametersParserTests
 
         // Assert
         var param = Assert.Single(node.Parameters);
+        var unknownField = Assert.Single(param.UnknownFields);
+        var key = Assert.IsType<UnknownScalarNode>(unknownField.Key);
+        var value = Assert.IsType<UnknownScalarNode>(unknownField.Value);
 
         Assert.Equal("myParam", param.Name);
+        Assert.Equal("futureAttribute", key.Value);
+        Assert.Equal("someValue", value.Value);
     }
 
     [Fact]
