@@ -19,15 +19,32 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers)
 
         while (!reader.Is<MappingEnd>())
         {
-            var key = reader.Read<Scalar>().Value;
+            if (!reader.Is<Scalar>())
+            {
+                var keyNode = reader.ReadUnknownNode();
+                var unknownFields = fields.UnknownFields.ToList();
+                unknownFields.Add(reader.ReadUnknownField(keyNode));
+                fields = fields with
+                {
+                    UnknownFields = unknownFields
+                };
+                continue;
+            }
 
-            if (_handlers.TryGetValue(key, out var handler))
+            var key = reader.Read<Scalar>();
+
+            if (_handlers.TryGetValue(key.Value, out var handler))
             {
                 fields = handler.Apply(reader, fields);
             }
             else
             {
-                reader.SkipNode();
+                var unknownFields = fields.UnknownFields.ToList();
+                unknownFields.Add(reader.ReadUnknownField(key));
+                fields = fields with
+                {
+                    UnknownFields = unknownFields
+                };
             }
         }
 
@@ -75,7 +92,8 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers)
             Condition = fields.Condition,
             TimeoutInMinutes = fields.TimeoutInMinutes,
             WorkingDirectory = fields.WorkingDirectory,
-            Env = fields.Env
+            Env = fields.Env,
+            UnknownFields = fields.UnknownFields
         };
     }
 }

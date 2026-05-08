@@ -1,4 +1,5 @@
 using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Application.Ast.Unknown;
 
 using YamlDotNet.Core.Events;
 
@@ -13,18 +14,26 @@ internal sealed class PipelineRootParser(StepsParser stepsParser)
         var start = reader.Read<MappingStart>();
 
         IReadOnlyList<StepNode>? steps = null;
+        var unknownFields = new List<UnknownFieldNode>();
 
         while (!reader.Is<MappingEnd>())
         {
-            var key = reader.Read<Scalar>().Value;
+            if (!reader.Is<Scalar>())
+            {
+                var keyNode = reader.ReadUnknownNode();
+                unknownFields.Add(reader.ReadUnknownField(keyNode));
+                continue;
+            }
 
-            if (key == "steps")
+            var key = reader.Read<Scalar>();
+
+            if (key.Value == "steps")
             {
                 steps = _stepsParser.Parse(reader);
             }
             else
             {
-                reader.SkipNode();
+                unknownFields.Add(reader.ReadUnknownField(key));
             }
         }
 
@@ -34,6 +43,9 @@ internal sealed class PipelineRootParser(StepsParser stepsParser)
 
         return steps is null
             ? throw new YamlParseException("Pipeline must contain 'steps'", span)
-            : new PipelineNode(steps, span);
+            : new PipelineNode(steps, span)
+            {
+                UnknownFields = unknownFields
+            };
     }
 }

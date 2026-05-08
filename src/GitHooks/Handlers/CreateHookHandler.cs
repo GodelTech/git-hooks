@@ -1,4 +1,3 @@
-using GitHooks.Infrastructure;
 using GitHooks.Infrastructure.Git;
 using GitHooks.Infrastructure.Hooks;
 using GitHooks.Infrastructure.Scaffold;

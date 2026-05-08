@@ -1,3 +1,4 @@
+using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Domain.Model;
 using GitHooks.Workflow.Infrastructure.Yaml;
 
@@ -10,31 +11,40 @@ public class YamlReaderTests
     [Fact]
     public void Create_ValidYaml_InitializesSuccessfully()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
+        // Act
         var streamStart = reader.Read<StreamStart>();
 
+        // Assert
         Assert.NotNull(streamStart);
     }
 
     [Fact]
     public void Read_WithMatchingType_ConsumesAndReturnsEvent()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
-
         _ = reader.Read<StreamStart>();
+
+        // Act
         var documentStart = reader.Read<DocumentStart>();
 
+        // Assert
         Assert.NotNull(documentStart);
     }
 
     [Fact]
     public void Read_WithMismatchType_ThrowsYamlParseException()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
+        // Act
         var exception = Assert.Throws<YamlParseException>(reader.Read<MappingStart>);
 
+        // Assert
         Assert.Equal("Expected MappingStart, got StreamStart", exception.Message);
         Assert.Equal(new SourceRef("pipeline.yml"), exception.Span.Source);
     }
@@ -42,30 +52,38 @@ public class YamlReaderTests
     [Fact]
     public void Read_AtEof_ThrowsEndOfStreamException()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
         ConsumeToEnd(reader);
 
+        // Act & Assert
         _ = Assert.Throws<EndOfStreamException>(reader.Read<StreamEnd>);
     }
 
     [Fact]
     public void Require_WithMatchingType_ConsumesEvent()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
+        // Act
         reader.Require<StreamStart>();
         var isDocumentStart = reader.Is<DocumentStart>();
 
+        // Assert
         Assert.True(isDocumentStart);
     }
 
     [Fact]
     public void Require_WithMismatchType_ThrowsYamlParseException()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
+        // Act
         var exception = Assert.Throws<YamlParseException>(reader.Require<MappingStart>);
 
+        // Assert
         Assert.Equal("Expected MappingStart, got StreamStart", exception.Message);
         Assert.Equal(new SourceRef("pipeline.yml"), exception.Span.Source);
     }
@@ -73,11 +91,14 @@ public class YamlReaderTests
     [Fact]
     public void Is_WithMatchingType_ReturnsTrueWithoutConsuming()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
+        // Act
         var firstCheck = reader.Is<StreamStart>();
         var streamStart = reader.Read<StreamStart>();
 
+        // Assert
         Assert.True(firstCheck);
         Assert.NotNull(streamStart);
     }
@@ -85,11 +106,14 @@ public class YamlReaderTests
     [Fact]
     public void Is_WithMismatchType_ReturnsFalseWithoutConsuming()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
+        // Act
         var firstCheck = reader.Is<MappingStart>();
         var streamStart = reader.Read<StreamStart>();
 
+        // Assert
         Assert.False(firstCheck);
         Assert.NotNull(streamStart);
     }
@@ -97,20 +121,25 @@ public class YamlReaderTests
     [Fact]
     public void Is_AtEof_ThrowsEndOfStreamException()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
         ConsumeToEnd(reader);
 
+        // Act & Assert
         _ = Assert.Throws<EndOfStreamException>(() => reader.Is<StreamEnd>());
     }
 
     [Fact]
     public void Peek_WithMatchingType_ReturnsEventWithoutConsuming()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
+        // Act
         var peeked = reader.Peek<StreamStart>();
         var consumed = reader.Read<StreamStart>();
 
+        // Assert
         Assert.NotNull(peeked);
         Assert.NotNull(consumed);
     }
@@ -118,105 +147,204 @@ public class YamlReaderTests
     [Fact]
     public void Peek_WithMismatchType_ThrowsYamlParseException()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
+        // Act
         var exception = Assert.Throws<YamlParseException>(reader.Peek<MappingStart>);
 
+        // Assert
         Assert.Equal("Expected MappingStart, got StreamStart", exception.Message);
         Assert.Equal(new SourceRef("pipeline.yml"), exception.Span.Source);
     }
 
     [Fact]
-    public void SkipNode_WithScalar_SkipsScalarNode()
+    public void ReadUnknownNode_WithScalar_ReturnsUnknownScalarNode()
     {
+        // Arrange
         var reader = YamlReader.Create("value", "pipeline.yml");
         ReadEnvelopeStart(reader);
 
-        reader.SkipNode();
-        var documentEnd = reader.Read<DocumentEnd>();
+        // Act
+        var node = reader.ReadUnknownNode();
 
-        Assert.NotNull(documentEnd);
+        // Assert
+        var scalar = Assert.IsType<UnknownScalarNode>(node);
+
+        Assert.Equal("value", scalar.Value);
     }
 
     [Fact]
-    public void SkipNode_WithMapping_SkipsMappingNode()
+    public void ReadUnknownNode_WithNestedMappingAndSequence_ReturnsCompleteTree()
     {
-        var reader = YamlReader.Create(
-            """
-            key1: value1
-            key2: value2
-            """,
-            "pipeline.yml"
-        );
-        ReadEnvelopeStart(reader);
-
-        reader.SkipNode();
-        var documentEnd = reader.Read<DocumentEnd>();
-
-        Assert.NotNull(documentEnd);
-    }
-
-    [Fact]
-    public void SkipNode_WithSequence_SkipsSequenceNode()
-    {
-        var reader = YamlReader.Create(
-            """
-            - one
-            - two
-            """,
-            "pipeline.yml"
-        );
-        ReadEnvelopeStart(reader);
-
-        reader.SkipNode();
-        var documentEnd = reader.Read<DocumentEnd>();
-
-        Assert.NotNull(documentEnd);
-    }
-
-    [Fact]
-    public void SkipNode_WithNestedStructures_SkipsWholeNode()
-    {
+        // Arrange
         var reader = YamlReader.Create(
             """
             root:
-              nested:
-                - first
-                - second
-              map:
-                key: value
+              - one
+              - two
             """,
             "pipeline.yml"
         );
         ReadEnvelopeStart(reader);
 
-        reader.SkipNode();
-        var documentEnd = reader.Read<DocumentEnd>();
+        // Act
+        var node = reader.ReadUnknownNode();
 
-        Assert.NotNull(documentEnd);
+        // Assert
+        var mapping = Assert.IsType<UnknownMappingNode>(node);
+        Assert.Single(mapping.Entries);
+
+        var entry = mapping.Entries[0];
+        var key = Assert.IsType<UnknownScalarNode>(entry.Key);
+        var value = Assert.IsType<UnknownSequenceNode>(entry.Value);
+
+        Assert.Equal("root", key.Value);
+        Assert.Equal(2, value.Items.Count);
     }
 
     [Fact]
-    public void SkipNode_AtEof_ThrowsYamlParseException()
+    public void ReadUnknownNode_WithMappingWithNonScalarKey_ReturnsMappingWithSequenceKey()
     {
+        // Arrange
+        var reader = YamlReader.Create(
+            """
+            ? [a, b]
+            : 42
+            """,
+            "pipeline.yml"
+        );
+        ReadEnvelopeStart(reader);
+
+        // Act
+        var node = reader.ReadUnknownNode();
+
+        // Assert
+        var mapping = Assert.IsType<UnknownMappingNode>(node);
+        Assert.Single(mapping.Entries);
+
+        _ = Assert.IsType<UnknownSequenceNode>(mapping.Entries[0].Key);
+
+        var value = Assert.IsType<UnknownScalarNode>(mapping.Entries[0].Value);
+
+        Assert.Equal("42", value.Value);
+    }
+
+    [Fact]
+    public void ReadUnknownNode_WithAlias_ReturnsUnknownReferenceNode()
+    {
+        // Arrange
+        var reader = YamlReader.Create(
+            """
+            first: &anchor value
+            second: *anchor
+            """,
+            "pipeline.yml"
+        );
+        ReadEnvelopeStart(reader);
+
+        // Act
+        var node = reader.ReadUnknownNode();
+
+        // Assert
+        var mapping = Assert.IsType<UnknownMappingNode>(node);
+        Assert.Equal(2, mapping.Entries.Count);
+
+        var reference = Assert.IsType<UnknownReferenceNode>(mapping.Entries[1].Value);
+
+        Assert.Equal("anchor", reference.Value);
+    }
+
+    [Fact]
+    public void ReadUnknownNode_WithDocumentEnd_ThrowsYamlParseException()
+    {
+        // Arrange
+        var reader = YamlReader.Create("value", "pipeline.yml");
+        ReadEnvelopeStart(reader);
+        _ = reader.ReadUnknownNode();
+
+        // Act
+        var exception = Assert.Throws<YamlParseException>(reader.ReadUnknownNode);
+
+        // Assert
+        Assert.Contains("Unsupported token while reading unknown node", exception.Message);
+        Assert.Contains(nameof(DocumentEnd), exception.Message);
+    }
+
+    [Fact]
+    public void ReadUnknownNode_AtExhaustedParser_ThrowsYamlParseException()
+    {
+        // Arrange
         var reader = YamlReader.Create("value", "pipeline.yml");
         ConsumeToEnd(reader);
 
-        var exception = Assert.Throws<YamlParseException>(reader.SkipNode);
+        // Act
+        var exception = Assert.Throws<YamlParseException>(reader.ReadUnknownNode);
 
-        Assert.Equal("Unexpected token while skipping node, got EOF", exception.Message);
-        Assert.Equal(new SourceRef("pipeline.yml"), exception.Span.Source);
+        // Assert
+        Assert.Equal("Unexpected token while reading unknown node, got EOF", exception.Message);
+    }
+
+    [Fact]
+    public void ReadUnknownField_WithScalarKey_CreatesFieldNode()
+    {
+        // Arrange
+        var reader = YamlReader.Create("key: value", "pipeline.yml");
+        ReadEnvelopeStart(reader);
+        reader.Require<MappingStart>();
+
+        var key = reader.Read<Scalar>();
+
+        // Act
+        var field = reader.ReadUnknownField(key);
+
+        // Assert
+        var parsedKey = Assert.IsType<UnknownScalarNode>(field.Key);
+        var parsedValue = Assert.IsType<UnknownScalarNode>(field.Value);
+
+        Assert.Equal("key", parsedKey.Value);
+        Assert.Equal("value", parsedValue.Value);
+    }
+
+    [Fact]
+    public void ReadUnknownField_WithUnknownNodeKey_CreatesFieldNode()
+    {
+        // Arrange
+        var reader = YamlReader.Create(
+            """
+            ? [a, b]
+            : custom
+            """,
+            "pipeline.yml"
+        );
+        ReadEnvelopeStart(reader);
+        reader.Require<MappingStart>();
+
+        var key = reader.ReadUnknownNode();
+
+        // Act
+        var field = reader.ReadUnknownField(key);
+
+        // Assert
+        _ = Assert.IsType<UnknownSequenceNode>(field.Key);
+
+        var value = Assert.IsType<UnknownScalarNode>(field.Value);
+
+        Assert.Equal("custom", value.Value);
     }
 
     [Fact]
     public void CurrentSpan_AfterReadingScalar_ReturnsSourceFromReader()
     {
+        // Arrange
         var reader = YamlReader.Create("value", "pipeline.yml");
         ReadEnvelopeStart(reader);
-
         _ = reader.Read<Scalar>();
+
+        // Act
         var span = reader.CurrentSpan();
 
+        // Assert
         Assert.Equal(new SourceRef("pipeline.yml"), span.Source);
         Assert.NotEqual(new SourceLocation(0, 0), span.Start);
         Assert.NotEqual(new SourceLocation(0, 0), span.End);
@@ -225,11 +353,14 @@ public class YamlReaderTests
     [Fact]
     public void CurrentSpan_AtExhaustedParser_ReturnsUnknownSpan()
     {
+        // Arrange
         var reader = YamlReader.Create("value", "pipeline.yml");
         ConsumeToEnd(reader);
 
+        // Act
         var span = reader.CurrentSpan();
 
+        // Assert
         Assert.Equal(new SourceRef("pipeline.yml"), span.Source);
         Assert.Equal(new SourceLocation(0, 0), span.Start);
         Assert.Equal(new SourceLocation(0, 0), span.End);
@@ -238,6 +369,7 @@ public class YamlReaderTests
     [Fact]
     public void SpanOf_WithMappingStartAndEnd_ReturnsRangeWithSameSource()
     {
+        // Arrange
         var reader = YamlReader.Create("key: value", "pipeline.yml");
         ReadEnvelopeStart(reader);
 
@@ -246,8 +378,10 @@ public class YamlReaderTests
         _ = reader.Read<Scalar>();
         var mappingEnd = reader.Read<MappingEnd>();
 
+        // Act
         var span = reader.SpanOf(mappingStart, mappingEnd);
 
+        // Assert
         Assert.Equal(new SourceRef("pipeline.yml"), span.Source);
         Assert.NotEqual(new SourceLocation(0, 0), span.Start);
         Assert.NotEqual(new SourceLocation(0, 0), span.End);

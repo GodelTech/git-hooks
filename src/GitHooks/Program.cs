@@ -1,3 +1,5 @@
+using System.CommandLine;
+
 using GitHooks.Commands;
 using GitHooks.Handlers;
 using GitHooks.Infrastructure;
@@ -8,8 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using Spectre.Console;
-
-using System.CommandLine;
 
 namespace GitHooks;
 

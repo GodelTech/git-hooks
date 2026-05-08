@@ -1,4 +1,5 @@
 using GitHooks.Workflow.Application.Ast.Expressions;
+using GitHooks.Workflow.Application.Ast.Unknown;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Steps;
 
@@ -17,4 +18,7 @@ internal sealed record StepFields
 
     public IReadOnlyDictionary<string, InterpolatedStringNode> Parameters { get; init; }
         = new Dictionary<string, InterpolatedStringNode>();
+
+    public IReadOnlyList<UnknownFieldNode> UnknownFields { get; init; }
+        = [];
 }

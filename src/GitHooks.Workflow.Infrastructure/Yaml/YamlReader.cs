@@ -1,3 +1,4 @@
+using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Domain.Model;
 
 using YamlDotNet.Core;
@@ -47,45 +48,88 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
             : throw Error($"Expected {typeof(T).Name}");
     }
 
-    /// <summary>Skipping (robust, no MoveNext).</summary>
-    public void SkipNode()
+    public UnknownNode ReadUnknownNode()
     {
-        // scalar (fast path)
-        if (TryConsumeSafe<Scalar>(out _))
+        if (TryConsumeSafe<Scalar>(out var scalar))
         {
-            return;
+            return new UnknownScalarNode(
+                scalar.Value,
+                SpanOf(scalar, scalar)
+            );
         }
 
-        // mapping
-        if (TryConsumeSafe<MappingStart>(out _))
+        if (TryConsumeSafe<AnchorAlias>(out var alias))
         {
+            return new UnknownReferenceNode(
+                alias.Value.ToString(),
+                SpanOf(alias, alias)
+            );
+        }
+
+        if (TryConsumeSafe<MappingStart>(out var mappingStart))
+        {
+            var entries = new List<UnknownMappingEntryNode>();
+
             while (!_parser.Accept<MappingEnd>(out _))
             {
-                _ = Read<Scalar>(); // key
-                SkipNode();         // value
+                var key = ReadUnknownNode();
+                var value = ReadUnknownNode();
+
+                entries.Add(
+                    new UnknownMappingEntryNode(
+                        key,
+                        value,
+                        MergeSpans(key.Span, value.Span)
+                    )
+                );
             }
 
-            Require<MappingEnd>();
-            return;
+            var mappingEnd = Read<MappingEnd>();
+
+            return new UnknownMappingNode(entries, SpanOf(mappingStart, mappingEnd));
         }
 
-        // sequence
-        if (TryConsumeSafe<SequenceStart>(out _))
+        if (TryConsumeSafe<SequenceStart>(out var sequenceStart))
         {
+            var items = new List<UnknownNode>();
+
             while (!_parser.Accept<SequenceEnd>(out _))
             {
-                SkipNode();
+                items.Add(ReadUnknownNode());
             }
 
-            Require<SequenceEnd>();
-            return;
+            var sequenceEnd = Read<SequenceEnd>();
+
+            return new UnknownSequenceNode(items, SpanOf(sequenceStart, sequenceEnd));
         }
 
-        // unknown token
-        if (!TryConsumeSafe<ParsingEvent>(out _))
+        if (TryConsumeSafe<ParsingEvent>(out var evt))
         {
-            throw Error("Unexpected token while skipping node");
+            throw new YamlParseException(
+                $"Unsupported token while reading unknown node: {evt.GetType().Name}",
+                SpanOf(evt, evt)
+            );
         }
+
+        throw Error("Unexpected token while reading unknown node");
+    }
+
+    public UnknownFieldNode ReadUnknownField(Scalar key)
+    {
+        var keyNode = new UnknownScalarNode(key.Value, SpanOf(key, key));
+
+        return ReadUnknownField(keyNode);
+    }
+
+    public UnknownFieldNode ReadUnknownField(UnknownNode key)
+    {
+        var value = ReadUnknownNode();
+
+        return new UnknownFieldNode(
+            key,
+            value,
+            MergeSpans(key.Span, value.Span)
+        );
     }
 
     private bool TryConsumeSafe<T>(out T evt) where T : ParsingEvent
@@ -129,6 +173,11 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
             new SourceLocation(start.Line, start.Column),
             new SourceLocation(end.Line, end.Column)
         );
+    }
+
+    private static SourceSpan MergeSpans(SourceSpan start, SourceSpan end)
+    {
+        return new SourceSpan(start.Source, start.Start, end.End);
     }
 
     private YamlParseException Error(string message)
