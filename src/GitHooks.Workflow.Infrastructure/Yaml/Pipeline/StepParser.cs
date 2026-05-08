@@ -57,34 +57,26 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers)
 
     private static StepNode BuildStep(StepFields fields, SourceSpan span)
     {
-        var typeCount =
-            (fields.Script is not null ? 1 : 0) +
-            (fields.Template is not null ? 1 : 0);
-
-        if (typeCount == 0)
+        StepNode node = (fields.Script, fields.Template) switch
         {
-            throw new YamlParseException(
+            // Only script is defined.
+            ({ } script, null) => new ScriptStepNode(script, span),
+
+            // Only template is defined.
+            (null, { } template) => new TemplateStepNode(template, fields.Parameters, span),
+
+            // No supported step type was provided.
+            (null, null) => throw new YamlParseException(
                 "Step must contain 'script' or 'template'",
                 span
-            );
-        }
+            ),
 
-        if (typeCount > 1)
-        {
-            throw new YamlParseException(
+            // Script and template are mutually exclusive.
+            ({ }, { }) => throw new YamlParseException(
                 "Step can contain only one of 'script' or 'template'",
                 span
-            );
-        }
-
-        StepNode node = fields.Script is not null
-            ? new ScriptStepNode(fields.Script, span)
-            : fields.Template is not null
-                ? new TemplateStepNode(fields.Template, fields.Parameters, span)
-                : throw new YamlParseException(
-                    "Step must contain 'script' or 'template'",
-                    span
-                );
+            )
+        };
 
         return node with
         {

@@ -13,6 +13,25 @@ namespace GitHooks.Workflow.Infrastructure.Tests.Yaml.Pipeline;
 public class StepParserTests
 {
     [Fact]
+    public void Parse_TemplateStep_ParsesTemplateAndParameters()
+    {
+        // Arrange & Act
+        var result = ParseStep(
+            """
+            template: templates/build.yml
+            parameters:
+              configuration: Release
+            """
+        );
+
+        // Assert
+        var step = Assert.IsType<TemplateStepNode>(result);
+
+        Assert.Equal("templates/build.yml", step.Template);
+        Assert.Equal("Release", step.Parameters["configuration"].Value);
+    }
+
+    [Fact]
     public void Parse_ScriptStep_ParsesKnownFieldAndCapturesUnknownField()
     {
         // Arrange & Act
@@ -57,6 +76,37 @@ public class StepParserTests
         var value = Assert.IsType<UnknownScalarNode>(unknownField.Value);
 
         Assert.Equal("custom", value.Value);
+    }
+
+    [Fact]
+    public void Parse_WithoutScriptOrTemplate_ThrowsYamlParseException()
+    {
+        // Arrange & Act & Assert
+        var exception = Assert.Throws<YamlParseException>(
+            () => ParseStep(
+                """
+                displayName: build
+                """
+            )
+        );
+
+        Assert.Equal("Step must contain 'script' or 'template'", exception.Message);
+    }
+
+    [Fact]
+    public void Parse_WithScriptAndTemplate_ThrowsYamlParseException()
+    {
+        // Arrange & Act & Assert
+        var exception = Assert.Throws<YamlParseException>(
+            () => ParseStep(
+                """
+                script: echo hello
+                template: templates/build.yml
+                """
+            )
+        );
+
+        Assert.Equal("Step can contain only one of 'script' or 'template'", exception.Message);
     }
 
     private static StepNode ParseStep(string yamlStep)
