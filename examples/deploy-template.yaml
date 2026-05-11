@@ -1,2 +1,9 @@
+parameters:
+  - name: organization
+    displayName: 'Azure DevOps organization'
+    type: string
+    default: 'godeltech'
+
+
 steps:
-  - script: echo Deploying to ${{ env }}
+  - script: echo Deploying to ${{ parameters.organization }}

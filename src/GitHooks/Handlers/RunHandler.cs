@@ -1,4 +1,5 @@
 using GitHooks.Infrastructure.Git;
+using GitHooks.Workflow.Application.Binding;
 using GitHooks.Workflow.Application.Parsing;
 
 using Spectre.Console;
@@ -7,10 +8,12 @@ namespace GitHooks.Handlers;
 
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
+    IPipelineParameterBinder pipelineParameterBinder,
     IPipelineParser pipelineParser,
     IAnsiConsole console) : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
+    private readonly IPipelineParameterBinder _pipelineParameterBinder = pipelineParameterBinder;
     private readonly IPipelineParser _pipelineParser = pipelineParser;
     private readonly IAnsiConsole _console = console;
 
@@ -65,9 +68,20 @@ public sealed class RunHandler(
             return 1;
         }
 
-#pragma warning disable IDE0059 // Unnecessary assignment of a value
-        var a = _pipelineParser.Parse(yamlContent, absoluteFilePath);
-#pragma warning restore IDE0059 // Unnecessary assignment of a value
+        try
+        {
+            var pipeline = _pipelineParser.Parse(yamlContent, absoluteFilePath);
+            var boundPipeline = _pipelineParameterBinder.Bind(pipeline);
+        }
+        catch (PipelineParameterBindingException ex)
+        {
+            var location = ex.Span.Start.Line > 0
+                ? $"{Markup.Escape(ex.Span.Source.Name)}:{ex.Span.Start.Line}:{ex.Span.Start.Column}: "
+                : string.Empty;
+
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(ex.Message)}");
+            return 1;
+        }
 
         //try
         //{

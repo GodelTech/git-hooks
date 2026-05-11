@@ -2,4 +2,4 @@ steps:
   - script: echo Hello
   - template: deploy-template.yaml
     parameters:
-      env: prod
+      organization: testOrg

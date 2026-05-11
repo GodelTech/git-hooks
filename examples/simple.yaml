@@ -1,6 +1,26 @@
+parameters:
+  - name: enableBuildDebug
+    displayName: 'Enable build debug'
+    type: boolean
+    default: true
+
+  - name: vmImage
+    displayName: 'Pool VM image'
+    type: string
+    default: 'ubuntu-latest'
+    values:
+      - windows-latest
+      - ubuntu-latest
+      - macOS-latest
+
+  - name: organization
+    displayName: 'Azure DevOps organization'
+    type: string
+    default: 'godeltech'
+
 steps:
   - script: echo Hello 1
   - script: echo Hello 2
     displayName: Hello 2
   - script: echo Hello 3
-    otherField: Other Field
+    otherField: ${{ parameters.organization }}

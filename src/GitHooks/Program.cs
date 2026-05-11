@@ -4,6 +4,7 @@ using GitHooks.Commands;
 using GitHooks.Handlers;
 using GitHooks.Infrastructure;
 using GitHooks.Templates;
+using GitHooks.Workflow.Application.DependencyInjection;
 using GitHooks.Workflow.Infrastructure.DependencyInjection;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -73,6 +74,7 @@ internal sealed class Program
 
         // add workflow
         _ = services.AddYamlPipelineParsing();
+        _ = services.AddPipelineParameterBinding();
 
         return services.BuildServiceProvider();
     }
