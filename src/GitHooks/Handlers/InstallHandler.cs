@@ -60,3 +60,4 @@ public sealed class InstallHandler(
         return 0;
     }
 }
+

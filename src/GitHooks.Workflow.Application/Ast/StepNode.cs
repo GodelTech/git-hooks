@@ -16,3 +16,4 @@ public abstract record StepNode(IReadOnlyList<UnknownFieldNode> UnknownFields, S
     public IReadOnlyDictionary<string, InterpolatedStringNode> Env { get; init; }
         = new Dictionary<string, InterpolatedStringNode>();
 }
+

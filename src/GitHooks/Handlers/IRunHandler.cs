@@ -13,3 +13,4 @@ public interface IRunHandler
     /// <returns>A task that represents the asynchronous operation, returning an exit code.</returns>
     public Task<int> HandleAsync(string filePath, CancellationToken cancellationToken = default);
 }
+

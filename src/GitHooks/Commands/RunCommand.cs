@@ -45,3 +45,4 @@ public sealed class RunCommand(IRunHandler runHandler, IAnsiConsole console)
         return _runHandler.HandleAsync(filePath, cancellationToken);
     }
 }
+

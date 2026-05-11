@@ -57,3 +57,4 @@ public sealed class GitHookScaffoldResult
         return new GitHookScaffoldResult(false, [], error, string.Empty);
     }
 }
+

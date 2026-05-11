@@ -1,5 +1,8 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Unknown;
+using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
+using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters;
+using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps;
 
 using YamlDotNet.Core.Events;
 
@@ -54,3 +57,4 @@ internal sealed class PipelineRootParser(
             : new PipelineNode(parameters, steps, unknownFields, span);
     }
 }
+

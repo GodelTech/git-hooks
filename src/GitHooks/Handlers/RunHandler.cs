@@ -1,5 +1,6 @@
 using GitHooks.Infrastructure.Git;
 using GitHooks.Workflow.Application.Binding;
+using GitHooks.Workflow.Application.Binding.Exceptions;
 using GitHooks.Workflow.Application.Parsing;
 
 using Spectre.Console;
@@ -113,3 +114,4 @@ public sealed class RunHandler(
         return 0;
     }
 }
+

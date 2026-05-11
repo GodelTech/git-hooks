@@ -1,5 +1,6 @@
 using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Domain.Model;
+using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -188,3 +189,4 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
         );
     }
 }
+

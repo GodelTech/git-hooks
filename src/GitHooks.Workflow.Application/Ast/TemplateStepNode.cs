@@ -10,3 +10,4 @@ public sealed record TemplateStepNode(
     IReadOnlyList<UnknownFieldNode> UnknownFields,
     SourceSpan Span)
     : StepNode(UnknownFields, Span);
+

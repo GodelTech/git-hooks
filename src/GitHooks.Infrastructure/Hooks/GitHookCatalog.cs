@@ -92,3 +92,4 @@ public sealed class GitHookCatalog : IGitHookCatalog
         return new GitHookResolutionResult(resolved, invalid);
     }
 }
+

@@ -18,3 +18,4 @@ public interface IGitHookScaffolder
     /// <returns>A task that represents the asynchronous operation, returning scaffold creation details.</returns>
     public Task<GitHookScaffoldResult> CreateScaffoldAsync(string repositoryRootPath, string hooksPath, IReadOnlyCollection<GitHook> hooks, bool overwrite, CancellationToken cancellationToken = default);
 }
+

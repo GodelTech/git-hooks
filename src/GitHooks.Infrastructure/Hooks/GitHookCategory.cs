@@ -32,3 +32,4 @@ public enum GitHookCategory
     /// </summary>
     Checkout,
 }
+

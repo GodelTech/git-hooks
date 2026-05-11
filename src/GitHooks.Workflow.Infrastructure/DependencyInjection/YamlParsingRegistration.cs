@@ -2,7 +2,8 @@ using GitHooks.Workflow.Application.Parsing;
 using GitHooks.Workflow.Infrastructure.Yaml;
 using GitHooks.Workflow.Infrastructure.Yaml.Expressions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline;
-using GitHooks.Workflow.Infrastructure.Yaml.Steps;
+using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters;
+using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -41,3 +42,4 @@ public static class YamlParsingRegistration
         return services;
     }
 }
+

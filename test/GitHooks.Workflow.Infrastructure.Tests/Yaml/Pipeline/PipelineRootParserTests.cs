@@ -2,6 +2,7 @@ using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Infrastructure.DependencyInjection;
 using GitHooks.Workflow.Infrastructure.Yaml;
+using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -119,3 +120,7 @@ public class PipelineRootParserTests
         return pipeline;
     }
 }
+
+
+
+

@@ -24,3 +24,4 @@ public sealed partial class TemplateTokenValidator : ITemplateTokenValidator
     [GeneratedRegex(@"\{\{[A-Z_]+\}\}")]
     private static partial Regex UnresolvedTokenRegex();
 }
+

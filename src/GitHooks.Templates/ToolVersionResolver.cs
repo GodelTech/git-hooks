@@ -35,3 +35,4 @@ public sealed class ToolVersionResolver : IToolVersionResolver
             ?? "unknown";
     }
 }
+

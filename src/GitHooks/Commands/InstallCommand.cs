@@ -55,3 +55,4 @@ public sealed class InstallCommand(IInstallHandler installHandler)
         return _installHandler.HandleAsync(scope, hooksPath, force, cancellationToken);
     }
 }
+

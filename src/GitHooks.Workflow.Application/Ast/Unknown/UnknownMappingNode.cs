@@ -6,3 +6,4 @@ public sealed record UnknownMappingNode(
     IReadOnlyList<UnknownMappingEntryNode> Entries,
     SourceSpan Span
 ) : UnknownNode(Span);
+

@@ -1,6 +1,6 @@
 using GitHooks.Workflow.Application.Parsing;
 using GitHooks.Workflow.Infrastructure.DependencyInjection;
-using GitHooks.Workflow.Infrastructure.Yaml;
+using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,9 +17,9 @@ public class PipelineParserTests
         // Act
         var result = parser.Parse(
             """
-            steps:
-              - script: echo hello
-            """,
+			steps:
+			  - script: echo hello
+			""",
             "pipeline.yml"
         );
 
@@ -38,12 +38,12 @@ public class PipelineParserTests
         var exception = Assert.Throws<YamlParseException>(
             () => parser.Parse(
                 """
-                steps:
-                  - script: echo hello
-                ---
-                steps:
-                  - script: echo again
-                """,
+				steps:
+				  - script: echo hello
+				---
+				steps:
+				  - script: echo again
+				""",
                 "pipeline.yml"
             )
         );
@@ -62,3 +62,4 @@ public class PipelineParserTests
         return provider.GetRequiredService<IPipelineParser>();
     }
 }
+

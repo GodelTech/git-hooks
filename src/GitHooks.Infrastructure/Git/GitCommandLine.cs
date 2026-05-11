@@ -53,3 +53,4 @@ public sealed class GitCommandLine(ICommandLine commandLine) : IGitCommandLine
         return _commandLine.RunAsync("git", ["config", $"--{scope.ToGitString()}", "--unset", "core.hooksPath"], cancellationToken);
     }
 }
+

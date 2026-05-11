@@ -25,3 +25,4 @@ public sealed class YamlTemplateProvider(ITemplateTokenValidator tokenValidator,
         return result;
     }
 }
+

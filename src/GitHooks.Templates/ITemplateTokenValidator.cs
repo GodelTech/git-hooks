@@ -11,3 +11,4 @@ public interface ITemplateTokenValidator
     /// <param name="content">The rendered content to validate.</param>
     public void ValidateNoUnresolvedTokens(string content);
 }
+

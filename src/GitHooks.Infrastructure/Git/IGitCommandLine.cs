@@ -53,3 +53,4 @@ public interface IGitCommandLine
     /// <returns>A task that represents the asynchronous operation, returning the command-line result.</returns>
     public Task<CommandLineResult> UnsetCoreHooksPathAsync(GitConfigScope scope, CancellationToken cancellationToken = default);
 }
+

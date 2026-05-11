@@ -18,3 +18,4 @@ public interface ICreateHookHandler
     /// <returns>A task that represents the asynchronous operation, returning an exit code.</returns>
     public Task<int> HandleAsync(GitConfigScope scope, string hooksPath, IReadOnlyCollection<string> hooks, bool force, CancellationToken cancellationToken = default);
 }
+
