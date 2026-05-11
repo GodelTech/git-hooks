@@ -66,4 +66,3 @@ internal sealed partial class ParameterScalarBinder
         return context.GetResolvedValue(parameterName, span);
     }
 }
-

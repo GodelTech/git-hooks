@@ -72,8 +72,3 @@ public class ScriptFieldHandlerTests
         return reader;
     }
 }
-
-
-
-
-

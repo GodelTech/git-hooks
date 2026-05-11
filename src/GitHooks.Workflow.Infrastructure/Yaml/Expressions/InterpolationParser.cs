@@ -11,4 +11,3 @@ internal sealed class InterpolationParser
         return new(value);
     }
 }
-

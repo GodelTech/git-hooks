@@ -16,4 +16,3 @@ public interface IYamlTemplateProvider : ITemplateProvider
     /// <returns>The tokenized YAML hook content.</returns>
     public string ApplyTokens(string templateContent, GitHook hook);
 }
-

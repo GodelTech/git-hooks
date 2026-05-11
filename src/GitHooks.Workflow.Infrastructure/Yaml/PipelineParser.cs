@@ -26,4 +26,3 @@ internal sealed class PipelineParser(PipelineRootParser pipelineRootParser)
         return result;
     }
 }
-

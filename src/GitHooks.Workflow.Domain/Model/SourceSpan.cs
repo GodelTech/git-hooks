@@ -15,4 +15,3 @@ public readonly record struct SourceSpan(
             );
     }
 }
-

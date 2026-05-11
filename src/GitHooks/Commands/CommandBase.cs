@@ -29,4 +29,3 @@ public abstract class CommandBase(string name, string? description = null)
     /// <returns>A task representing the asynchronous operation with an exit code.</returns>
     public abstract Task<int> HandleActionAsync(ParseResult parseResult, CancellationToken cancellationToken);
 }
-

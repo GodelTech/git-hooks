@@ -18,4 +18,3 @@ internal sealed class ScriptFieldHandler(InterpolationParser parser) : IStepFiel
         };
     }
 }
-

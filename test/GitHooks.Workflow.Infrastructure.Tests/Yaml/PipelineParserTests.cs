@@ -62,4 +62,3 @@ public class PipelineParserTests
         return provider.GetRequiredService<IPipelineParser>();
     }
 }
-

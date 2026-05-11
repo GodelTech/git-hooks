@@ -6,4 +6,3 @@ internal interface IStepFieldHandler
 
     public StepFields Apply(YamlReader reader, StepFields fields);
 }
-

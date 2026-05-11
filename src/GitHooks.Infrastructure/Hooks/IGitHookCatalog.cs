@@ -42,4 +42,3 @@ public interface IGitHookCatalog
     /// </returns>
     public GitHookResolutionResult ResolveHooks(IReadOnlyCollection<string> hooks);
 }
-

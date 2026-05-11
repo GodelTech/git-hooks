@@ -42,4 +42,3 @@ public static class YamlParsingRegistration
         return services;
     }
 }
-

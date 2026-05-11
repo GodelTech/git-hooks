@@ -22,4 +22,3 @@ internal static class TemplateTokens
     /// <summary>Replaced with the current tool version (e.g. <c>1.2.3</c>).</summary>
     internal const string Version = "{{VERSION}}";
 }
-

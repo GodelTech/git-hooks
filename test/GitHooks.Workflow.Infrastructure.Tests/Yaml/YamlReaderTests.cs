@@ -399,7 +399,3 @@ public class YamlReaderTests
         reader.Require<StreamEnd>();
     }
 }
-
-
-
-

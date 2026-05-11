@@ -6,4 +6,3 @@ public sealed record TemplateStep(
     string TemplatePath,
     IReadOnlyDictionary<string, string> Parameters)
     : StepBase(Id, Span);
-

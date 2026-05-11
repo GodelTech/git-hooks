@@ -22,4 +22,3 @@ internal sealed record StepFields
     public IReadOnlyList<UnknownFieldNode> UnknownFields { get; init; }
         = [];
 }
-

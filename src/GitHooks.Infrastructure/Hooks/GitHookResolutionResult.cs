@@ -18,4 +18,3 @@ public sealed record GitHookResolutionResult(
     /// </summary>
     public bool IsValid => InvalidHooks.Count == 0;
 }
-

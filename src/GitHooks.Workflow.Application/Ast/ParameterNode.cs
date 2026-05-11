@@ -12,4 +12,3 @@ public sealed record ParameterNode(
     IReadOnlyList<UnknownFieldNode> UnknownFields,
     SourceSpan Span)
     : AstNode(UnknownFields, Span);
-

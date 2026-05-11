@@ -18,4 +18,3 @@ internal sealed class ConditionFieldHandler(ExpressionParser parser) : IStepFiel
         };
     }
 }
-

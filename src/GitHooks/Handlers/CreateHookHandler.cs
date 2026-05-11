@@ -86,4 +86,3 @@ public sealed class CreateHookHandler(
         return 0;
     }
 }
-

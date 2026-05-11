@@ -14,4 +14,3 @@ internal sealed class DisplayNameFieldHandler : IStepFieldHandler
         };
     }
 }
-

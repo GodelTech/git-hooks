@@ -62,4 +62,3 @@ public static class GitHookCatalogExtensions
         return catalog.GetHooks(GitHookCategory.Checkout);
     }
 }
-

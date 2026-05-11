@@ -13,4 +13,3 @@ public sealed class PipelineParameterBindingException(string message, SourceSpan
     /// </summary>
     public SourceSpan Span { get; } = span;
 }
-

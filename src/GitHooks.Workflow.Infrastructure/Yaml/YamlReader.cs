@@ -189,4 +189,3 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
         );
     }
 }
-

@@ -26,4 +26,3 @@ internal sealed class StepsParser(StepParser stepParser)
         return steps;
     }
 }
-

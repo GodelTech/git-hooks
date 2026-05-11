@@ -11,4 +11,3 @@ public interface IToolVersionResolver
     /// <returns>The resolved version value.</returns>
     public string ResolveVersion();
 }
-

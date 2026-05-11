@@ -73,5 +73,3 @@ public sealed class CreateCommand(ICreateHookHandler createHookHandler)
         return _createHookHandler.HandleAsync(scope, hooksPath, hooks, force, cancellationToken);
     }
 }
-
-

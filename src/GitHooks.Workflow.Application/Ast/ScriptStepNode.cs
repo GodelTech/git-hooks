@@ -9,4 +9,3 @@ public sealed record ScriptStepNode(
     IReadOnlyList<UnknownFieldNode> UnknownFields,
     SourceSpan Span)
     : StepNode(UnknownFields, Span);
-

@@ -69,8 +69,3 @@ public class DisplayNameFieldHandlerTests
         return reader;
     }
 }
-
-
-
-
-

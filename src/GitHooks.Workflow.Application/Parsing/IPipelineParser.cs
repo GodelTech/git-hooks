@@ -6,4 +6,3 @@ public interface IPipelineParser
 {
     public PipelineNode Parse(string content, string sourceName);
 }
-

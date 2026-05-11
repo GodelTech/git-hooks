@@ -26,4 +26,3 @@ public sealed class BashTemplateProvider(ITemplateTokenValidator tokenValidator,
         return result;
     }
 }
-

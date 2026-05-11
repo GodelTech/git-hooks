@@ -9,4 +9,3 @@ public sealed record PipelineNode(
     IReadOnlyList<UnknownFieldNode> UnknownFields,
     SourceSpan Span)
     : AstNode(UnknownFields, Span);
-

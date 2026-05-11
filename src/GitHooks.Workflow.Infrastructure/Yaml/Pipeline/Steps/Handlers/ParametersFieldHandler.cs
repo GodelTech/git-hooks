@@ -15,4 +15,3 @@ internal sealed class ParametersFieldHandler(InterpolationParser parser)
         };
     }
 }
-

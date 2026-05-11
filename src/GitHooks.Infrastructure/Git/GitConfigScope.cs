@@ -20,4 +20,3 @@ public enum GitConfigScope
     /// </summary>
     System
 }
-

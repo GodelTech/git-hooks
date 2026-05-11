@@ -16,4 +16,3 @@ public interface IPipelineParameterBinder
     /// <exception cref="PipelineParameterBindingException">Thrown when a parameter reference cannot be resolved or validated.</exception>
     public PipelineNode Bind(PipelineNode pipeline);
 }
-

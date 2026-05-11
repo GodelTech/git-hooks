@@ -51,4 +51,3 @@ public abstract class EmbeddedTemplateProviderBase : ITemplateProvider
         return reader.ReadToEnd().ReplaceLineEndings("\n");
     }
 }
-

@@ -17,4 +17,3 @@ public interface IBashTemplateProvider : ITemplateProvider
     /// <returns>The tokenized Bash hook content.</returns>
     public string ApplyTokens(string templateContent, string hooksPath, GitHook hook);
 }
-

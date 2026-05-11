@@ -18,4 +18,3 @@ internal sealed class WorkingDirectoryFieldHandler(InterpolationParser parser) :
         };
     }
 }
-

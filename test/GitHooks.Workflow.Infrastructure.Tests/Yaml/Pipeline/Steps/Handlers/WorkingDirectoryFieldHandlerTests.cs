@@ -72,8 +72,3 @@ public class WorkingDirectoryFieldHandlerTests
         return reader;
     }
 }
-
-
-
-
-

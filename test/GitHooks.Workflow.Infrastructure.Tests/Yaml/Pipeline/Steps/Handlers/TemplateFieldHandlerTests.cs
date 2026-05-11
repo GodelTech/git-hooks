@@ -69,8 +69,3 @@ public class TemplateFieldHandlerTests
         return reader;
     }
 }
-
-
-
-
-

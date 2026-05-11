@@ -57,4 +57,3 @@ internal sealed class PipelineRootParser(
             : new PipelineNode(parameters, steps, unknownFields, span);
     }
 }
-

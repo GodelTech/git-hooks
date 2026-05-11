@@ -31,5 +31,3 @@ public class InterpolationParserTests
         Assert.Equal("Hello, $(variables.Name)!", result.Value);
     }
 }
-
-

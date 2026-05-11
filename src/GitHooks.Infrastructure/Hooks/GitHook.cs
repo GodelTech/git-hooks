@@ -29,4 +29,3 @@ public sealed record GitHook(
     string Description,
     bool CanAbort
 );
-

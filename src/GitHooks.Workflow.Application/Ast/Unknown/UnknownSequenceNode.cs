@@ -6,4 +6,3 @@ public sealed record UnknownSequenceNode(
     IReadOnlyList<UnknownNode> Items,
     SourceSpan Span
 ) : UnknownNode(Span);
-

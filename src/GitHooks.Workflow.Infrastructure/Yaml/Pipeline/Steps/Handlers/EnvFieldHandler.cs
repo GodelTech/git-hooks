@@ -15,4 +15,3 @@ internal sealed class EnvFieldHandler(InterpolationParser parser)
         };
     }
 }
-

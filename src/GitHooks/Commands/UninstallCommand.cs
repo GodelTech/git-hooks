@@ -38,4 +38,3 @@ public sealed class UninstallCommand(IUninstallHandler uninstallHandler)
         return _uninstallHandler.HandleAsync(scope, cancellationToken);
     }
 }
-

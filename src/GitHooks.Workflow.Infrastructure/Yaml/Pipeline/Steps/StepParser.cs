@@ -88,4 +88,3 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers)
         };
     }
 }
-

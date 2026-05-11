@@ -38,4 +38,3 @@ internal abstract class MapFieldHandler : IStepFieldHandler
         return result;
     }
 }
-

@@ -73,8 +73,3 @@ public class ConditionFieldHandlerTests
         return reader;
     }
 }
-
-
-
-
-

@@ -19,4 +19,3 @@ public class SourceSpanTests
         Assert.Equal(new SourceLocation(0, 0), result.End);
     }
 }
-

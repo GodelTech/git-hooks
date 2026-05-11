@@ -253,4 +253,3 @@ public class PipelineParameterBinderTests
         return SourceSpan.Unknown(new SourceRef(sourceName));
     }
 }
-

@@ -7,4 +7,3 @@ public sealed class YamlParseException(string message, SourceSpan span, Exceptio
 {
     public SourceSpan Span { get; } = span;
 }
-

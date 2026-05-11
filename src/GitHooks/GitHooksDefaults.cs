@@ -22,4 +22,3 @@ public static class GitHooksDefaults
     /// <summary>The default hooks created by the create command when no hooks are specified.</summary>
     public static readonly string[] CreateHooks = [.. CommitHooks, .. PushHooks];
 }
-

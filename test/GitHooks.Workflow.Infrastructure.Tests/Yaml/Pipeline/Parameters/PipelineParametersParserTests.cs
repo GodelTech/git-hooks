@@ -336,8 +336,3 @@ public class PipelineParametersParserTests
         return pipeline;
     }
 }
-
-
-
-
-

@@ -12,4 +12,3 @@ public interface ITemplateProvider
     /// <returns>A task containing the template content.</returns>
     public ValueTask<string> GetTemplateAsync(CancellationToken cancellationToken = default);
 }
-
