@@ -110,6 +110,44 @@ public class StepParserTests
         Assert.Equal("Step can contain only one of 'script' or 'template'", exception.Message);
     }
 
+    [Theory]
+    [InlineData("displayName: Build", "displayName")]
+    [InlineData("condition: succeeded()", "condition")]
+    [InlineData("timeoutInMinutes: 10", "timeoutInMinutes")]
+    [InlineData("workingDirectory: ./artifacts", "workingDirectory")]
+    [InlineData("env:\n  NAME: value", "env")]
+    public void Parse_TemplateStepContainsScriptOnlyField_ThrowsYamlParseException(string invalidField, string fieldName)
+    {
+        var exception = Assert.Throws<YamlParseException>(
+            () => ParseStep(
+                $"""
+                template: templates/build.yml
+                {invalidField}
+                """
+            )
+        );
+
+        Assert.Equal($"Template step cannot contain fields: {fieldName}", exception.Message);
+    }
+
+    [Fact]
+    public void Parse_TemplateStepContainsMultipleScriptOnlyFields_ThrowsYamlParseExceptionWithDeterministicFieldOrder()
+    {
+        var exception = Assert.Throws<YamlParseException>(
+            () => ParseStep(
+                """
+                template: templates/build.yml
+                env:
+                  NAME: value
+                displayName: Build
+                timeoutInMinutes: 5
+                """
+            )
+        );
+
+        Assert.Equal("Template step cannot contain fields: displayName, timeoutInMinutes, env", exception.Message);
+    }
+
     private static StepNode ParseStep(string yamlStep)
     {
         var yaml = $"""

@@ -4,6 +4,7 @@ using GitHooks.Workflow.Infrastructure.Yaml.Expressions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps;
+using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Builders;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,6 +31,21 @@ public static class YamlParsingRegistration
         foreach (var handler in handlers)
         {
             _ = services.AddSingleton(handlerType, handler);
+        }
+
+        // Register all IStepNodeBuilder implementations
+        var builderType = typeof(IStepNodeBuilder);
+
+        var builders = builderType.Assembly
+            .GetTypes()
+            .Where(t =>
+                t is { IsAbstract: false, IsInterface: false } &&
+                builderType.IsAssignableFrom(t)
+            );
+
+        foreach (var builder in builders)
+        {
+            _ = services.AddSingleton(builderType, builder);
         }
 
         _ = services.AddSingleton<StepParser>();

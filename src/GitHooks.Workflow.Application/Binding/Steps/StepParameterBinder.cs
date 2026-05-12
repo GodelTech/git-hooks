@@ -13,7 +13,7 @@ internal sealed class StepParameterBinder(UnknownNodeParameterBinder unknownNode
 
     public StepNode Bind(StepNode step, ParameterBindingContext context)
     {
-        var boundStep = step switch
+        return step switch
         {
             ScriptStepNode scriptStep => BindScriptStep(scriptStep, context),
             TemplateStepNode templateStep => BindTemplateStep(templateStep, context),
@@ -22,34 +22,31 @@ internal sealed class StepParameterBinder(UnknownNodeParameterBinder unknownNode
                 step.Span
             )
         };
-
-        return boundStep with
-        {
-            DisplayName = boundStep.DisplayName is null
-                ? null
-                : ParameterScalarBinder.Bind(boundStep.DisplayName, boundStep.Span, context),
-            WorkingDirectory = boundStep.WorkingDirectory is null
-                ? null
-                : new InterpolatedStringNode(ParameterScalarBinder.Bind(boundStep.WorkingDirectory.Value, boundStep.Span, context)),
-            Env = BindInterpolatedStringMap(boundStep.Env, context),
-            UnknownFields = _unknownNodeParameterBinder.BindUnknownFields(boundStep.UnknownFields, context)
-        };
     }
 
-    private static StepNode BindScriptStep(ScriptStepNode step, ParameterBindingContext context)
+    private ScriptStepNode BindScriptStep(ScriptStepNode step, ParameterBindingContext context)
     {
         return step with
         {
-            Script = new InterpolatedStringNode(ParameterScalarBinder.Bind(step.Script.Value, step.Span, context))
+            Script = new InterpolatedStringNode(ParameterScalarBinder.Bind(step.Script.Value, step.Span, context)),
+            DisplayName = step.DisplayName is null
+                ? null
+                : ParameterScalarBinder.Bind(step.DisplayName, step.Span, context),
+            WorkingDirectory = step.WorkingDirectory is null
+                ? null
+                : new InterpolatedStringNode(ParameterScalarBinder.Bind(step.WorkingDirectory.Value, step.Span, context)),
+            Env = BindInterpolatedStringMap(step.Env, context),
+            UnknownFields = _unknownNodeParameterBinder.BindUnknownFields(step.UnknownFields, context)
         };
     }
 
-    private static StepNode BindTemplateStep(TemplateStepNode step, ParameterBindingContext context)
+    private TemplateStepNode BindTemplateStep(TemplateStepNode step, ParameterBindingContext context)
     {
         return step with
         {
             Parameters = BindInterpolatedStringMap(step.Parameters, context),
             Template = ParameterScalarBinder.Bind(step.Template, step.Span, context),
+            UnknownFields = _unknownNodeParameterBinder.BindUnknownFields(step.UnknownFields, context)
         };
     }
 

@@ -6,10 +6,10 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps;
 
-internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers)
+internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers, IEnumerable<IStepNodeBuilder> builders)
 {
-    private readonly Dictionary<string, IStepFieldHandler> _handlers
-        = handlers.ToDictionary(h => h.Key, StringComparer.Ordinal);
+    private readonly Dictionary<string, IStepFieldHandler> _handlers = handlers.ToDictionary(h => h.Key, StringComparer.Ordinal);
+    private readonly List<IStepNodeBuilder> _builders = [.. builders];
 
     public StepNode Parse(YamlReader reader)
     {
@@ -55,36 +55,23 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers)
         return BuildStep(fields, span);
     }
 
-    private static StepNode BuildStep(StepFields fields, SourceSpan span)
+    private StepNode BuildStep(StepFields fields, SourceSpan span)
     {
-        StepNode node = (fields.Script, fields.Template) switch
+        var applicableBuilders = _builders
+            .Where(builder => builder.CanBuild(fields))
+            .ToList();
+
+        return applicableBuilders.Count switch
         {
-            // Only script is defined.
-            ({ } script, null) => new ScriptStepNode(script, fields.UnknownFields, span),
-
-            // Only template is defined.
-            (null, { } template) => new TemplateStepNode(template, fields.Parameters, fields.UnknownFields, span),
-
-            // No supported step type was provided.
-            (null, null) => throw new YamlParseException(
+            1 => applicableBuilders[0].Build(fields, span),
+            0 => throw new YamlParseException(
                 "Step must contain 'script' or 'template'",
                 span
             ),
-
-            // Script and template are mutually exclusive.
-            ({ }, { }) => throw new YamlParseException(
+            _ => throw new YamlParseException(
                 "Step can contain only one of 'script' or 'template'",
                 span
             )
-        };
-
-        return node with
-        {
-            DisplayName = fields.DisplayName,
-            Condition = fields.Condition,
-            TimeoutInMinutes = fields.TimeoutInMinutes,
-            WorkingDirectory = fields.WorkingDirectory,
-            Env = fields.Env
         };
     }
 }
