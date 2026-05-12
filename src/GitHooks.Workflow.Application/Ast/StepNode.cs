@@ -4,6 +4,7 @@ using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Application.Ast;
 
+// todo: move all fields to ScriptStepNode as TemplateStepNode should only have Template and Parameters fields
 public abstract record StepNode(IReadOnlyList<UnknownFieldNode> UnknownFields, SourceSpan Span)
     : AstNode(UnknownFields, Span)
 {
