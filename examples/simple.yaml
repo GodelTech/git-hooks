@@ -1,26 +1,26 @@
 parameters:
-  - name: enableBuildDebug
-    displayName: 'Enable build debug'
+  - name: enableDebug
+    displayName: 'Enable debug'
     type: boolean
     default: true
 
-  - name: vmImage
-    displayName: 'Pool VM image'
+  - name: operatingSystem
+    displayName: 'Operating system'
     type: string
-    default: 'ubuntu-latest'
+    default: 'ubuntu'
     values:
-      - windows-latest
-      - ubuntu-latest
-      - macOS-latest
+      - windows
+      - ubuntu
+      - macOS
 
-  - name: organization
-    displayName: 'Azure DevOps organization'
+  - name: serverName
+    displayName: 'Server name'
     type: string
-    default: 'godeltech'
+    default: 'TEST-SERVER'
 
 steps:
   - script: echo Hello 1
   - script: echo Hello 2
     displayName: Hello 2
   - script: echo Hello 3
-    otherField: ${{ parameters.organization }}
+    otherField: ${{ parameters.serverName }}

@@ -17,16 +17,16 @@ public class PipelineParameterBinderTests
     {
         var pipeline = CreatePipeline(
             [
-                CreateParameter("organization", ParameterType.Text, "godeltech")
+                CreateParameter("serverName", ParameterType.Text, "TEST-SERVER")
             ],
             [
                 CreateScriptStep(
-                    "echo ${{ parameters.organization }}",
-                    displayName: "Deploy ${{ parameters.organization }}",
-                    workingDirectory: "./artifacts/${{ parameters.organization }}",
+                    "echo ${{ parameters.serverName }}",
+                    displayName: "Deploy ${{ parameters.serverName }}",
+                    workingDirectory: "./artifacts/${{ parameters.serverName }}",
                     env: new Dictionary<string, string>(StringComparer.Ordinal)
                     {
-                        ["ORG"] = "${{ parameters.organization }}"
+                        ["SERVER_NAME"] = "${{ parameters.serverName }}"
                     }
                 )
             ]
@@ -36,10 +36,10 @@ public class PipelineParameterBinderTests
 
         var step = Assert.IsType<ScriptStepNode>(Assert.Single(result.Steps));
 
-        Assert.Equal("echo godeltech", step.Script.Value);
-        Assert.Equal("Deploy godeltech", step.DisplayName);
-        Assert.Equal("./artifacts/godeltech", step.WorkingDirectory?.Value);
-        Assert.Equal("godeltech", step.Env["ORG"].Value);
+        Assert.Equal("echo TEST-SERVER", step.Script.Value);
+        Assert.Equal("Deploy TEST-SERVER", step.DisplayName);
+        Assert.Equal("./artifacts/TEST-SERVER", step.WorkingDirectory?.Value);
+        Assert.Equal("TEST-SERVER", step.Env["SERVER_NAME"].Value);
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class PipelineParameterBinderTests
                 [
                     new UnknownMappingEntryNode(
                         new UnknownScalarNode("target", unknownSpan),
-                        new UnknownScalarNode("${{ parameters.organization }}", unknownSpan),
+                        new UnknownScalarNode("${{ parameters.serverName }}", unknownSpan),
                         unknownSpan
                     )
                 ],
@@ -64,7 +64,7 @@ public class PipelineParameterBinderTests
 
         var pipeline = CreatePipeline(
             [
-                CreateParameter("organization", ParameterType.Text, "godeltech")
+                CreateParameter("serverName", ParameterType.Text, "TEST-SERVER")
             ],
             [
                 CreateScriptStep("echo ok", unknownFields: [inputsField])
@@ -79,7 +79,7 @@ public class PipelineParameterBinderTests
         var entry = Assert.Single(mapping.Entries);
         var value = Assert.IsType<UnknownScalarNode>(entry.Value);
 
-        Assert.Equal("godeltech", value.Value);
+        Assert.Equal("TEST-SERVER", value.Value);
     }
 
     [Fact]
@@ -87,14 +87,14 @@ public class PipelineParameterBinderTests
     {
         var pipeline = CreatePipeline(
             [
-                CreateParameter("organization", ParameterType.Text, "godeltech")
+                CreateParameter("serverName", ParameterType.Text, "TEST-SERVER")
             ],
             [
                 CreateTemplateStep(
-                    "deploy-template.yaml",
+                    "push-template.yaml",
                     new Dictionary<string, string>(StringComparer.Ordinal)
                     {
-                        ["organization"] = "${{ parameters.organization }}"
+                        ["serverName"] = "${{ parameters.serverName }}"
                     }
                 )
             ]
@@ -104,7 +104,7 @@ public class PipelineParameterBinderTests
 
         var step = Assert.IsType<TemplateStepNode>(Assert.Single(result.Steps));
 
-        Assert.Equal("godeltech", step.Parameters["organization"].Value);
+        Assert.Equal("TEST-SERVER", step.Parameters["serverName"].Value);
     }
 
     [Fact]
@@ -112,10 +112,10 @@ public class PipelineParameterBinderTests
     {
         var pipeline = CreatePipeline(
             [
-                CreateParameter("organization", ParameterType.Text, "godeltech")
+                CreateParameter("serverName", ParameterType.Text, "TEST-SERVER")
             ],
             [
-                CreateScriptStep("echo ${{ parameters.organization }}")
+                CreateScriptStep("echo ${{ parameters.serverName }}")
             ]
         );
 
@@ -123,13 +123,13 @@ public class PipelineParameterBinderTests
             pipeline,
             new Dictionary<string, string>(StringComparer.Ordinal)
             {
-                ["organization"] = "contoso"
+                ["serverName"] = "TEST-SERVER"
             }
         );
 
         var step = Assert.IsType<ScriptStepNode>(Assert.Single(result.Steps));
 
-        Assert.Equal("echo contoso", step.Script.Value);
+        Assert.Equal("echo TEST-SERVER", step.Script.Value);
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public class PipelineParameterBinderTests
     {
         var pipeline = CreatePipeline(
             [
-                CreateParameter("organization", ParameterType.Text, "godeltech")
+                CreateParameter("serverName", ParameterType.Text, "TEST-SERVER")
             ],
             [
                 CreateScriptStep("echo ok")
@@ -187,7 +187,7 @@ public class PipelineParameterBinderTests
     {
         var pipeline = CreatePipeline(
             [
-                CreateParameter("vmImage", ParameterType.Text, "ubuntu-latest", ["ubuntu-latest", "windows-latest"])
+                CreateParameter("operatingSystem", ParameterType.Text, "ubuntu", ["ubuntu", "windows"])
             ],
             [
                 CreateScriptStep("echo ok")
@@ -199,12 +199,12 @@ public class PipelineParameterBinderTests
                 pipeline,
                 new Dictionary<string, string>(StringComparer.Ordinal)
                 {
-                    ["vmImage"] = "linux-latest"
+                    ["operatingSystem"] = "linux"
                 }
             )
         );
 
-        Assert.Equal("Parameter 'vmImage' value 'linux-latest' is not in the allowed values list.", exception.Message);
+        Assert.Equal("Parameter 'operatingSystem' value 'linux' is not in the allowed values list.", exception.Message);
     }
 
     [Fact]
@@ -212,7 +212,7 @@ public class PipelineParameterBinderTests
     {
         var pipeline = CreatePipeline(
             [
-                CreateParameter("vmImage", ParameterType.Text, "linux-latest", ["ubuntu-latest", "windows-latest"])
+                CreateParameter("operatingSystem", ParameterType.Text, "ubuntu", ["ubuntu", "windows"])
             ],
             [
                 CreateScriptStep("echo ok")
@@ -221,7 +221,7 @@ public class PipelineParameterBinderTests
 
         var exception = Assert.Throws<PipelineParameterBindingException>(() => CreateBinder().Bind(pipeline));
 
-        Assert.Equal("Parameter 'vmImage' value 'linux-latest' is not in the allowed values list.", exception.Message);
+        Assert.Equal("Parameter 'operatingSystem' value 'linux' is not in the allowed values list.", exception.Message);
     }
 
     [Fact]
@@ -229,16 +229,16 @@ public class PipelineParameterBinderTests
     {
         var pipeline = CreatePipeline(
             [
-                CreateParameter("organization", ParameterType.Text)
+                CreateParameter("serverName", ParameterType.Text)
             ],
             [
-                CreateScriptStep("echo ${{ parameters.organization }}")
+                CreateScriptStep("echo ${{ parameters.serverName }}")
             ]
         );
 
         var exception = Assert.Throws<PipelineParameterBindingException>(() => CreateBinder().Bind(pipeline));
 
-        Assert.Equal("Parameter 'organization' does not have a value.", exception.Message);
+        Assert.Equal("Parameter 'serverName' does not have a value.", exception.Message);
     }
 
     [Fact]
@@ -247,13 +247,13 @@ public class PipelineParameterBinderTests
         var pipeline = CreatePipeline(
             [],
             [
-                CreateScriptStep("echo ${{ variables.organization }}")
+                CreateScriptStep("echo ${{ variables.serverName }}")
             ]
         );
 
         var exception = Assert.Throws<PipelineParameterBindingException>(() => CreateBinder().Bind(pipeline));
 
-        Assert.Equal("Unsupported expression 'variables.organization'. Only 'parameters.<name>' is currently supported.", exception.Message);
+        Assert.Equal("Unsupported expression 'variables.serverName'. Only 'parameters.<name>' is currently supported.", exception.Message);
     }
 
     private static IPipelineParameterBinder CreateBinder()

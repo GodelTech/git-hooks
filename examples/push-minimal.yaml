@@ -1,0 +1,5 @@
+steps:
+  - script: echo Hello
+  - template: push-template.yaml
+    parameters:
+      serverName: TEST-SERVER-2

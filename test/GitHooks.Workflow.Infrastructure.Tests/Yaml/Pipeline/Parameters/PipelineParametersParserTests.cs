@@ -170,13 +170,13 @@ public class PipelineParametersParserTests
         var node = ParseRoot(
             """
             parameters:
-              - name: vmImage
+              - name: operatingSystem
                 type: string
-                default: ubuntu-latest
+                default: ubuntu
                 values:
-                  - windows-latest
-                  - ubuntu-latest
-                  - macOS-latest
+                  - windows
+                  - ubuntu
+                  - macOS
             steps:
               - script: echo ok
             """
@@ -185,8 +185,8 @@ public class PipelineParametersParserTests
         // Assert
         var param = Assert.Single(node.Parameters);
 
-        Assert.Equal(["windows-latest", "ubuntu-latest", "macOS-latest"], param.Values);
-        Assert.Equal("ubuntu-latest", param.Default);
+        Assert.Equal(["windows", "ubuntu", "macOS"], param.Values);
+        Assert.Equal("ubuntu", param.Default);
     }
 
     [Fact]

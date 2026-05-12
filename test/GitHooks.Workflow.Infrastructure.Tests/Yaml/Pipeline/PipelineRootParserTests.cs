@@ -79,9 +79,9 @@ public class PipelineRootParserTests
         var node = ParseRoot(
             """
             parameters:
-              - name: vmImage
+              - name: operatingSystem
                 type: string
-                default: ubuntu-latest
+                default: ubuntu
             steps:
               - script: echo hello
             """
@@ -90,9 +90,9 @@ public class PipelineRootParserTests
         // Assert
         var parameter = Assert.Single(node.Parameters);
 
-        Assert.Equal("vmImage", parameter.Name);
+        Assert.Equal("operatingSystem", parameter.Name);
         Assert.Equal(ParameterType.Text, parameter.Type);
-        Assert.Equal("ubuntu-latest", parameter.Default);
+        Assert.Equal("ubuntu", parameter.Default);
     }
 
     private static PipelineNode ParseRoot(string yamlRoot)

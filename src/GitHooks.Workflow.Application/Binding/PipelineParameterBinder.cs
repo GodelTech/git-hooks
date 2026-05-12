@@ -5,9 +5,6 @@ using GitHooks.Workflow.Application.Binding.UnknownNodes;
 
 namespace GitHooks.Workflow.Application.Binding;
 
-/// <summary>
-/// Applies Azure DevOps-style <c>${{ parameters.name }}</c> substitutions to a parsed pipeline AST.
-/// </summary>
 internal sealed class PipelineParameterBinder(
     StepParameterBinder stepParameterBinder,
     UnknownNodeParameterBinder unknownNodeParameterBinder)

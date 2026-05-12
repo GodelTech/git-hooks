@@ -1,0 +1,8 @@
+parameters:
+  - name: serverName
+    displayName: 'Server name'
+    type: string
+    default: 'TEST-SERVER'
+
+steps:
+  - script: echo Push to ${{ parameters.serverName }}
