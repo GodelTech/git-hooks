@@ -18,11 +18,64 @@ indent_size = 4
 max_line_length = 140
 
 # Language style — non-default values
-dotnet_separate_import_directive_groups = true
-dotnet_style_require_accessibility_modifiers = always
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+dotnet_style_require_accessibility_modifiers = always:warning
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_predefined_type_for_member_access = true:warning
 dotnet_style_parentheses_in_arithmetic_binary_operators = never_if_unnecessary
 dotnet_style_parentheses_in_relational_binary_operators = never_if_unnecessary
 dotnet_style_parentheses_in_other_binary_operators = never_if_unnecessary
+dotnet_style_object_initializer = true:warning
+dotnet_style_collection_initializer = true:warning
+dotnet_style_null_propagation = true:warning
+dotnet_style_coalesce_expression = true:warning
+dotnet_style_explicit_tuple_names = true:warning
+
+csharp_style_var_for_built_in_types = true:warning
+csharp_style_var_when_type_is_apparent = true:warning
+csharp_style_var_elsewhere = true:warning
+csharp_style_throw_expression = true:warning
+csharp_prefer_braces = true:warning
+
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+
+csharp_indent_block_contents = true
+csharp_indent_braces = false
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_indent_labels = one_less_than_current
+
+csharp_space_after_cast = false
+csharp_space_after_colon_in_inheritance_clause = true
+csharp_space_after_comma = true
+csharp_space_after_dot = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_after_semicolon_in_for_statement = true
+csharp_space_around_binary_operators = before_and_after
+csharp_space_around_declaration_statements = do_not_ignore
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_before_comma = false
+csharp_space_before_dot = false
+csharp_space_before_open_square_brackets = false
+csharp_space_before_semicolon_in_for_statement = false
+csharp_space_between_empty_square_brackets = false
+csharp_space_between_method_call_empty_parameter_list_parentheses = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_parentheses = false
+csharp_space_between_square_brackets = false
+
+csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = false
 
 # Analyzer categories
 dotnet_analyzer_diagnostic.category-Design.severity = warning
@@ -102,6 +155,25 @@ dotnet_diagnostic.CA5394.severity = error
 # 'var' is preferred in modern C#
 dotnet_diagnostic.IDE0008.severity = none
 
+# Qualification style: avoid 'this.' unless disambiguation is required.
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+# SA1101: PrefixLocalCallsWithThis
+# Use Roslyn qualification preferences instead of enforcing 'this.' prefixes.
+dotnet_diagnostic.SA1101.severity = none
+
+# IDE0065: 'using' directive placement
+# Use built-in .NET style rule and prefer usings outside namespace.
+csharp_using_directive_placement = outside_namespace:warning
+dotnet_diagnostic.IDE0065.severity = warning
+
+# SA1200: UsingDirectivesMustBePlacedCorrectly
+# Prefer IDE0065 for using placement to avoid overlapping diagnostics.
+dotnet_diagnostic.SA1200.severity = none
+
 # Usage — enable disabled rules
 # CA2213: Disposable fields should be disposed
 dotnet_diagnostic.CA2213.severity = error
@@ -123,8 +195,30 @@ dotnet_diagnostic.CA2243.severity = error
 # SA1633: File should have header
 dotnet_diagnostic.SA1633.severity = none
 
+# SA1009: ClosingParenthesisMustNotBeFollowedBySpace
+dotnet_diagnostic.SA1009.severity = none
+
+# SA1111: ClosingParenthesisMustBeOnLineOfLastParameter
+# Keep formatting preference flexible; do not enforce this StyleCop readability rule.
+dotnet_diagnostic.SA1111.severity = none
+
+# SA1309: FieldNamesMustNotBeginWithUnderscore
+# Modern .NET convention prefers underscore-prefixed private fields.
+dotnet_diagnostic.SA1309.severity = none
+
+# Roslyn naming rules: private fields must be _camelCase
+dotnet_naming_rule.private_fields_must_be_underscore_camel_case.severity = warning
+dotnet_naming_rule.private_fields_must_be_underscore_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_must_be_underscore_camel_case.style = underscore_camel_case
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+
 [*.cs]
-csharp_style_namespace_declarations = file_scoped
+csharp_style_namespace_declarations = file_scoped:warning
 
 [test/**/*.cs]
 # CA1707: Identifiers should not contain underscores
