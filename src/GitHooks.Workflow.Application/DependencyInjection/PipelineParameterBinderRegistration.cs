@@ -1,6 +1,6 @@
+using GitHooks.Workflow.Application.Binding;
 using GitHooks.Workflow.Application.Binding.Steps;
 using GitHooks.Workflow.Application.Binding.UnknownNodes;
-using GitHooks.Workflow.Application.Binding;
 
 using Microsoft.Extensions.DependencyInjection;
 

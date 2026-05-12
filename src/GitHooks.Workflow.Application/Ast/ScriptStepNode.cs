@@ -11,7 +11,9 @@ public sealed record ScriptStepNode(
     : StepNode(UnknownFields, Span)
 {
     public string? DisplayName { get; init; }
+
     public ExpressionNode? Condition { get; init; }
+
     public int? TimeoutInMinutes { get; init; } // todo: consider using TimeSpan instead of int for better clarity and flexibility
 
     public InterpolatedStringNode? WorkingDirectory { get; init; }

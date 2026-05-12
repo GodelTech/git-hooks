@@ -20,14 +20,16 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
         );
     }
 
-    public T Read<T>() where T : ParsingEvent
+    public T Read<T>()
+        where T : ParsingEvent
     {
         return !_parser.TryConsume<T>(out var evt)
             ? throw Error($"Expected {typeof(T).Name}")
             : evt;
     }
 
-    public void Require<T>() where T : ParsingEvent
+    public void Require<T>()
+        where T : ParsingEvent
     {
         if (!_parser.TryConsume<T>(out _))
         {
@@ -35,14 +37,18 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
         }
     }
 
-    /// <summary>Peek: is the next event of type T?</summary>
-    public bool Is<T>() where T : ParsingEvent
+    /// <summary>Peek: is the next event of type T?.</summary>
+    /// <returns></returns>
+    public bool Is<T>()
+        where T : ParsingEvent
     {
         return _parser.Accept<T>(out _);
     }
 
     /// <summary>Peek and return the next event of type T without consuming.</summary>
-    public T Peek<T>() where T : ParsingEvent
+    /// <returns></returns>
+    public T Peek<T>()
+        where T : ParsingEvent
     {
         return _parser.Accept<T>(out var evt)
             ? evt
@@ -133,7 +139,8 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
         );
     }
 
-    private bool TryConsumeSafe<T>(out T evt) where T : ParsingEvent
+    private bool TryConsumeSafe<T>(out T evt)
+        where T : ParsingEvent
     {
         try
         {

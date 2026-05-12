@@ -87,33 +87,32 @@ public sealed class RunHandler(
             return 1;
         }
 
-        //try
-        //{
+        // try
+        // {
         //    // Stage 1: Parse YAML to typed AST.
         //    var pipeline = _pipelineParserOld.Parse(yamlContent, absoluteFilePath);
 
-        //    // Stage 2: Expand template steps recursively.
+        // // Stage 2: Expand template steps recursively.
         //    var expanded = await _templateExpander.ExpandAsync(pipeline, absoluteFilePath, cancellationToken);
 
-        //    // Stage 3: Execute expanded script steps.
+        // // Stage 3: Execute expanded script steps.
         //    var result = await _pipelineRunner.RunAsync(expanded, cancellationToken);
 
-        //    if (!result.IsSuccess)
+        // if (!result.IsSuccess)
         //    {
         //        var failedStep = result.FailedStepId.HasValue ? $" at step {result.FailedStepId.Value}" : string.Empty;
         //        _console.MarkupLineInterpolated($"[red][[ERROR]][/] Pipeline execution failed{failedStep}: {Markup.Escape(result.ErrorMessage ?? "Unknown error.")}");
         //        return 1;
         //    }
 
-        //    _console.MarkupLine("[green][[SUCCESS]][/] Pipeline completed successfully.");
+        // _console.MarkupLine("[green][[SUCCESS]][/] Pipeline completed successfully.");
         //    return 0;
-        //}
-        //catch (PipelineException ex)
-        //{
+        // }
+        // catch (PipelineException ex)
+        // {
         //    _console.MarkupLineInterpolated($"[red][[ERROR]][/] {Markup.Escape(ex.Message)}");
         //    return 1;
-        //}
-
+        // }
         return 0;
     }
 }

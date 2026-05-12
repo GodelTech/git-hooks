@@ -16,6 +16,7 @@ public sealed class GitHookCatalog : IGitHookCatalog
     // Static so the list and lookup dictionary are built once per process, not per instance.
     private static readonly IReadOnlyCollection<GitHook> _all =
     [
+
         // Commit hooks
         new("pre-commit",         GitHookCategory.Commit,   "Runs before the commit message editor opens. Aborts the commit on non-zero exit.",                 CanAbort: true),
         new("prepare-commit-msg", GitHookCategory.Commit,   "Runs before the commit editor with the default message. Used to modify the message template.",     CanAbort: true),
@@ -46,7 +47,7 @@ public sealed class GitHookCatalog : IGitHookCatalog
             .ToDictionary(g => g.Key, g => (IReadOnlyCollection<GitHook>)[.. g]);
 
     /// <summary>
-    /// A shared singleton instance for use outside of dependency injection containers.
+    /// Gets a shared singleton instance for use outside of dependency injection containers.
     /// </summary>
     public static IGitHookCatalog Default { get; } = new GitHookCatalog();
 

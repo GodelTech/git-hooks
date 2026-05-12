@@ -19,7 +19,7 @@ max_line_length = 140
 
 # Language style — non-default values
 dotnet_sort_system_directives_first = true
-dotnet_separate_import_directive_groups = false
+dotnet_separate_import_directive_groups = true
 dotnet_style_require_accessibility_modifiers = always:warning
 dotnet_style_predefined_type_for_locals_parameters_members = true:warning
 dotnet_style_predefined_type_for_member_access = true:warning
@@ -160,7 +160,6 @@ dotnet_style_qualification_for_field = false:warning
 dotnet_style_qualification_for_property = false:warning
 dotnet_style_qualification_for_method = false:warning
 dotnet_style_qualification_for_event = false:warning
-
 # SA1101: PrefixLocalCallsWithThis
 # Use Roslyn qualification preferences instead of enforcing 'this.' prefixes.
 dotnet_diagnostic.SA1101.severity = none
@@ -169,7 +168,6 @@ dotnet_diagnostic.SA1101.severity = none
 # Use built-in .NET style rule and prefer usings outside namespace.
 csharp_using_directive_placement = outside_namespace:warning
 dotnet_diagnostic.IDE0065.severity = warning
-
 # SA1200: UsingDirectivesMustBePlacedCorrectly
 # Prefer IDE0065 for using placement to avoid overlapping diagnostics.
 dotnet_diagnostic.SA1200.severity = none
@@ -194,13 +192,12 @@ dotnet_diagnostic.CA2243.severity = error
 
 # SA1633: File should have header
 dotnet_diagnostic.SA1633.severity = none
-
 # SA1009: ClosingParenthesisMustNotBeFollowedBySpace
 dotnet_diagnostic.SA1009.severity = none
-
 # SA1111: ClosingParenthesisMustBeOnLineOfLastParameter
-# Keep formatting preference flexible; do not enforce this StyleCop readability rule.
 dotnet_diagnostic.SA1111.severity = none
+# SA1413: UseTrailingCommaInMultiLineInitializers
+dotnet_diagnostic.SA1413.severity = none
 
 # SA1309: FieldNamesMustNotBeginWithUnderscore
 # Modern .NET convention prefers underscore-prefixed private fields.

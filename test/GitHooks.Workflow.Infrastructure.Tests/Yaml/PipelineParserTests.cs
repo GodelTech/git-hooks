@@ -17,9 +17,9 @@ public class PipelineParserTests
         // Act
         var result = parser.Parse(
             """
-			steps:
-			  - script: echo hello
-			""",
+            steps:
+              - script: echo hello
+            """,
             "pipeline.yml"
         );
 
@@ -38,12 +38,12 @@ public class PipelineParserTests
         var exception = Assert.Throws<YamlParseException>(
             () => parser.Parse(
                 """
-				steps:
-				  - script: echo hello
-				---
-				steps:
-				  - script: echo again
-				""",
+                steps:
+                  - script: echo hello
+                ---
+                steps:
+                  - script: echo again
+                """,
                 "pipeline.yml"
             )
         );
