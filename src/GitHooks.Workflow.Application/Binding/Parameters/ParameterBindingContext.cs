@@ -10,6 +10,9 @@ internal sealed class ParameterBindingContext(
     IReadOnlyDictionary<string, ParameterNode> declarations,
     IReadOnlyDictionary<string, string> resolvedValues)
 {
+    private readonly IReadOnlyDictionary<string, ParameterNode> _declarations = declarations;
+    private readonly IReadOnlyDictionary<string, string> _resolvedValues = resolvedValues;
+
     public static ParameterBindingContext Create(
         IReadOnlyList<ParameterNode> parameters,
         IReadOnlyDictionary<string, string>? parameterOverrides = null)
@@ -60,12 +63,12 @@ internal sealed class ParameterBindingContext(
 
     public string GetResolvedValue(string parameterName, SourceSpan span)
     {
-        if (resolvedValues.TryGetValue(parameterName, out var value))
+        if (_resolvedValues.TryGetValue(parameterName, out var value))
         {
             return value;
         }
 
-        if (declarations.ContainsKey(parameterName))
+        if (_declarations.ContainsKey(parameterName))
         {
             throw new PipelineParameterBindingException(
                 $"Parameter '{parameterName}' does not have a value.",
