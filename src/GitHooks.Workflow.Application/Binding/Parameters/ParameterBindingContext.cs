@@ -10,7 +10,9 @@ internal sealed class ParameterBindingContext(
     IReadOnlyDictionary<string, ParameterNode> declarations,
     IReadOnlyDictionary<string, string> resolvedValues)
 {
-    public static ParameterBindingContext Create(IReadOnlyList<ParameterNode> parameters)
+    public static ParameterBindingContext Create(
+        IReadOnlyList<ParameterNode> parameters,
+        IReadOnlyDictionary<string, string>? parameterOverrides = null)
     {
         var declarations = new Dictionary<string, ParameterNode>(StringComparer.Ordinal);
         var resolvedValues = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -32,6 +34,25 @@ internal sealed class ParameterBindingContext(
 
             ValidateParameterValue(parameter, parameter.Default, parameter.Span);
             resolvedValues[parameter.Name] = parameter.Default;
+        }
+
+        if (parameterOverrides is not null)
+        {
+            var commandLineSpan = SourceSpan.Unknown(new SourceRef("command-line"));
+
+            foreach (var parameterOverride in parameterOverrides)
+            {
+                if (!declarations.TryGetValue(parameterOverride.Key, out var declaration))
+                {
+                    throw new PipelineParameterBindingException(
+                        $"Parameter '{parameterOverride.Key}' is not defined.",
+                        commandLineSpan
+                    );
+                }
+
+                ValidateParameterValue(declaration, parameterOverride.Value, declaration.Span);
+                resolvedValues[parameterOverride.Key] = parameterOverride.Value;
+            }
         }
 
         return new ParameterBindingContext(declarations, resolvedValues);

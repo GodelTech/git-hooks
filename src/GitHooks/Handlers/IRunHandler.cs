@@ -9,7 +9,11 @@ public interface IRunHandler
     /// Parses and validates the provided YAML file along with repository path information.
     /// </summary>
     /// <param name="filePath">Path to the YAML file.</param>
+    /// <param name="parameterOverrides">Optional command-line parameter values that override YAML defaults.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation, returning an exit code.</returns>
-    public Task<int> HandleAsync(string filePath, CancellationToken cancellationToken = default);
+    public Task<int> HandleAsync(
+        string filePath,
+        IReadOnlyDictionary<string, string>? parameterOverrides = null,
+        CancellationToken cancellationToken = default);
 }

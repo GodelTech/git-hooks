@@ -17,11 +17,13 @@ internal sealed class PipelineParameterBinder(
     private readonly UnknownNodeParameterBinder _unknownNodeParameterBinder = unknownNodeParameterBinder;
 
     /// <inheritdoc/>
-    public PipelineNode Bind(PipelineNode pipeline)
+    public PipelineNode Bind(
+        PipelineNode pipeline,
+        IReadOnlyDictionary<string, string>? parameterOverrides = null)
     {
         ArgumentNullException.ThrowIfNull(pipeline);
 
-        var context = ParameterBindingContext.Create(pipeline.Parameters);
+        var context = ParameterBindingContext.Create(pipeline.Parameters, parameterOverrides);
 
         return pipeline with
         {

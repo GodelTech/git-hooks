@@ -311,6 +311,31 @@ public class PipelineParametersParserTests
         Assert.Empty(node.UnknownFields);
     }
 
+    [Fact]
+    public void Parse_ParameterWithNonScalarKey_CapturesAsUnknownField()
+    {
+        // Arrange & Act
+        var node = ParseRoot(
+            """
+            parameters:
+              - name: myParam
+                ? [complex, key]
+                : someValue
+            steps:
+              - script: echo ok
+            """
+        );
+
+        // Assert
+        var param = Assert.Single(node.Parameters);
+
+        Assert.Equal("myParam", param.Name);
+        var unknownField = Assert.Single(param.UnknownFields);
+
+        // Non-scalar key should be captured as unknown field
+        Assert.NotNull(unknownField);
+    }
+
     private static PipelineNode ParseRoot(string yamlRoot)
     {
         var yaml = $"""

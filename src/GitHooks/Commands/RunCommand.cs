@@ -18,6 +18,9 @@ namespace GitHooks.Commands;
 public sealed class RunCommand(IRunHandler runHandler, IAnsiConsole console)
     : CommandBase("run", "Parse and validate a hook YAML file and display repository path details.")
 {
+    private const string ParameterOptionName = "--parameter";
+    private const string ParametersOptionName = "--parameters";
+
     private readonly IRunHandler _runHandler = runHandler;
     private readonly IAnsiConsole _console = console;
 
@@ -29,12 +32,27 @@ public sealed class RunCommand(IRunHandler runHandler, IAnsiConsole console)
             Description = "Path to YAML file (for example: pre-commit.yaml).",
             Required = true,
         };
+
+        var parameterOption = new Option<string[]>(ParameterOptionName)
+        {
+            Description = "Parameter override in name=value format. Repeat option to pass multiple values.",
+        };
+        parameterOption.Aliases.Add("-p");
+
+        yield return parameterOption;
+
+        yield return new Option<string?>(ParametersOptionName)
+        {
+            Description = "Comma-separated parameter overrides in name=value format.",
+        };
     }
 
     /// <inheritdoc/>
     public override Task<int> HandleActionAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
         var filePath = parseResult.GetValue<string>("--file");
+        var parameterEntries = parseResult.GetValue<string[]>(ParameterOptionName) ?? [];
+        var parameterListEntry = parseResult.GetValue<string?>(ParametersOptionName);
 
         if (string.IsNullOrWhiteSpace(filePath))
         {
@@ -42,6 +60,88 @@ public sealed class RunCommand(IRunHandler runHandler, IAnsiConsole console)
             return Task.FromResult(1);
         }
 
-        return _runHandler.HandleAsync(filePath, cancellationToken);
+        if (!TryParseParameterOverrides(parameterEntries, parameterListEntry, out var parameterOverrides, out var errorMessage))
+        {
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {Markup.Escape(errorMessage)}");
+            return Task.FromResult(1);
+        }
+
+        return _runHandler.HandleAsync(filePath, parameterOverrides, cancellationToken);
+    }
+
+    internal static bool TryParseParameterOverrides(
+        IReadOnlyList<string> parameterEntries,
+        string? parameterListEntry,
+        out Dictionary<string, string> parameterOverrides,
+        out string errorMessage)
+    {
+        parameterOverrides = new Dictionary<string, string>(StringComparer.Ordinal);
+        errorMessage = string.Empty;
+
+        foreach (var parameterEntry in parameterEntries)
+        {
+            if (!TryAddParameterOverride(parameterEntry, ParameterOptionName, parameterOverrides, out errorMessage))
+            {
+                return false;
+            }
+        }
+
+        if (parameterListEntry is null)
+        {
+            return true;
+        }
+
+        var parameterListItems = parameterListEntry.Split(',', StringSplitOptions.None);
+
+        foreach (var parameterListItem in parameterListItems)
+        {
+            if (!TryAddParameterOverride(parameterListItem, ParametersOptionName, parameterOverrides, out errorMessage))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool TryAddParameterOverride(
+        string rawEntry,
+        string optionName,
+        IDictionary<string, string> parameterOverrides,
+        out string errorMessage)
+    {
+        errorMessage = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(rawEntry))
+        {
+            errorMessage = $"Option '{optionName}' contains an empty parameter entry.";
+            return false;
+        }
+
+        var separatorIndex = rawEntry.IndexOf('=');
+
+        if (separatorIndex < 0)
+        {
+            errorMessage = $"Option '{optionName}' entry '{rawEntry}' must use the name=value format.";
+            return false;
+        }
+
+        var parameterName = rawEntry[..separatorIndex].Trim();
+
+        if (string.IsNullOrWhiteSpace(parameterName))
+        {
+            errorMessage = $"Option '{optionName}' entry '{rawEntry}' must specify a parameter name before '='.";
+            return false;
+        }
+
+        var parameterValue = rawEntry[(separatorIndex + 1)..].Trim();
+
+        if (!parameterOverrides.TryAdd(parameterName, parameterValue))
+        {
+            errorMessage = $"Parameter '{parameterName}' is provided more than once in command-line overrides.";
+            return false;
+        }
+
+        return true;
     }
 }

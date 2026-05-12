@@ -19,7 +19,10 @@ public sealed class RunHandler(
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
-    public async Task<int> HandleAsync(string filePath, CancellationToken cancellationToken = default)
+    public async Task<int> HandleAsync(
+        string filePath,
+        IReadOnlyDictionary<string, string>? parameterOverrides = null,
+        CancellationToken cancellationToken = default)
     {
         if (!await _gitCommandLine.IsAvailableAsync(cancellationToken))
         {
@@ -72,7 +75,7 @@ public sealed class RunHandler(
         try
         {
             var pipeline = _pipelineParser.Parse(yamlContent, absoluteFilePath);
-            var boundPipeline = _pipelineParameterBinder.Bind(pipeline);
+            var boundPipeline = _pipelineParameterBinder.Bind(pipeline, parameterOverrides);
         }
         catch (PipelineParameterBindingException ex)
         {

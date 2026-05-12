@@ -108,6 +108,106 @@ public class PipelineParameterBinderTests
     }
 
     [Fact]
+    public void Bind_CommandLineOverrideProvided_ExpandsOverrideValue()
+    {
+        var pipeline = CreatePipeline(
+            [
+                CreateParameter("organization", ParameterType.Text, "godeltech")
+            ],
+            [
+                CreateScriptStep("echo ${{ parameters.organization }}")
+            ]
+        );
+
+        var result = CreateBinder().Bind(
+            pipeline,
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["organization"] = "contoso"
+            }
+        );
+
+        var step = Assert.IsType<ScriptStepNode>(Assert.Single(result.Steps));
+
+        Assert.Equal("echo contoso", step.Script.Value);
+    }
+
+    [Fact]
+    public void Bind_CommandLineOverrideUnknownParameter_ThrowsException()
+    {
+        var pipeline = CreatePipeline(
+            [
+                CreateParameter("organization", ParameterType.Text, "godeltech")
+            ],
+            [
+                CreateScriptStep("echo ok")
+            ]
+        );
+
+        var exception = Assert.Throws<PipelineParameterBindingException>(
+            () => CreateBinder().Bind(
+                pipeline,
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["tenant"] = "contoso"
+                }
+            )
+        );
+
+        Assert.Equal("Parameter 'tenant' is not defined.", exception.Message);
+    }
+
+    [Fact]
+    public void Bind_CommandLineOverrideWithInvalidBoolean_ThrowsException()
+    {
+        var pipeline = CreatePipeline(
+            [
+                CreateParameter("isEnabled", ParameterType.Boolean, "true")
+            ],
+            [
+                CreateScriptStep("echo ok")
+            ]
+        );
+
+        var exception = Assert.Throws<PipelineParameterBindingException>(
+            () => CreateBinder().Bind(
+                pipeline,
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["isEnabled"] = "yes"
+                }
+            )
+        );
+
+        Assert.Equal("Parameter 'isEnabled' expects a boolean value but received 'yes'.", exception.Message);
+    }
+
+    [Fact]
+    public void Bind_CommandLineOverrideOutsideAllowedValues_ThrowsException()
+    {
+        var pipeline = CreatePipeline(
+            [
+                CreateParameter("vmImage", ParameterType.Text, "ubuntu-latest", ["ubuntu-latest", "windows-latest"])
+            ],
+            [
+                CreateScriptStep("echo ok")
+            ]
+        );
+
+        var exception = Assert.Throws<PipelineParameterBindingException>(
+            () => CreateBinder().Bind(
+                pipeline,
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["vmImage"] = "linux-latest"
+                }
+            )
+        );
+
+        Assert.Equal("Parameter 'vmImage' value 'linux-latest' is not in the allowed values list.", exception.Message);
+    }
+
+    [Fact]
     public void Bind_ParameterValueOutsideAllowedValues_ThrowsException()
     {
         var pipeline = CreatePipeline(
