@@ -8,8 +8,13 @@ namespace GitHooks.Workflow.Application.Binding;
 /// <summary>
 /// Applies Azure DevOps-style <c>${{ parameters.name }}</c> substitutions to a parsed pipeline AST.
 /// </summary>
-internal sealed class PipelineParameterBinder : IPipelineParameterBinder
+internal sealed class PipelineParameterBinder(
+    StepParameterBinder stepParameterBinder,
+    UnknownNodeParameterBinder unknownNodeParameterBinder)
+    : IPipelineParameterBinder
 {
+    private readonly StepParameterBinder _stepParameterBinder = stepParameterBinder;
+    private readonly UnknownNodeParameterBinder _unknownNodeParameterBinder = unknownNodeParameterBinder;
 
     /// <inheritdoc/>
     public PipelineNode Bind(PipelineNode pipeline)
@@ -20,8 +25,8 @@ internal sealed class PipelineParameterBinder : IPipelineParameterBinder
 
         return pipeline with
         {
-            Steps = [.. pipeline.Steps.Select(step => StepParameterBinder.Bind(step, context))],
-            UnknownFields = UnknownNodeParameterBinder.BindUnknownFields(pipeline.UnknownFields, context)
+            Steps = [.. pipeline.Steps.Select(step => _stepParameterBinder.Bind(step, context))],
+            UnknownFields = _unknownNodeParameterBinder.BindUnknownFields(pipeline.UnknownFields, context)
         };
     }
 }

@@ -7,9 +7,11 @@ using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Application.Binding.Steps;
 
-internal sealed class StepParameterBinder
+internal sealed class StepParameterBinder(UnknownNodeParameterBinder unknownNodeParameterBinder)
 {
-    public static StepNode Bind(StepNode step, ParameterBindingContext context)
+    private readonly UnknownNodeParameterBinder _unknownNodeParameterBinder = unknownNodeParameterBinder;
+
+    public StepNode Bind(StepNode step, ParameterBindingContext context)
     {
         var boundStep = step switch
         {
@@ -30,7 +32,7 @@ internal sealed class StepParameterBinder
                 ? null
                 : new InterpolatedStringNode(ParameterScalarBinder.Bind(boundStep.WorkingDirectory.Value, boundStep.Span, context)),
             Env = BindInterpolatedStringMap(boundStep.Env, context),
-            UnknownFields = UnknownNodeParameterBinder.BindUnknownFields(boundStep.UnknownFields, context)
+            UnknownFields = _unknownNodeParameterBinder.BindUnknownFields(boundStep.UnknownFields, context)
         };
     }
 

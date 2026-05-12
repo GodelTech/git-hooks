@@ -6,18 +6,20 @@ namespace GitHooks.Workflow.Application.Binding.UnknownNodes;
 
 internal sealed class UnknownNodeParameterBinder
 {
-    public static UnknownFieldNode[] BindUnknownFields(
+    private readonly Func<UnknownNode, ParameterBindingContext, UnknownNode> _bindUnknownNode = BindUnknownNode;
+
+    public UnknownFieldNode[] BindUnknownFields(
         IReadOnlyList<UnknownFieldNode> unknownFields,
         ParameterBindingContext context)
     {
         return [.. unknownFields.Select(field => field with
         {
-            Key = BindUnknownNode(field.Key, context),
-            Value = BindUnknownNode(field.Value, context)
+            Key = _bindUnknownNode(field.Key, context),
+            Value = _bindUnknownNode(field.Value, context)
         })];
     }
 
-    public static UnknownNode BindUnknownNode(UnknownNode node, ParameterBindingContext context)
+    private static UnknownNode BindUnknownNode(UnknownNode node, ParameterBindingContext context)
     {
         return node switch
         {
