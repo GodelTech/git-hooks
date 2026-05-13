@@ -17,6 +17,8 @@ public sealed class CommandLine : ICommandLine
     /// </remarks>
     public async Task<CommandLineResult> RunAsync(string fileName, IEnumerable<string> arguments, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(arguments);
+
         using var process = new Process
         {
             StartInfo = new ProcessStartInfo

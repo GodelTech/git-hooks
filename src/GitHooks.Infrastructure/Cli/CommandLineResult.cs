@@ -53,6 +53,8 @@ public sealed class CommandLineResult
     /// <returns>A new <see cref="CommandLineResult"/> with exit code 1 and the exception message as the error.</returns>
     public static CommandLineResult FromException(Exception ex)
     {
+        ArgumentNullException.ThrowIfNull(ex);
+
         return new CommandLineResult(string.Empty, ex.Message, 1);
     }
 }

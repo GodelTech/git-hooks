@@ -5,11 +5,14 @@ namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Builders;
 
 internal sealed class TemplateStepNodeBuilder : StepNodeBuilderBase
 {
-    private static readonly IReadOnlySet<string> AllowedFields = new HashSet<string>
+    private static readonly IReadOnlySet<string> s_allowedFields = new HashSet<string>
     {
         "template",
         "parameters"
     };
+
+    /// <inheritdoc />
+    protected override string StepType => "Template";
 
     /// <inheritdoc />
     public override bool CanBuild(StepFields fields)
@@ -18,12 +21,9 @@ internal sealed class TemplateStepNodeBuilder : StepNodeBuilderBase
     }
 
     /// <inheritdoc />
-    protected override string StepType => "Template";
-
-    /// <inheritdoc />
     protected override IReadOnlySet<string> GetAllowedFields()
     {
-        return AllowedFields;
+        return s_allowedFields;
     }
 
     /// <inheritdoc />

@@ -309,6 +309,11 @@ public class PipelineParameterBinderTests
         SourceSpan? span = null)
     {
         var effectiveSpan = span ?? CreateSpan();
+        var boundEnv = env?.ToDictionary(
+            pair => pair.Key,
+            pair => new InterpolatedStringNode(pair.Value),
+            StringComparer.Ordinal
+        ) ?? new Dictionary<string, InterpolatedStringNode>(StringComparer.Ordinal);
 
         return new ScriptStepNode(
             new InterpolatedStringNode(script),
@@ -320,11 +325,7 @@ public class PipelineParameterBinderTests
             WorkingDirectory = workingDirectory is null
                 ? null
                 : new InterpolatedStringNode(workingDirectory),
-            Env = env?.ToDictionary(
-                pair => pair.Key,
-                pair => new InterpolatedStringNode(pair.Value),
-                StringComparer.Ordinal
-            ) ?? new Dictionary<string, InterpolatedStringNode>(StringComparer.Ordinal)
+            Env = boundEnv
         };
     }
 
@@ -335,14 +336,19 @@ public class PipelineParameterBinderTests
         SourceSpan? span = null)
     {
         var effectiveSpan = span ?? CreateSpan();
+        var boundParameters = new Dictionary<string, InterpolatedStringNode>(StringComparer.Ordinal);
+
+        if (parameters is not null)
+        {
+            foreach (var pair in parameters)
+            {
+                boundParameters[pair.Key] = new InterpolatedStringNode(pair.Value);
+            }
+        }
 
         return new TemplateStepNode(
             template,
-            parameters?.ToDictionary(
-                pair => pair.Key,
-                pair => new InterpolatedStringNode(pair.Value),
-                StringComparer.Ordinal
-            ) ?? new Dictionary<string, InterpolatedStringNode>(StringComparer.Ordinal),
+            boundParameters,
             unknownFields ?? [],
             effectiveSpan
         );

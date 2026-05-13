@@ -15,6 +15,9 @@ public sealed class YamlTemplateProvider(ITemplateTokenValidator tokenValidator,
     /// <inheritdoc/>
     public string ApplyTokens(string templateContent, GitHook hook)
     {
+        ArgumentNullException.ThrowIfNull(templateContent);
+        ArgumentNullException.ThrowIfNull(hook);
+
         var result = templateContent
             .Replace(TemplateTokens.HookName, hook.Name)
             .Replace(TemplateTokens.HookDescription, hook.Description)

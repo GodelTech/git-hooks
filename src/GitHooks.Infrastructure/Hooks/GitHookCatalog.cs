@@ -14,7 +14,7 @@ public sealed class GitHookCatalog : IGitHookCatalog
     // Full catalog — all 11 hooks across the five supported categories.
     // CanAbort = true means a non-zero exit code cancels the Git operation.
     // Static so the list and lookup dictionary are built once per process, not per instance.
-    private static readonly IReadOnlyCollection<GitHook> _all =
+    private static readonly IReadOnlyCollection<GitHook> s_all =
     [
 
         // Commit hooks
@@ -39,10 +39,10 @@ public sealed class GitHookCatalog : IGitHookCatalog
         new("post-index-change",  GitHookCategory.Checkout, "Runs after the staging area (index) is written to disk. Informational; cannot abort.",             CanAbort: false),
     ];
 
-    private static readonly Dictionary<string, GitHook> _hooksByName = _all.ToDictionary(hook => hook.Name, StringComparer.Ordinal);
+    private static readonly Dictionary<string, GitHook> s_hooksByName = s_all.ToDictionary(hook => hook.Name, StringComparer.Ordinal);
 
-    private static readonly Dictionary<GitHookCategory, IReadOnlyCollection<GitHook>> _hooksByCategory =
-        _all
+    private static readonly Dictionary<GitHookCategory, IReadOnlyCollection<GitHook>> s_hooksByCategory =
+        s_all
             .GroupBy(hook => hook.Category)
             .ToDictionary(g => g.Key, g => (IReadOnlyCollection<GitHook>)[.. g]);
 
@@ -54,13 +54,13 @@ public sealed class GitHookCatalog : IGitHookCatalog
     /// <inheritdoc/>
     public IReadOnlyCollection<GitHook> GetAllHooks()
     {
-        return _all;
+        return s_all;
     }
 
     /// <inheritdoc/>
     public IReadOnlyCollection<GitHook> GetHooks(GitHookCategory category)
     {
-        return _hooksByCategory.TryGetValue(category, out var hooks)
+        return s_hooksByCategory.TryGetValue(category, out var hooks)
             ? hooks
             : [];
     }
@@ -80,7 +80,7 @@ public sealed class GitHookCatalog : IGitHookCatalog
         foreach (var hook in normalizedHooks)
         {
             // Single TryGetValue per hook — avoids the double-lookup of ContainsKey + indexer.
-            if (_hooksByName.TryGetValue(hook, out var gitHook))
+            if (s_hooksByName.TryGetValue(hook, out var gitHook))
             {
                 resolved.Add(gitHook);
             }

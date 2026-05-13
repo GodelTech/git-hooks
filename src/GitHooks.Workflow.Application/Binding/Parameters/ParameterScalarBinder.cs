@@ -8,9 +8,6 @@ namespace GitHooks.Workflow.Application.Binding.Parameters;
 
 internal sealed partial class ParameterScalarBinder
 {
-    [GeneratedRegex("\\$\\{\\{(?<expression>.*?)\\}\\}", RegexOptions.CultureInvariant)]
-    private static partial Regex InterpolationPattern();
-
     public static string Bind(string value, SourceSpan span, ParameterBindingContext context)
     {
         if (string.IsNullOrEmpty(value))
@@ -41,6 +38,9 @@ internal sealed partial class ParameterScalarBinder
         _ = builder.Append(value, currentIndex, value.Length - currentIndex);
         return builder.ToString();
     }
+
+    [GeneratedRegex("\\$\\{\\{(?<expression>.*?)\\}\\}", RegexOptions.CultureInvariant)]
+    private static partial Regex InterpolationPattern();
 
     private static string ResolveExpression(string expression, SourceSpan span, ParameterBindingContext context)
     {

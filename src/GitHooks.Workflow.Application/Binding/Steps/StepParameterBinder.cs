@@ -24,6 +24,19 @@ internal sealed class StepParameterBinder(UnknownNodeParameterBinder unknownNode
         };
     }
 
+    private static Dictionary<string, InterpolatedStringNode> BindInterpolatedStringMap(
+        IReadOnlyDictionary<string, InterpolatedStringNode> values,
+        ParameterBindingContext context)
+    {
+        return values.ToDictionary(
+            pair => pair.Key,
+            pair => new InterpolatedStringNode(
+                ParameterScalarBinder.Bind(pair.Value.Value, SourceSpan.Unknown(new SourceRef(pair.Key)), context)
+            ),
+            StringComparer.Ordinal
+        );
+    }
+
     private ScriptStepNode BindScriptStep(ScriptStepNode step, ParameterBindingContext context)
     {
         return step with
@@ -48,18 +61,5 @@ internal sealed class StepParameterBinder(UnknownNodeParameterBinder unknownNode
             Template = ParameterScalarBinder.Bind(step.Template, step.Span, context),
             UnknownFields = _unknownNodeParameterBinder.BindUnknownFields(step.UnknownFields, context)
         };
-    }
-
-    private static Dictionary<string, InterpolatedStringNode> BindInterpolatedStringMap(
-        IReadOnlyDictionary<string, InterpolatedStringNode> values,
-        ParameterBindingContext context)
-    {
-        return values.ToDictionary(
-            pair => pair.Key,
-            pair => new InterpolatedStringNode(
-                ParameterScalarBinder.Bind(pair.Value.Value, SourceSpan.Unknown(new SourceRef(pair.Key)), context)
-            ),
-            StringComparer.Ordinal
-        );
     }
 }

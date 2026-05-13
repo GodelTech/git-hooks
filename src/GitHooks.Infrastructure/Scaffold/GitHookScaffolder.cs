@@ -20,6 +20,8 @@ public sealed class GitHookScaffolder(
     /// <inheritdoc/>
     public async Task<GitHookScaffoldResult> CreateScaffoldAsync(string repositoryRootPath, string hooksPath, IReadOnlyCollection<GitHook> hooks, bool overwrite, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(hooks);
+
         if (string.IsNullOrWhiteSpace(hooksPath))
         {
             return GitHookScaffoldResult.Failure("hooks-path cannot be empty.");

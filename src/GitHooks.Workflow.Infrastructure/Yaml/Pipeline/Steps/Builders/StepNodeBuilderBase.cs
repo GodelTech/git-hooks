@@ -16,13 +16,13 @@ namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Builders;
 /// </remarks>
 internal abstract class StepNodeBuilderBase : IStepNodeBuilder
 {
-    /// <inheritdoc />
-    public abstract bool CanBuild(StepFields fields);
-
     /// <summary>
     /// Gets the YAML step type name used in validation error messages (e.g. <c>"template"</c>, <c>"script"</c>).
     /// </summary>
     protected abstract string StepType { get; }
+
+    /// <inheritdoc />
+    public abstract bool CanBuild(StepFields fields);
 
     /// <inheritdoc />
     public StepNode Build(StepFields fields, SourceSpan span)

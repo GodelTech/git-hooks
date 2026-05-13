@@ -19,6 +19,8 @@ public static class GitHookCatalogExtensions
     /// </returns>
     public static IReadOnlyCollection<GitHook> GetCommitHooks(this IGitHookCatalog catalog)
     {
+        ArgumentNullException.ThrowIfNull(catalog);
+
         return catalog.GetHooks(GitHookCategory.Commit);
     }
 
@@ -29,6 +31,8 @@ public static class GitHookCatalogExtensions
     /// <returns><c>pre-push</c>.</returns>
     public static IReadOnlyCollection<GitHook> GetPushHooks(this IGitHookCatalog catalog)
     {
+        ArgumentNullException.ThrowIfNull(catalog);
+
         return catalog.GetHooks(GitHookCategory.Push);
     }
 
@@ -39,6 +43,8 @@ public static class GitHookCatalogExtensions
     /// <returns><c>pre-merge-commit</c>, <c>post-merge</c>.</returns>
     public static IReadOnlyCollection<GitHook> GetMergeHooks(this IGitHookCatalog catalog)
     {
+        ArgumentNullException.ThrowIfNull(catalog);
+
         return catalog.GetHooks(GitHookCategory.Merge);
     }
 
@@ -49,6 +55,8 @@ public static class GitHookCatalogExtensions
     /// <returns><c>pre-rebase</c>, <c>post-rewrite</c>.</returns>
     public static IReadOnlyCollection<GitHook> GetRebaseHooks(this IGitHookCatalog catalog)
     {
+        ArgumentNullException.ThrowIfNull(catalog);
+
         return catalog.GetHooks(GitHookCategory.Rebase);
     }
 
@@ -59,6 +67,8 @@ public static class GitHookCatalogExtensions
     /// <returns><c>post-checkout</c>, <c>post-index-change</c>.</returns>
     public static IReadOnlyCollection<GitHook> GetCheckoutHooks(this IGitHookCatalog catalog)
     {
+        ArgumentNullException.ThrowIfNull(catalog);
+
         return catalog.GetHooks(GitHookCategory.Checkout);
     }
 }

@@ -5,7 +5,7 @@ namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Builders;
 
 internal sealed class ScriptStepNodeBuilder : StepNodeBuilderBase
 {
-    private static readonly IReadOnlySet<string> AllowedFields = new HashSet<string>
+    private static readonly IReadOnlySet<string> s_allowedFields = new HashSet<string>
     {
         "script",
         "displayName",
@@ -16,18 +16,18 @@ internal sealed class ScriptStepNodeBuilder : StepNodeBuilderBase
     };
 
     /// <inheritdoc />
+    protected override string StepType => "Script";
+
+    /// <inheritdoc />
     public override bool CanBuild(StepFields fields)
     {
         return fields.Script is not null;
     }
 
     /// <inheritdoc />
-    protected override string StepType => "Script";
-
-    /// <inheritdoc />
     protected override IReadOnlySet<string> GetAllowedFields()
     {
-        return AllowedFields;
+        return s_allowedFields;
     }
 
     /// <inheritdoc />

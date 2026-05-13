@@ -139,6 +139,25 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
         );
     }
 
+    public SourceSpan CurrentSpan()
+    {
+        var mark = _parser.Current?.Start;
+
+        return mark is null
+            ? SourceSpan.Unknown(_source) :
+            SpanOf(mark.Value, mark.Value);
+    }
+
+    public SourceSpan SpanOf(ParsingEvent start, ParsingEvent end)
+    {
+        return SpanOf(start.Start, end.End);
+    }
+
+    private static SourceSpan MergeSpans(SourceSpan start, SourceSpan end)
+    {
+        return new SourceSpan(start.Source, start.Start, end.End);
+    }
+
     private bool TryConsumeSafe<T>(out T evt)
         where T : ParsingEvent
     {
@@ -160,20 +179,6 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
         }
     }
 
-    public SourceSpan CurrentSpan()
-    {
-        var mark = _parser.Current?.Start;
-
-        return mark is null
-            ? SourceSpan.Unknown(_source) :
-            SpanOf(mark.Value, mark.Value);
-    }
-
-    public SourceSpan SpanOf(ParsingEvent start, ParsingEvent end)
-    {
-        return SpanOf(start.Start, end.End);
-    }
-
     private SourceSpan SpanOf(Mark start, Mark end)
     {
         return new SourceSpan(
@@ -181,11 +186,6 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
             new SourceLocation(start.Line, start.Column),
             new SourceLocation(end.Line, end.Column)
         );
-    }
-
-    private static SourceSpan MergeSpans(SourceSpan start, SourceSpan end)
-    {
-        return new SourceSpan(start.Source, start.Start, end.End);
     }
 
     private YamlParseException Error(string message)
