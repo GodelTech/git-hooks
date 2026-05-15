@@ -52,13 +52,12 @@ public class TemplateStepNodeBuilderTests
             Parameters = new Dictionary<string, InterpolatedStringNode>
             {
                 ["configuration"] = new InterpolatedStringNode("Release")
-            },
-            UnknownFields = [unknownField]
+            }
         };
 
         var builder = new TemplateStepNodeBuilder();
 
-        var step = Assert.IsType<TemplateStepNode>(builder.Build(fields, span));
+        var step = Assert.IsType<TemplateStepNode>(builder.Build(fields, [unknownField], span));
 
         Assert.Equal("templates/build.yml", step.Template);
         Assert.Equal("Release", step.Parameters["configuration"].Value);
@@ -73,7 +72,7 @@ public class TemplateStepNodeBuilderTests
         var fields = new StepFields();
         var builder = new TemplateStepNodeBuilder();
 
-        var exception = Assert.Throws<InvalidOperationException>(() => builder.Build(fields, span));
+        var exception = Assert.Throws<InvalidOperationException>(() => builder.Build(fields, [], span));
 
         Assert.Equal("Template step builder requires a template value.", exception.Message);
     }
@@ -90,7 +89,7 @@ public class TemplateStepNodeBuilderTests
 
         var builder = new TemplateStepNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, span));
+        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
 
         Assert.Equal("Template step cannot contain fields: script", exception.Message);
     }

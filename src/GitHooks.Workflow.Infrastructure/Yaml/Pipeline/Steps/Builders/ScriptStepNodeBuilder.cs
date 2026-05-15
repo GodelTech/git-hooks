@@ -1,4 +1,5 @@
 using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Builders;
@@ -31,11 +32,11 @@ internal sealed class ScriptStepNodeBuilder : StepNodeBuilderBase
     }
 
     /// <inheritdoc />
-    protected override StepNode Create(StepFields fields, SourceSpan span)
+    protected override StepNode Create(StepFields fields, IReadOnlyList<UnknownFieldNode> unknownFields, SourceSpan span)
     {
         var script = fields.Script ?? throw new InvalidOperationException($"{StepType} step builder requires a script value.");
 
-        return new ScriptStepNode(script, fields.UnknownFields, span)
+        return new ScriptStepNode(script, unknownFields, span)
         {
             DisplayName = fields.DisplayName,
             Condition = fields.Condition,

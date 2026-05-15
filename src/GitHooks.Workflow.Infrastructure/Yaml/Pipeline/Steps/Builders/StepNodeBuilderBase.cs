@@ -1,4 +1,5 @@
 using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Domain.Model;
 using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
@@ -25,7 +26,7 @@ internal abstract class StepNodeBuilderBase : IStepNodeBuilder
     public abstract bool CanBuild(StepFields fields);
 
     /// <inheritdoc />
-    public StepNode Build(StepFields fields, SourceSpan span)
+    public StepNode Build(StepFields fields, IReadOnlyList<UnknownFieldNode> unknownFields, SourceSpan span)
     {
         var violatingFields = GetViolatingFields(fields);
 
@@ -34,16 +35,17 @@ internal abstract class StepNodeBuilderBase : IStepNodeBuilder
                 $"{StepType} step cannot contain fields: {string.Join(", ", violatingFields)}",
                 span
             )
-            : Create(fields, span);
+            : Create(fields, unknownFields, span);
     }
 
     /// <summary>
     /// Creates the concrete <see cref="StepNode"/> after all field validation has passed.
     /// </summary>
     /// <param name="fields">The parsed step fields.</param>
+    /// <param name="unknownFields">The list of unknown fields encountered during parsing.</param>
     /// <param name="span">The source location of the step.</param>
     /// <returns>The constructed <see cref="StepNode"/>.</returns>
-    protected abstract StepNode Create(StepFields fields, SourceSpan span);
+    protected abstract StepNode Create(StepFields fields, IReadOnlyList<UnknownFieldNode> unknownFields, SourceSpan span);
 
     /// <summary>
     /// Returns the set of YAML field names this builder explicitly allows.

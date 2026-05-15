@@ -57,13 +57,12 @@ public class ScriptStepNodeBuilderTests
             Env = new Dictionary<string, InterpolatedStringNode>
             {
                 ["DOTNET_ENVIRONMENT"] = new InterpolatedStringNode("CI")
-            },
-            UnknownFields = [unknownField]
+            }
         };
 
         var builder = new ScriptStepNodeBuilder();
 
-        var step = Assert.IsType<ScriptStepNode>(builder.Build(fields, span));
+        var step = Assert.IsType<ScriptStepNode>(builder.Build(fields, [unknownField], span));
 
         Assert.Equal("echo hello", step.Script.Value);
         Assert.Equal("Build", step.DisplayName);
@@ -82,7 +81,7 @@ public class ScriptStepNodeBuilderTests
         var fields = new StepFields();
         var builder = new ScriptStepNodeBuilder();
 
-        var exception = Assert.Throws<InvalidOperationException>(() => builder.Build(fields, span));
+        var exception = Assert.Throws<InvalidOperationException>(() => builder.Build(fields, [], span));
 
         Assert.Equal("Script step builder requires a script value.", exception.Message);
     }
@@ -99,7 +98,7 @@ public class ScriptStepNodeBuilderTests
 
         var builder = new ScriptStepNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, span));
+        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
 
         Assert.Equal("Script step cannot contain fields: template", exception.Message);
     }

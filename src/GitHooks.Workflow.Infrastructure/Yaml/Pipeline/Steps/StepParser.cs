@@ -1,4 +1,5 @@
 using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Domain.Model;
 using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
@@ -16,18 +17,14 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers, IEnume
         var start = reader.Read<MappingStart>();
 
         var fields = new StepFields();
+        var unknownFields = new List<UnknownFieldNode>();
 
         while (!reader.Is<MappingEnd>())
         {
             if (!reader.Is<Scalar>())
             {
                 var keyNode = reader.ReadUnknownNode();
-                var unknownFields = fields.UnknownFields.ToList();
                 unknownFields.Add(reader.ReadUnknownField(keyNode));
-                fields = fields with
-                {
-                    UnknownFields = unknownFields
-                };
                 continue;
             }
 
@@ -39,12 +36,7 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers, IEnume
             }
             else
             {
-                var unknownFields = fields.UnknownFields.ToList();
                 unknownFields.Add(reader.ReadUnknownField(key));
-                fields = fields with
-                {
-                    UnknownFields = unknownFields
-                };
             }
         }
 
@@ -52,10 +44,10 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers, IEnume
 
         var span = reader.SpanOf(start, end);
 
-        return BuildStep(fields, span);
+        return BuildStep(fields, unknownFields, span);
     }
 
-    private StepNode BuildStep(StepFields fields, SourceSpan span)
+    private StepNode BuildStep(StepFields fields, IReadOnlyList<UnknownFieldNode> unknownFields, SourceSpan span)
     {
         var applicableBuilders = _builders
             .Where(builder => builder.CanBuild(fields))
@@ -63,7 +55,7 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers, IEnume
 
         return applicableBuilders.Count switch
         {
-            1 => applicableBuilders[0].Build(fields, span),
+            1 => applicableBuilders[0].Build(fields, unknownFields, span),
             0 => throw new YamlParseException(
                 "Step must contain 'script' or 'template'",
                 span

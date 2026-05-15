@@ -1,4 +1,5 @@
 using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Builders;
@@ -27,10 +28,10 @@ internal sealed class TemplateStepNodeBuilder : StepNodeBuilderBase
     }
 
     /// <inheritdoc />
-    protected override StepNode Create(StepFields fields, SourceSpan span)
+    protected override StepNode Create(StepFields fields, IReadOnlyList<UnknownFieldNode> unknownFields, SourceSpan span)
     {
         var template = fields.Template ?? throw new InvalidOperationException($"{StepType} step builder requires a template value.");
 
-        return new TemplateStepNode(template, fields.Parameters, fields.UnknownFields, span);
+        return new TemplateStepNode(template, fields.Parameters, unknownFields, span);
     }
 }
