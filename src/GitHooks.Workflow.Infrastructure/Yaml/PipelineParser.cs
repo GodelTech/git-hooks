@@ -7,7 +7,7 @@ using YamlDotNet.Core.Events;
 namespace GitHooks.Workflow.Infrastructure.Yaml;
 
 internal sealed class PipelineParser(PipelineRootParser pipelineRootParser)
-        : IPipelineParser
+    : IPipelineParser
 {
     private readonly PipelineRootParser _pipelineRootParser = pipelineRootParser;
 

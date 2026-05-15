@@ -4,7 +4,7 @@ using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Binding.Exceptions;
 using GitHooks.Workflow.Domain.Model;
 
-namespace GitHooks.Workflow.Application.Binding.Parameters;
+namespace GitHooks.Workflow.Application.Binding;
 
 internal sealed class ParameterBindingContext(
     IReadOnlyDictionary<string, ParameterNode> declarations,

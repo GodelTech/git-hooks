@@ -4,11 +4,13 @@ using System.Text.RegularExpressions;
 using GitHooks.Workflow.Application.Binding.Exceptions;
 using GitHooks.Workflow.Domain.Model;
 
-namespace GitHooks.Workflow.Application.Binding.Parameters;
+namespace GitHooks.Workflow.Application.Binding;
 
-internal sealed partial class ParameterScalarBinder
+internal sealed partial class StringBinder
 {
-    public static string Bind(string value, SourceSpan span, ParameterBindingContext context)
+#pragma warning disable CA1822 // Mark members as static
+    public string Bind(string value, SourceSpan span, ParameterBindingContext context)
+#pragma warning restore CA1822 // Mark members as static
     {
         if (string.IsNullOrEmpty(value))
         {
