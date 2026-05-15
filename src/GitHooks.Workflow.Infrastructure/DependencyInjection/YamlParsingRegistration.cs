@@ -3,6 +3,7 @@ using GitHooks.Workflow.Infrastructure.Yaml;
 using GitHooks.Workflow.Infrastructure.Yaml.Expressions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters;
+using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters.Builders;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -47,8 +48,26 @@ public static class YamlParsingRegistration
             _ = services.AddSingleton(builderType, builder);
         }
 
+        // Register all IParameterFieldHandler implementations
+        var parameterHandlerType = typeof(IParameterFieldHandler);
+
+        var parameterHandlers = parameterHandlerType.Assembly
+            .GetTypes()
+            .Where(t =>
+                t is { IsAbstract: false, IsInterface: false } &&
+                parameterHandlerType.IsAssignableFrom(t)
+            );
+
+        foreach (var parameterHandler in parameterHandlers)
+        {
+            _ = services.AddSingleton(parameterHandlerType, parameterHandler);
+        }
+
+        _ = services.AddSingleton<IParameterNodeBuilder, ParameterNodeBuilder>();
+
         _ = services.AddSingleton<StepParser>();
         _ = services.AddSingleton<StepsParser>();
+        _ = services.AddSingleton<ParameterParser>();
         _ = services.AddSingleton<PipelineParametersParser>();
         _ = services.AddSingleton<PipelineRootParser>();
 

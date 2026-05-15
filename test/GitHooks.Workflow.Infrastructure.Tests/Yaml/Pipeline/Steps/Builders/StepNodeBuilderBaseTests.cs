@@ -13,7 +13,6 @@ public class StepNodeBuilderBaseTests
     [Fact]
     public void Build_WithNoViolatingFields_CallsCreateAndReturnsStepNode()
     {
-        // Arrange
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var fields = new StepFields
         {
@@ -21,10 +20,8 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        // Act
         var result = builder.Build(fields, [], span);
 
-        // Assert
         Assert.NotNull(result);
         Assert.IsType<ScriptStepNode>(result);
     }
@@ -32,7 +29,6 @@ public class StepNodeBuilderBaseTests
     [Fact]
     public void Build_WithViolatingFields_ThrowsYamlParseException()
     {
-        // Arrange
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var fields = new StepFields
         {
@@ -41,7 +37,6 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
         Assert.Contains("cannot contain fields", exception.Message);
         Assert.Contains("displayName", exception.Message);
@@ -50,7 +45,6 @@ public class StepNodeBuilderBaseTests
     [Fact]
     public void Build_WithMultipleViolatingFields_IncludesAllInErrorMessage()
     {
-        // Arrange
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var fields = new StepFields
         {
@@ -60,7 +54,6 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
         Assert.Contains("displayName", exception.Message);
         Assert.Contains("timeoutInMinutes", exception.Message);
@@ -69,7 +62,6 @@ public class StepNodeBuilderBaseTests
     [Fact]
     public void Build_WithEnvViolation_IncludesEnvInErrorMessage()
     {
-        // Arrange
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var env = new Dictionary<string, InterpolatedStringNode>
         {
@@ -82,7 +74,6 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
         Assert.Contains("env", exception.Message);
     }
@@ -90,7 +81,6 @@ public class StepNodeBuilderBaseTests
     [Fact]
     public void Build_WithParametersViolation_IncludesParametersInErrorMessage()
     {
-        // Arrange
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var parameters = new Dictionary<string, InterpolatedStringNode>
         {
@@ -103,7 +93,6 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
         Assert.Contains("parameters", exception.Message);
     }
@@ -111,7 +100,6 @@ public class StepNodeBuilderBaseTests
     [Fact]
     public void Build_WithScriptViolation_IncludesScriptInErrorMessage()
     {
-        // Arrange
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var builder = new TestStepNodeBuilderNoScript();
         var fields = new StepFields
@@ -119,7 +107,6 @@ public class StepNodeBuilderBaseTests
             Script = new InterpolatedStringNode("echo hello")
         };
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
         Assert.Contains("script", exception.Message);
     }
@@ -127,7 +114,6 @@ public class StepNodeBuilderBaseTests
     [Fact]
     public void Build_WithTemplateViolation_IncludesTemplateInErrorMessage()
     {
-        // Arrange
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var fields = new StepFields
         {
@@ -136,7 +122,6 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
         Assert.Contains("template", exception.Message);
     }
@@ -144,7 +129,6 @@ public class StepNodeBuilderBaseTests
     [Fact]
     public void Build_WithConditionViolation_IncludesConditionInErrorMessage()
     {
-        // Arrange
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var fields = new StepFields
         {
@@ -153,7 +137,6 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
         Assert.Contains("condition", exception.Message);
     }
@@ -161,7 +144,6 @@ public class StepNodeBuilderBaseTests
     [Fact]
     public void Build_WithWorkingDirectoryViolation_IncludesWorkingDirectoryInErrorMessage()
     {
-        // Arrange
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var fields = new StepFields
         {
@@ -170,7 +152,6 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
         Assert.Contains("workingDirectory", exception.Message);
     }
@@ -178,7 +159,6 @@ public class StepNodeBuilderBaseTests
     [Fact]
     public void Build_WithScriptViolationAllowed_ReturnsSuccessfully()
     {
-        // Arrange
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var fields = new StepFields
         {
@@ -186,10 +166,8 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        // Act
         var result = builder.Build(fields, [], span);
 
-        // Assert
         Assert.NotNull(result);
         Assert.IsType<ScriptStepNode>(result);
     }
@@ -197,7 +175,6 @@ public class StepNodeBuilderBaseTests
     [Fact]
     public void Build_WithAllFieldsViolating_IncludesAllFieldNamesInErrorMessage()
     {
-        // Arrange
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var parameters = new Dictionary<string, InterpolatedStringNode>
         {
@@ -220,7 +197,6 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
         var errorMessage = exception.Message;
         Assert.Contains("template", errorMessage);

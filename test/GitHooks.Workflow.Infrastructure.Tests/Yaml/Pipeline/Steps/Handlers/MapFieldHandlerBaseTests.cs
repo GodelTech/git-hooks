@@ -14,23 +14,19 @@ public class MapFieldHandlerBaseTests
     [Fact]
     public void ReadMap_WithEmptyMap_ReturnsEmptyDictionary()
     {
-        // Arrange
         var handler = new TestMapFieldHandler(new InterpolationParser());
         var reader = CreateReader("env: {}");
 
         _ = reader.Read<Scalar>();
 
-        // Act
         var result = handler.ReadMapForTest(reader);
 
-        // Assert
         Assert.Empty(result);
     }
 
     [Fact]
     public void ReadMap_WithDuplicateKeys_UsesLastValue()
     {
-        // Arrange
         var handler = new TestMapFieldHandler(new InterpolationParser());
         var reader = CreateReader(
             """
@@ -42,10 +38,8 @@ public class MapFieldHandlerBaseTests
 
         _ = reader.Read<Scalar>();
 
-        // Act
         var result = handler.ReadMapForTest(reader);
 
-        // Assert
         Assert.Single(result);
 
         var keyValue = Assert.IsType<InterpolatedStringNode>(result["KEY"]);
@@ -55,7 +49,6 @@ public class MapFieldHandlerBaseTests
     [Fact]
     public void ReadMap_WithNonScalarKey_ThrowsYamlParseException()
     {
-        // Arrange
         var handler = new TestMapFieldHandler(new InterpolationParser());
         var reader = CreateReader(
             """
@@ -67,7 +60,6 @@ public class MapFieldHandlerBaseTests
 
         _ = reader.Read<Scalar>();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => handler.ReadMapForTest(reader));
 
         Assert.Contains("Expected Scalar", exception.Message);
@@ -76,7 +68,6 @@ public class MapFieldHandlerBaseTests
     [Fact]
     public void ReadMap_WithNonScalarValue_ThrowsYamlParseException()
     {
-        // Arrange
         var handler = new TestMapFieldHandler(new InterpolationParser());
         var reader = CreateReader(
             """
@@ -88,7 +79,6 @@ public class MapFieldHandlerBaseTests
 
         _ = reader.Read<Scalar>();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => handler.ReadMapForTest(reader));
 
         Assert.Contains("Expected Scalar", exception.Message);

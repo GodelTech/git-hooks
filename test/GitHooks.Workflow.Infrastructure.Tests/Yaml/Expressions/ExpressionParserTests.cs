@@ -16,10 +16,8 @@ public class ExpressionParserTests
         string input,
         string expected)
     {
-        // Arrange & Act
         var result = _parser.Parse(input);
 
-        // Assert
         var node = Assert.IsType<RawExpressionNode>(result);
 
         Assert.Equal(expected, node.Value);

@@ -11,10 +11,8 @@ public class PipelineParserTests
     [Fact]
     public void Parse_WithValidPipeline_ReturnsPipelineNodeFromSource()
     {
-        // Arrange
         var parser = CreateParser();
 
-        // Act
         var result = parser.Parse(
             """
             steps:
@@ -23,7 +21,6 @@ public class PipelineParserTests
             "pipeline.yml"
         );
 
-        // Assert
         Assert.Single(result.Steps);
         Assert.Equal("pipeline.yml", result.Span.Source.Name);
     }
@@ -31,10 +28,8 @@ public class PipelineParserTests
     [Fact]
     public void Parse_WithMultipleDocuments_ThrowsYamlParseException()
     {
-        // Arrange
         var parser = CreateParser();
 
-        // Act
         var exception = Assert.Throws<YamlParseException>(
             () => parser.Parse(
                 """
@@ -48,7 +43,6 @@ public class PipelineParserTests
             )
         );
 
-        // Assert
         Assert.Contains("Expected StreamEnd", exception.Message);
     }
 

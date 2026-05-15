@@ -14,24 +14,20 @@ public class StepsParserTests
     [Fact]
     public void Parse_WithEmptySequence_ReturnsEmptyList()
     {
-        // Arrange & Act
         var result = ParseSteps("[]");
 
-        // Assert
         Assert.Empty(result);
     }
 
     [Fact]
     public void Parse_WithSingleStep_ReturnsSingleStepNode()
     {
-        // Arrange & Act
         var result = ParseSteps(
             """
             - script: echo hello
             """
         );
 
-        // Assert
         var step = Assert.Single(result);
 
         _ = Assert.IsType<ScriptStepNode>(step);
@@ -40,7 +36,6 @@ public class StepsParserTests
     [Fact]
     public void Parse_WithMultipleSteps_ReturnsAllStepNodes()
     {
-        // Arrange & Act
         var result = ParseSteps(
             """
             - script: echo first
@@ -49,7 +44,6 @@ public class StepsParserTests
             """
         );
 
-        // Assert
         Assert.Equal(3, result.Count);
 
         Assert.All(result, step => Assert.IsType<ScriptStepNode>(step));
@@ -58,7 +52,6 @@ public class StepsParserTests
     [Fact]
     public void Parse_WithMultipleSteps_PreservesOrder()
     {
-        // Arrange & Act
         var result = ParseSteps(
             """
             - script: echo first
@@ -66,7 +59,6 @@ public class StepsParserTests
             """
         );
 
-        // Assert
         Assert.Equal(2, result.Count);
 
         var first = Assert.IsType<ScriptStepNode>(result[0]);

@@ -14,29 +14,23 @@ public class ConditionFieldHandlerTests
     [Fact]
     public void Key_Always_ReturnsCondition()
     {
-        // Arrange
         var handler = new ConditionFieldHandler(new ExpressionParser());
 
-        // Act
         var key = handler.Key;
 
-        // Assert
         Assert.Equal("condition", key);
     }
 
     [Fact]
     public void Apply_WithScalarValue_ParsesAndSetsCondition()
     {
-        // Arrange
         var handler = new ConditionFieldHandler(new ExpressionParser());
         var reader = CreateReader("condition: '  succeeded()  '");
 
         _ = reader.Read<Scalar>();
 
-        // Act
         var result = handler.Apply(reader, new StepFields());
 
-        // Assert
         var condition = Assert.IsType<RawExpressionNode>(result.Condition);
         Assert.Equal("succeeded()", condition.Value);
     }
@@ -44,7 +38,6 @@ public class ConditionFieldHandlerTests
     [Fact]
     public void Apply_WithNonScalarValue_ThrowsYamlParseException()
     {
-        // Arrange
         var handler = new ConditionFieldHandler(new ExpressionParser());
         var reader = CreateReader(
             """
@@ -56,7 +49,6 @@ public class ConditionFieldHandlerTests
 
         _ = reader.Read<Scalar>();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => handler.Apply(reader, new StepFields()));
 
         Assert.Contains("Expected Scalar", exception.Message);

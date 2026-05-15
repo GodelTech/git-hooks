@@ -14,20 +14,16 @@ public class EnvFieldHandlerTests
     [Fact]
     public void Key_Always_ReturnsEnv()
     {
-        // Arrange
         var handler = new EnvFieldHandler(new InterpolationParser());
 
-        // Act
         var key = handler.Key;
 
-        // Assert
         Assert.Equal("env", key);
     }
 
     [Fact]
     public void Apply_WithMappingValue_SetsEnvDictionary()
     {
-        // Arrange
         var handler = new EnvFieldHandler(new InterpolationParser());
         var reader = CreateReader(
             """
@@ -39,10 +35,8 @@ public class EnvFieldHandlerTests
 
         _ = reader.Read<Scalar>();
 
-        // Act
         var result = handler.Apply(reader, new StepFields());
 
-        // Assert
         Assert.Equal(2, result.Env.Count);
 
         var buildConfiguration = Assert.IsType<InterpolatedStringNode>(result.Env["BUILD_CONFIGURATION"]);
@@ -55,13 +49,11 @@ public class EnvFieldHandlerTests
     [Fact]
     public void Apply_WithScalarValue_ThrowsYamlParseException()
     {
-        // Arrange
         var handler = new EnvFieldHandler(new InterpolationParser());
         var reader = CreateReader("env: value");
 
         _ = reader.Read<Scalar>();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => handler.Apply(reader, new StepFields()));
 
         Assert.Contains("Expected MappingStart", exception.Message);

@@ -12,36 +12,29 @@ public class TemplateFieldHandlerTests
     [Fact]
     public void Key_Always_ReturnsTemplate()
     {
-        // Arrange
         var handler = new TemplateFieldHandler();
 
-        // Act
         var key = handler.Key;
 
-        // Assert
         Assert.Equal("template", key);
     }
 
     [Fact]
     public void Apply_WithScalarValue_SetsTemplate()
     {
-        // Arrange
         var handler = new TemplateFieldHandler();
         var reader = CreateReader("template: templates/build.yml");
 
         _ = reader.Read<Scalar>();
 
-        // Act
         var result = handler.Apply(reader, new StepFields());
 
-        // Assert
         Assert.Equal("templates/build.yml", result.Template);
     }
 
     [Fact]
     public void Apply_WithNonScalarValue_ThrowsYamlParseException()
     {
-        // Arrange
         var handler = new TemplateFieldHandler();
         var reader = CreateReader(
             """
@@ -52,7 +45,6 @@ public class TemplateFieldHandlerTests
 
         _ = reader.Read<Scalar>();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => handler.Apply(reader, new StepFields()));
 
         Assert.Contains("Expected Scalar", exception.Message);

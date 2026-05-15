@@ -13,20 +13,16 @@ public class InterpolationParserTests
     [InlineData("", "")]
     public void Parse_WithVariousInputs_ReturnsNodeWithSameValue(string input, string expected)
     {
-        // Arrange & Act
         var result = _parser.Parse(input);
 
-        // Assert
         Assert.Equal(expected, result.Value);
     }
 
     [Fact]
     public void Parse_WithInterpolatedTemplate_ReturnsInterpolatedStringNodeWithSameValue()
     {
-        // Arrange & Act
         var result = _parser.Parse("Hello, $(variables.Name)!");
 
-        // Assert
         Assert.IsType<InterpolatedStringNode>(result);
         Assert.Equal("Hello, $(variables.Name)!", result.Value);
     }

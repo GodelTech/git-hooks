@@ -14,20 +14,16 @@ public class ParametersFieldHandlerTests
     [Fact]
     public void Key_Always_ReturnsParameters()
     {
-        // Arrange
         var handler = new ParametersFieldHandler(new InterpolationParser());
 
-        // Act
         var key = handler.Key;
 
-        // Assert
         Assert.Equal("parameters", key);
     }
 
     [Fact]
     public void Apply_WithMappingValue_SetsParametersDictionary()
     {
-        // Arrange
         var handler = new ParametersFieldHandler(new InterpolationParser());
         var reader = CreateReader(
             """
@@ -39,10 +35,8 @@ public class ParametersFieldHandlerTests
 
         _ = reader.Read<Scalar>();
 
-        // Act
         var result = handler.Apply(reader, new StepFields());
 
-        // Assert
         Assert.Equal(2, result.Parameters.Count);
 
         var solution = Assert.IsType<InterpolatedStringNode>(result.Parameters["solution"]);
@@ -55,13 +49,11 @@ public class ParametersFieldHandlerTests
     [Fact]
     public void Apply_WithScalarValue_ThrowsYamlParseException()
     {
-        // Arrange
         var handler = new ParametersFieldHandler(new InterpolationParser());
         var reader = CreateReader("parameters: value");
 
         _ = reader.Read<Scalar>();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => handler.Apply(reader, new StepFields()));
 
         Assert.Contains("Expected MappingStart", exception.Message);

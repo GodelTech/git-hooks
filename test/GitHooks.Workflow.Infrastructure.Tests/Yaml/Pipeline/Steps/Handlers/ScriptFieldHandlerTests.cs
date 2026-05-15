@@ -14,29 +14,23 @@ public class ScriptFieldHandlerTests
     [Fact]
     public void Key_Always_ReturnsScript()
     {
-        // Arrange
         var handler = new ScriptFieldHandler(new InterpolationParser());
 
-        // Act
         var key = handler.Key;
 
-        // Assert
         Assert.Equal("script", key);
     }
 
     [Fact]
     public void Apply_WithScalarValue_SetsScript()
     {
-        // Arrange
         var handler = new ScriptFieldHandler(new InterpolationParser());
         var reader = CreateReader("script: echo hello");
 
         _ = reader.Read<Scalar>();
 
-        // Act
         var result = handler.Apply(reader, new StepFields());
 
-        // Assert
         var script = Assert.IsType<InterpolatedStringNode>(result.Script);
         Assert.Equal("echo hello", script.Value);
     }
@@ -44,7 +38,6 @@ public class ScriptFieldHandlerTests
     [Fact]
     public void Apply_WithNonScalarValue_ThrowsYamlParseException()
     {
-        // Arrange
         var handler = new ScriptFieldHandler(new InterpolationParser());
         var reader = CreateReader(
             """
@@ -55,7 +48,6 @@ public class ScriptFieldHandlerTests
 
         _ = reader.Read<Scalar>();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => handler.Apply(reader, new StepFields()));
 
         Assert.Contains("Expected Scalar", exception.Message);

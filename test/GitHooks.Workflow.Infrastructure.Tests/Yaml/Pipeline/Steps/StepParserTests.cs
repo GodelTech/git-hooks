@@ -16,7 +16,6 @@ public class StepParserTests
     [Fact]
     public void Parse_TemplateStep_ParsesTemplateAndParameters()
     {
-        // Arrange & Act
         var result = ParseStep(
             """
             template: templates/build.yml
@@ -25,7 +24,6 @@ public class StepParserTests
             """
         );
 
-        // Assert
         var step = Assert.IsType<TemplateStepNode>(result);
 
         Assert.Equal("templates/build.yml", step.Template);
@@ -35,7 +33,6 @@ public class StepParserTests
     [Fact]
     public void Parse_ScriptStep_ParsesKnownFieldAndCapturesUnknownField()
     {
-        // Arrange & Act
         var result = ParseStep(
             """
             script: echo hello
@@ -45,7 +42,6 @@ public class StepParserTests
             """
         );
 
-        // Assert
         var step = Assert.IsType<ScriptStepNode>(result);
         var unknownField = Assert.Single(step.UnknownFields);
         var key = Assert.IsType<UnknownScalarNode>(unknownField.Key);
@@ -59,7 +55,6 @@ public class StepParserTests
     [Fact]
     public void Parse_ComplexUnknownKey_CapturesUnknownFieldWithSequenceKey()
     {
-        // Arrange & Act
         var result = ParseStep(
             """
             script: echo hello
@@ -68,7 +63,6 @@ public class StepParserTests
             """
         );
 
-        // Assert
         var step = Assert.IsType<ScriptStepNode>(result);
         var unknownField = Assert.Single(step.UnknownFields);
 
@@ -82,7 +76,6 @@ public class StepParserTests
     [Fact]
     public void Parse_WithoutScriptOrTemplate_ThrowsYamlParseException()
     {
-        // Arrange & Act & Assert
         var exception = Assert.Throws<YamlParseException>(
             () => ParseStep(
                 """
@@ -97,7 +90,6 @@ public class StepParserTests
     [Fact]
     public void Parse_WithScriptAndTemplate_ThrowsYamlParseException()
     {
-        // Arrange & Act & Assert
         var exception = Assert.Throws<YamlParseException>(
             () => ParseStep(
                 """

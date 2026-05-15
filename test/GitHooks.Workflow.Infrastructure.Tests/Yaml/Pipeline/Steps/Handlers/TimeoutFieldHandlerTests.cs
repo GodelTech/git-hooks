@@ -12,49 +12,40 @@ public class TimeoutFieldHandlerTests
     [Fact]
     public void Key_Always_ReturnsTimeoutInMinutes()
     {
-        // Arrange
         var handler = new TimeoutFieldHandler();
 
-        // Act
         var key = handler.Key;
 
-        // Assert
         Assert.Equal("timeoutInMinutes", key);
     }
 
     [Fact]
     public void Apply_WithIntegerScalar_SetsTimeoutInMinutes()
     {
-        // Arrange
         var handler = new TimeoutFieldHandler();
         var reader = CreateReader("timeoutInMinutes: 15");
 
         _ = reader.Read<Scalar>();
 
-        // Act
         var result = handler.Apply(reader, new StepFields());
 
-        // Assert
         Assert.Equal(15, result.TimeoutInMinutes);
     }
 
     [Fact]
     public void Apply_WithNonIntegerScalar_ThrowsFormatException()
     {
-        // Arrange
         var handler = new TimeoutFieldHandler();
         var reader = CreateReader("timeoutInMinutes: abc");
 
         _ = reader.Read<Scalar>();
 
-        // Act & Assert
         _ = Assert.Throws<FormatException>(() => handler.Apply(reader, new StepFields()));
     }
 
     [Fact]
     public void Apply_WithNonScalarValue_ThrowsYamlParseException()
     {
-        // Arrange
         var handler = new TimeoutFieldHandler();
         var reader = CreateReader(
             """
@@ -65,7 +56,6 @@ public class TimeoutFieldHandlerTests
 
         _ = reader.Read<Scalar>();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => handler.Apply(reader, new StepFields()));
 
         Assert.Contains("Expected Scalar", exception.Message);

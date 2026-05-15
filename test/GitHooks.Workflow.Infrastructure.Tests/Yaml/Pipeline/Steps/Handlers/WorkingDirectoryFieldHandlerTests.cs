@@ -14,29 +14,23 @@ public class WorkingDirectoryFieldHandlerTests
     [Fact]
     public void Key_Always_ReturnsWorkingDirectory()
     {
-        // Arrange
         var handler = new WorkingDirectoryFieldHandler(new InterpolationParser());
 
-        // Act
         var key = handler.Key;
 
-        // Assert
         Assert.Equal("workingDirectory", key);
     }
 
     [Fact]
     public void Apply_WithScalarValue_SetsWorkingDirectory()
     {
-        // Arrange
         var handler = new WorkingDirectoryFieldHandler(new InterpolationParser());
         var reader = CreateReader("workingDirectory: src/GitHooks");
 
         _ = reader.Read<Scalar>();
 
-        // Act
         var result = handler.Apply(reader, new StepFields());
 
-        // Assert
         var workingDirectory = Assert.IsType<InterpolatedStringNode>(result.WorkingDirectory);
         Assert.Equal("src/GitHooks", workingDirectory.Value);
     }
@@ -44,7 +38,6 @@ public class WorkingDirectoryFieldHandlerTests
     [Fact]
     public void Apply_WithNonScalarValue_ThrowsYamlParseException()
     {
-        // Arrange
         var handler = new WorkingDirectoryFieldHandler(new InterpolationParser());
         var reader = CreateReader(
             """
@@ -55,7 +48,6 @@ public class WorkingDirectoryFieldHandlerTests
 
         _ = reader.Read<Scalar>();
 
-        // Act & Assert
         var exception = Assert.Throws<YamlParseException>(() => handler.Apply(reader, new StepFields()));
 
         Assert.Contains("Expected Scalar", exception.Message);

@@ -16,7 +16,6 @@ public class PipelineRootParserTests
     [Fact]
     public void Parse_WithoutSteps_ThrowsYamlParseException()
     {
-        // Arrange & Act & Assert
         var exception = Assert.Throws<YamlParseException>(
             () => ParseRoot(
                 """
@@ -31,7 +30,6 @@ public class PipelineRootParserTests
     [Fact]
     public void Parse_WithUnknownRootScalarField_CapturesUnknownField()
     {
-        // Arrange & Act
         var node = ParseRoot(
             """
             name: ci
@@ -40,7 +38,6 @@ public class PipelineRootParserTests
             """
         );
 
-        // Assert
         var unknownField = Assert.Single(node.UnknownFields);
         var key = Assert.IsType<UnknownScalarNode>(unknownField.Key);
         var value = Assert.IsType<UnknownScalarNode>(unknownField.Value);
@@ -52,7 +49,6 @@ public class PipelineRootParserTests
     [Fact]
     public void Parse_WithUnknownRootComplexKey_CapturesUnknownField()
     {
-        // Arrange & Act
         var node = ParseRoot(
             """
             ? [a, b]
@@ -62,7 +58,6 @@ public class PipelineRootParserTests
             """
         );
 
-        // Assert
         var unknownField = Assert.Single(node.UnknownFields);
 
         _ = Assert.IsType<UnknownSequenceNode>(unknownField.Key);
@@ -75,7 +70,6 @@ public class PipelineRootParserTests
     [Fact]
     public void Parse_WithParametersBeforeSteps_ParsesRootParameters()
     {
-        // Arrange & Act
         var node = ParseRoot(
             """
             parameters:
@@ -87,7 +81,6 @@ public class PipelineRootParserTests
             """
         );
 
-        // Assert
         var parameter = Assert.Single(node.Parameters);
 
         Assert.Equal("operatingSystem", parameter.Name);
