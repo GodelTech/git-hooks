@@ -68,7 +68,7 @@ public static class YamlParsingRegistration
         _ = services.AddSingleton<StepParser>();
         _ = services.AddSingleton<StepsParser>();
         _ = services.AddSingleton<ParameterParser>();
-        _ = services.AddSingleton<PipelineParametersParser>();
+        _ = services.AddSingleton<ParametersParser>();
         _ = services.AddSingleton<PipelineRootParser>();
 
         _ = services.AddSingleton<IPipelineParser, PipelineParser>();

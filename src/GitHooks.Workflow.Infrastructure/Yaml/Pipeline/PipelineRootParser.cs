@@ -9,10 +9,10 @@ using YamlDotNet.Core.Events;
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline;
 
 internal sealed class PipelineRootParser(
-    PipelineParametersParser pipelineParametersParser,
+    ParametersParser parametersParser,
     StepsParser stepsParser)
 {
-    private readonly PipelineParametersParser _pipelineParametersParser = pipelineParametersParser;
+    private readonly ParametersParser _parametersParser = parametersParser;
     private readonly StepsParser _stepsParser = stepsParser;
 
     public PipelineNode Parse(YamlReader reader)
@@ -36,7 +36,7 @@ internal sealed class PipelineRootParser(
 
             if (key.Value == "parameters")
             {
-                parameters = _pipelineParametersParser.Parse(reader);
+                parameters = _parametersParser.Parse(reader);
             }
             else if (key.Value == "steps")
             {

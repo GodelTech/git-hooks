@@ -212,7 +212,7 @@ public class PipelineParameterBinderTests
     {
         var pipeline = CreatePipeline(
             [
-                CreateParameter("operatingSystem", ParameterType.Text, "ubuntu", ["ubuntu", "windows"])
+                CreateParameter("operatingSystem", ParameterType.Text, "linux", ["ubuntu", "windows"])
             ],
             [
                 CreateScriptStep("echo ok")

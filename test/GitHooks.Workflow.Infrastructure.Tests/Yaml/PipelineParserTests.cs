@@ -26,6 +26,29 @@ public class PipelineParserTests
     }
 
     [Fact]
+    public void Parse_WithParameters_ReturnsPipelineNodeWithParsedParameters()
+    {
+        var parser = CreateParser();
+
+        var result = parser.Parse(
+            """
+            parameters:
+              - name: configuration
+                type: string
+                default: Release
+            steps:
+              - script: echo hello
+            """,
+            "pipeline.yml"
+        );
+
+        var parameter = Assert.Single(result.Parameters);
+
+        Assert.Equal("configuration", parameter.Name);
+        Assert.Equal("Release", parameter.Default);
+    }
+
+    [Fact]
     public void Parse_WithMultipleDocuments_ThrowsYamlParseException()
     {
         var parser = CreateParser();

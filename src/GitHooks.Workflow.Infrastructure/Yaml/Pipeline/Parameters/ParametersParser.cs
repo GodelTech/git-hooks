@@ -4,7 +4,7 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters;
 
-internal sealed class PipelineParametersParser(ParameterParser parameterParser)
+internal sealed class ParametersParser(ParameterParser parameterParser)
 {
     private readonly ParameterParser _parameterParser = parameterParser;
 
