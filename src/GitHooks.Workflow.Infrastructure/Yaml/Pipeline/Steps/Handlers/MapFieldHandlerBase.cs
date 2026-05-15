@@ -5,12 +5,12 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Handlers;
 
-internal abstract class MapFieldHandler : IStepFieldHandler
+internal abstract class MapFieldHandlerBase : IStepFieldHandler
 {
     private readonly InterpolationParser _parser;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Protected constructor is required for inheritance")]
-    protected MapFieldHandler(InterpolationParser parser)
+    protected MapFieldHandlerBase(InterpolationParser parser)
     {
         _parser = parser;
     }

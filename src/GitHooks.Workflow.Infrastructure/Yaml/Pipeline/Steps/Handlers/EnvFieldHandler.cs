@@ -3,7 +3,7 @@ using GitHooks.Workflow.Infrastructure.Yaml.Expressions;
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Handlers;
 
 internal sealed class EnvFieldHandler(InterpolationParser parser)
-    : MapFieldHandler(parser)
+    : MapFieldHandlerBase(parser)
 {
     public override string Key => "env";
 

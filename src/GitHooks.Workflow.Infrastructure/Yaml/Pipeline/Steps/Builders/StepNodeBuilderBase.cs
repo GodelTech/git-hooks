@@ -51,14 +51,10 @@ internal abstract class StepNodeBuilderBase : IStepNodeBuilder
     /// will be reported as a violation and cause <see cref="Build"/> to throw.
     /// </summary>
     /// <remarks>
-    /// Defaults to an empty set, meaning no fields are allowed unless overridden.
-    /// Subclasses should include every field name they intentionally consume.
+    /// Subclasses must include every field name they intentionally consume.
     /// </remarks>
     /// <returns>A set of allowed lowercase YAML field names.</returns>
-    protected virtual IReadOnlySet<string> GetAllowedFields()
-    {
-        return new HashSet<string>();
-    }
+    protected abstract IReadOnlySet<string> GetAllowedFields();
 
     /// <summary>
     /// Checks each populated field in <paramref name="fields"/> against the allowed set

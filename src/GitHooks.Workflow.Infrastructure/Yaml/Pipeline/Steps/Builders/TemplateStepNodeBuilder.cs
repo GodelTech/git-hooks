@@ -29,7 +29,7 @@ internal sealed class TemplateStepNodeBuilder : StepNodeBuilderBase
     /// <inheritdoc />
     protected override StepNode Create(StepFields fields, SourceSpan span)
     {
-        var template = fields.Template ?? throw new InvalidOperationException("Template step builder requires a template value.");
+        var template = fields.Template ?? throw new InvalidOperationException($"{StepType} step builder requires a template value.");
 
         return new TemplateStepNode(template, fields.Parameters, fields.UnknownFields, span);
     }

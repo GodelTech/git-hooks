@@ -9,7 +9,7 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Tests.Yaml.Pipeline.Steps.Handlers;
 
-public class MapFieldHandlerTests
+public class MapFieldHandlerBaseTests
 {
     [Fact]
     public void ReadMap_WithEmptyMap_ReturnsEmptyDictionary()
@@ -106,7 +106,7 @@ public class MapFieldHandlerTests
     }
 
     private sealed class TestMapFieldHandler(InterpolationParser parser)
-        : MapFieldHandler(parser)
+        : MapFieldHandlerBase(parser)
     {
         public override string Key => "test";
 

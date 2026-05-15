@@ -33,7 +33,7 @@ internal sealed class ScriptStepNodeBuilder : StepNodeBuilderBase
     /// <inheritdoc />
     protected override StepNode Create(StepFields fields, SourceSpan span)
     {
-        var script = fields.Script ?? throw new InvalidOperationException("Script step builder requires a script value.");
+        var script = fields.Script ?? throw new InvalidOperationException($"{StepType} step builder requires a script value.");
 
         return new ScriptStepNode(script, fields.UnknownFields, span)
         {
