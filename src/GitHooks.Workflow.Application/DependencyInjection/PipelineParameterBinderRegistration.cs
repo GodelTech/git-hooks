@@ -11,6 +11,8 @@ public static class PipelineParameterBinderRegistration
     public static IServiceCollection AddPipelineParameterBinding(this IServiceCollection services)
     {
         _ = services.AddSingleton<UnknownNodeParameterBinder>();
+        _ = services.AddSingleton<ScriptStepParameterBinder>();
+        _ = services.AddSingleton<TemplateStepParameterBinder>();
         _ = services.AddSingleton<StepParameterBinder>();
         _ = services.AddSingleton<IPipelineParameterBinder, PipelineParameterBinder>();
 

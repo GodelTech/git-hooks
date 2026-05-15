@@ -1,5 +1,4 @@
 using System.CommandLine;
-using System.Diagnostics.CodeAnalysis;
 
 namespace GitHooks.Commands;
 
@@ -11,7 +10,7 @@ namespace GitHooks.Commands;
 /// </remarks>
 /// <param name="name">The name of the command.</param>
 /// <param name="description">The description of the command.</param>
-[SuppressMessage("Design", "CA1010:Collections should implement generic interface", Justification = "Inherits IEnumerable from Command base class for internal command/option management, not intended as a collection type")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1010:Collections should implement generic interface", Justification = "Inherits IEnumerable from Command base class for internal command/option management, not intended as a collection type")]
 public abstract class CommandBase(string name, string? description = null)
     : Command(name, description)
 {
