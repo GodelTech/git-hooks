@@ -1,16 +1,18 @@
 using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Application.Binding.Core;
 using GitHooks.Workflow.Application.Binding.Expressions;
+using GitHooks.Workflow.Application.Binding.Unknown;
 
 namespace GitHooks.Workflow.Application.Binding.Pipeline.Steps.Binders;
 
 internal sealed class TemplateStepNodeParameterBinder(
     InterpolationParameterBinder interpolationParameterBinder,
-    StringBinder stringBinder,
+    StringParameterBinder stringParameterBinder,
     UnknownNodeParameterBinder unknownNodeParameterBinder)
     : IStepNodeParameterBinder
 {
     private readonly InterpolationParameterBinder _interpolationParameterBinder = interpolationParameterBinder;
-    private readonly StringBinder _stringBinder = stringBinder;
+    private readonly StringParameterBinder _stringParameterBinder = stringParameterBinder;
     private readonly UnknownNodeParameterBinder _unknownNodeParameterBinder = unknownNodeParameterBinder;
 
     public bool CanBind(StepNode step)
@@ -24,7 +26,7 @@ internal sealed class TemplateStepNodeParameterBinder(
 
         return templateStep with
         {
-            Template = _stringBinder.Bind(templateStep.Template, templateStep.Span, context),
+            Template = _stringParameterBinder.Bind(templateStep.Template, templateStep.Span, context),
             Parameters = templateStep.Parameters.ToDictionary(
                 pair => pair.Key,
                 pair => _interpolationParameterBinder.Bind(pair.Value, templateStep.Span, context),

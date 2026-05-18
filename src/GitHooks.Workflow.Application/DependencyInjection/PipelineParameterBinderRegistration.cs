@@ -1,7 +1,9 @@
 using GitHooks.Workflow.Application.Binding;
+using GitHooks.Workflow.Application.Binding.Core;
 using GitHooks.Workflow.Application.Binding.Expressions;
 using GitHooks.Workflow.Application.Binding.Pipeline;
 using GitHooks.Workflow.Application.Binding.Pipeline.Steps;
+using GitHooks.Workflow.Application.Binding.Unknown;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,8 +14,12 @@ public static class PipelineParameterBinderRegistration
     public static IServiceCollection AddPipelineParameterBinding(this IServiceCollection services)
     {
         // Register core binders
+        _ = services.AddSingleton<StringParameterBinder>();
+
+        // Register expression binders
         _ = services.AddSingleton<InterpolationParameterBinder>();
-        _ = services.AddSingleton<StringBinder>();
+
+        // Register unknown binders
         _ = services.AddSingleton<UnknownNodeParameterBinder>();
 
         // Register all IStepNodeParameterBinder implementations

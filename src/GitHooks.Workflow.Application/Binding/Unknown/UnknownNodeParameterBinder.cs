@@ -1,11 +1,12 @@
 using GitHooks.Workflow.Application.Ast.Unknown;
+using GitHooks.Workflow.Application.Binding.Core;
 using GitHooks.Workflow.Application.Binding.Exceptions;
 
-namespace GitHooks.Workflow.Application.Binding;
+namespace GitHooks.Workflow.Application.Binding.Unknown;
 
-internal sealed class UnknownNodeParameterBinder(StringBinder stringBinder)
+internal sealed class UnknownNodeParameterBinder(StringParameterBinder stringParameterBinder)
 {
-    private readonly StringBinder _stringBinder = stringBinder;
+    private readonly StringParameterBinder _stringParameterBinder = stringParameterBinder;
 
     public UnknownFieldNode[] BindUnknownFields(
         IReadOnlyList<UnknownFieldNode> unknownFields,
@@ -28,7 +29,7 @@ internal sealed class UnknownNodeParameterBinder(StringBinder stringBinder)
         {
             UnknownScalarNode scalarNode => scalarNode with
             {
-                Value = _stringBinder.Bind(scalarNode.Value, scalarNode.Span, context)
+                Value = _stringParameterBinder.Bind(scalarNode.Value, scalarNode.Span, context)
             },
             UnknownMappingNode mappingNode => mappingNode with
             {

@@ -1,5 +1,6 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Binding.Pipeline.Steps;
+using GitHooks.Workflow.Application.Binding.Unknown;
 
 namespace GitHooks.Workflow.Application.Binding.Pipeline;
 

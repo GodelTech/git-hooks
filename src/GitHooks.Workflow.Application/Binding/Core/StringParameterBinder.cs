@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 using GitHooks.Workflow.Application.Binding.Exceptions;
 using GitHooks.Workflow.Domain.Model;
 
-namespace GitHooks.Workflow.Application.Binding;
+namespace GitHooks.Workflow.Application.Binding.Core;
 
-internal sealed partial class StringBinder
+internal sealed partial class StringParameterBinder
 {
 #pragma warning disable CA1822 // Mark members as static
     public string Bind(string value, SourceSpan span, ParameterBindingContext context)
