@@ -11,7 +11,8 @@ public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
     IPipelineParameterBinder pipelineParameterBinder,
     IPipelineParser pipelineParser,
-    IAnsiConsole console) : IRunHandler
+    IAnsiConsole console)
+    : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
     private readonly IPipelineParameterBinder _pipelineParameterBinder = pipelineParameterBinder;

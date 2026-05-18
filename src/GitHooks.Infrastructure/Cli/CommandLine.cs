@@ -6,7 +6,8 @@ namespace GitHooks.Infrastructure.Cli;
 /// <summary>
 /// Default implementation of <see cref="ICommandLine"/> that runs external processes.
 /// </summary>
-public sealed class CommandLine : ICommandLine
+public sealed class CommandLine
+    : ICommandLine
 {
     /// <inheritdoc/>
     /// <remarks>

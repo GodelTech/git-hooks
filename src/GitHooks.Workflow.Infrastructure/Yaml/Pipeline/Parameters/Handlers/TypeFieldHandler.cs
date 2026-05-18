@@ -4,7 +4,8 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters.Handlers;
 
-internal sealed class TypeFieldHandler : IParameterFieldHandler
+internal sealed class TypeFieldHandler
+    : IParameterFieldHandler
 {
     public string Key => "type";
 

@@ -12,8 +12,7 @@ namespace GitHooks.Workflow.Infrastructure.DependencyInjection;
 
 public static class YamlParsingRegistration
 {
-    public static IServiceCollection AddYamlPipelineParsing(
-        this IServiceCollection services)
+    public static IServiceCollection AddYamlPipelineParsing(this IServiceCollection services)
     {
         _ = services.AddSingleton<ExpressionParser>();
         _ = services.AddSingleton<InterpolationParser>();

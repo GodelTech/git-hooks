@@ -4,7 +4,8 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Handlers;
 
-internal sealed class ConditionFieldHandler(ExpressionParser parser) : IStepFieldHandler
+internal sealed class ConditionFieldHandler(ExpressionParser parser)
+    : IStepFieldHandler
 {
     private readonly ExpressionParser _parser = parser;
 

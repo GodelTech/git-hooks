@@ -15,7 +15,8 @@ namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Builders;
 /// that new fields added to <see cref="StepFields"/> are rejected by default,
 /// forcing a conscious opt-in decision for each builder.
 /// </remarks>
-internal abstract class StepNodeBuilderBase : IStepNodeBuilder
+internal abstract class StepNodeBuilderBase
+    : IStepNodeBuilder
 {
     /// <summary>
     /// Gets the YAML step type name used in validation error messages (e.g. <c>"template"</c>, <c>"script"</c>).

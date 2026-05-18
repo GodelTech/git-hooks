@@ -13,7 +13,8 @@ public sealed class CreateHookHandler(
     IGitCommandLine gitCommandLine,
     IGitHookCatalog gitHookCatalog,
     IGitHookScaffolder gitHookScaffolder,
-    IAnsiConsole console) : ICreateHookHandler
+    IAnsiConsole console)
+    : ICreateHookHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
     private readonly IGitHookCatalog _gitHookCatalog = gitHookCatalog;

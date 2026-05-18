@@ -2,7 +2,8 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Handlers;
 
-internal sealed class DisplayNameFieldHandler : IStepFieldHandler
+internal sealed class DisplayNameFieldHandler
+    : IStepFieldHandler
 {
     public string Key => "displayName";
 

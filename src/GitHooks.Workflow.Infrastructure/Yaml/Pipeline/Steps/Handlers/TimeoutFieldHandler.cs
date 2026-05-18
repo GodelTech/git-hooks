@@ -2,7 +2,8 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Handlers;
 
-internal sealed class TimeoutFieldHandler : IStepFieldHandler
+internal sealed class TimeoutFieldHandler
+    : IStepFieldHandler
 {
     public string Key => "timeoutInMinutes";
 

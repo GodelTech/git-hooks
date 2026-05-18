@@ -12,7 +12,8 @@ namespace GitHooks.Infrastructure.Scaffold;
 /// <param name="yamlTemplateProvider">The provider used to load raw YAML hook scaffold templates.</param>
 public sealed class GitHookScaffolder(
     IBashTemplateProvider bashTemplateProvider,
-    IYamlTemplateProvider yamlTemplateProvider) : IGitHookScaffolder
+    IYamlTemplateProvider yamlTemplateProvider)
+    : IGitHookScaffolder
 {
     private readonly IBashTemplateProvider _bashTemplateProvider = bashTemplateProvider;
     private readonly IYamlTemplateProvider _yamlTemplateProvider = yamlTemplateProvider;

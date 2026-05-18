@@ -5,7 +5,8 @@ namespace GitHooks.Templates;
 /// <summary>
 /// Resolves the tool version from assembly metadata.
 /// </summary>
-public sealed class ToolVersionResolver : IToolVersionResolver
+public sealed class ToolVersionResolver
+    : IToolVersionResolver
 {
     private readonly Lazy<string> _version;
 

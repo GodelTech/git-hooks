@@ -9,7 +9,8 @@ namespace GitHooks.Handlers;
 /// </summary>
 public sealed class UninstallHandler(
     IGitCommandLine gitCommandLine,
-    IAnsiConsole console) : IUninstallHandler
+    IAnsiConsole console)
+    : IUninstallHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
     private readonly IAnsiConsole _console = console;

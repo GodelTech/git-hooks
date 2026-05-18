@@ -3,7 +3,8 @@ namespace GitHooks.Templates;
 /// <summary>
 /// Base implementation of <see cref="ITemplateProvider"/> that loads template text from an embedded resource.
 /// </summary>
-public abstract class EmbeddedTemplateProviderBase : ITemplateProvider
+public abstract class EmbeddedTemplateProviderBase
+    : ITemplateProvider
 {
     private readonly string _resourceName;
     private readonly Lazy<string> _template;

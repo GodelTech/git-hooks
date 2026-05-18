@@ -2,7 +2,8 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters.Handlers;
 
-internal sealed class DefaultFieldHandler : IParameterFieldHandler
+internal sealed class DefaultFieldHandler
+    : IParameterFieldHandler
 {
     public string Key => "default";
 

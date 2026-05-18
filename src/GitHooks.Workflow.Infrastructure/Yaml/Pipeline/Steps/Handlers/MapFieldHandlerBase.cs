@@ -5,7 +5,8 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Handlers;
 
-internal abstract class MapFieldHandlerBase : IStepFieldHandler
+internal abstract class MapFieldHandlerBase
+    : IStepFieldHandler
 {
     private readonly InterpolationParser _parser;
 

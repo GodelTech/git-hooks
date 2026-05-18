@@ -9,7 +9,8 @@ namespace GitHooks.Handlers;
 /// </summary>
 public sealed class InstallHandler(
     IGitCommandLine gitCommandLine,
-    IAnsiConsole console) : IInstallHandler
+    IAnsiConsole console)
+    : IInstallHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
     private readonly IAnsiConsole _console = console;

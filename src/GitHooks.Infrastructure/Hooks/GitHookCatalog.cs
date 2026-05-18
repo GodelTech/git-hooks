@@ -9,7 +9,8 @@ namespace GitHooks.Infrastructure.Hooks;
 /// Use <see cref="Default"/> for non-DI contexts; register via DI as
 /// <c>services.AddSingleton&lt;IGitHookCatalog, GitHookCatalog&gt;()</c> in hosted applications.
 /// </remarks>
-public sealed class GitHookCatalog : IGitHookCatalog
+public sealed class GitHookCatalog
+    : IGitHookCatalog
 {
     // Full catalog — all 11 hooks across the five supported categories.
     // CanAbort = true means a non-zero exit code cancels the Git operation.

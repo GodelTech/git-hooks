@@ -4,5 +4,5 @@ namespace GitHooks.Workflow.Application.Ast.Unknown;
 
 public sealed record UnknownSequenceNode(
     IReadOnlyList<UnknownNode> Items,
-    SourceSpan Span
-) : UnknownNode(Span);
+    SourceSpan Span)
+    : UnknownNode(Span);

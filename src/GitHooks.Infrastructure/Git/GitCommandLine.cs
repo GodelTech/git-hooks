@@ -9,7 +9,8 @@ namespace GitHooks.Infrastructure.Git;
 /// Initializes a new instance of the <see cref="GitCommandLine"/> class.
 /// </remarks>
 /// <param name="commandLine">The command-line used to execute git commands.</param>
-public sealed class GitCommandLine(ICommandLine commandLine) : IGitCommandLine
+public sealed class GitCommandLine(ICommandLine commandLine)
+    : IGitCommandLine
 {
     private readonly ICommandLine _commandLine = commandLine;
 

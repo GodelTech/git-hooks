@@ -11,11 +11,15 @@ internal sealed class UnknownNodeParameterBinder(StringBinder stringBinder)
         IReadOnlyList<UnknownFieldNode> unknownFields,
         ParameterBindingContext context)
     {
-        return [.. unknownFields.Select(field => field with
-        {
-            Key = BindUnknownNode(field.Key, context),
-            Value = BindUnknownNode(field.Value, context)
-        })];
+        return [.. unknownFields
+            .Select(
+                field => field with
+                {
+                    Key = BindUnknownNode(field.Key, context),
+                    Value = BindUnknownNode(field.Value, context)
+                }
+            )
+        ];
     }
 
     private UnknownNode BindUnknownNode(UnknownNode node, ParameterBindingContext context)
@@ -28,11 +32,15 @@ internal sealed class UnknownNodeParameterBinder(StringBinder stringBinder)
             },
             UnknownMappingNode mappingNode => mappingNode with
             {
-                Entries = [.. mappingNode.Entries.Select(entry => entry with
-                {
-                    Key = BindUnknownNode(entry.Key, context),
-                    Value = BindUnknownNode(entry.Value, context)
-                })]
+                Entries = [.. mappingNode.Entries
+                    .Select(
+                        entry => entry with
+                        {
+                            Key = BindUnknownNode(entry.Key, context),
+                            Value = BindUnknownNode(entry.Value, context)
+                        }
+                    )
+                ]
             },
             UnknownSequenceNode sequenceNode => sequenceNode with
             {

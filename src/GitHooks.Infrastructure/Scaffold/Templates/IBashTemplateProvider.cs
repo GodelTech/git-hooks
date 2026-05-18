@@ -6,7 +6,8 @@ namespace GitHooks.Infrastructure.Scaffold.Templates;
 /// <summary>
 /// Marker abstraction for services that provide Bash hook templates.
 /// </summary>
-public interface IBashTemplateProvider : ITemplateProvider
+public interface IBashTemplateProvider
+    : ITemplateProvider
 {
     /// <summary>
     /// Applies token replacements to a Bash hook template.

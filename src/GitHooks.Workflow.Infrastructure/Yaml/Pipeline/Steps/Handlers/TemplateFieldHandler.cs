@@ -2,7 +2,8 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Handlers;
 
-internal sealed class TemplateFieldHandler : IStepFieldHandler
+internal sealed class TemplateFieldHandler
+    : IStepFieldHandler
 {
     public string Key => "template";
 

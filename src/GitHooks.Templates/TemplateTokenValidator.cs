@@ -5,7 +5,8 @@ namespace GitHooks.Templates;
 /// <summary>
 /// Default unresolved-token validator for scaffold templates.
 /// </summary>
-public sealed partial class TemplateTokenValidator : ITemplateTokenValidator
+public sealed partial class TemplateTokenValidator
+    : ITemplateTokenValidator
 {
     /// <inheritdoc/>
     public void ValidateNoUnresolvedTokens(string content)

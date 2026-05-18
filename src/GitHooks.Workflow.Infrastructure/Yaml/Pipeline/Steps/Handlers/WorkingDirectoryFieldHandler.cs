@@ -4,7 +4,8 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Handlers;
 
-internal sealed class WorkingDirectoryFieldHandler(InterpolationParser parser) : IStepFieldHandler
+internal sealed class WorkingDirectoryFieldHandler(InterpolationParser parser)
+    : IStepFieldHandler
 {
     private readonly InterpolationParser _parser = parser;
 

@@ -4,7 +4,8 @@ using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Builders;
 
-internal sealed class TemplateStepNodeBuilder : StepNodeBuilderBase
+internal sealed class TemplateStepNodeBuilder
+    : StepNodeBuilderBase
 {
     private static readonly IReadOnlySet<string> s_allowedFields = new HashSet<string>
     {

@@ -5,7 +5,8 @@ using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters.Builders;
 
-internal sealed class ParameterNodeBuilder : IParameterNodeBuilder
+internal sealed class ParameterNodeBuilder
+    : IParameterNodeBuilder
 {
     public bool CanBuild(ParameterFields fields)
     {
