@@ -1,7 +1,10 @@
 using GitHooks.Infrastructure.Git;
 using GitHooks.Workflow.Application.Binding;
 using GitHooks.Workflow.Application.Binding.Exceptions;
+using GitHooks.Workflow.Application.Expansion;
+using GitHooks.Workflow.Application.Expansion.Exceptions;
 using GitHooks.Workflow.Application.Parsing;
+using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 using Spectre.Console;
 
@@ -11,12 +14,14 @@ public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
     IPipelineParameterBinder pipelineParameterBinder,
     IPipelineParser pipelineParser,
+    IPipelineTemplateExpander pipelineTemplateExpander,
     IAnsiConsole console)
     : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
     private readonly IPipelineParameterBinder _pipelineParameterBinder = pipelineParameterBinder;
     private readonly IPipelineParser _pipelineParser = pipelineParser;
+    private readonly IPipelineTemplateExpander _pipelineTemplateExpander = pipelineTemplateExpander;
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
@@ -77,6 +82,16 @@ public sealed class RunHandler(
         {
             var pipeline = _pipelineParser.Parse(yamlContent, absoluteFilePath);
             var boundPipeline = _pipelineParameterBinder.Bind(pipeline, parameterOverrides);
+            var expandedPipeline = await _pipelineTemplateExpander.ExpandAsync(boundPipeline, absoluteFilePath, cancellationToken);
+        }
+        catch (YamlParseException ex)
+        {
+            var location = ex.Span.Start.Line > 0
+                ? $"{Markup.Escape(ex.Span.Source.Name)}:{ex.Span.Start.Line}:{ex.Span.Start.Column}: "
+                : string.Empty;
+
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(ex.Message)}");
+            return 1;
         }
         catch (PipelineParameterBindingException ex)
         {
@@ -85,6 +100,19 @@ public sealed class RunHandler(
                 : string.Empty;
 
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(ex.Message)}");
+            return 1;
+        }
+        catch (PipelineTemplateExpansionException ex)
+        {
+            var location = ex.Span.Start.Line > 0
+                ? $"{Markup.Escape(ex.Span.Source.Name)}:{ex.Span.Start.Line}:{ex.Span.Start.Column}: "
+                : string.Empty;
+
+            var includeChain = ex.IncludeChain.Count > 0
+                ? $" Include chain: {string.Join(" -> ", ex.IncludeChain.Select(Markup.Escape))}."
+                : string.Empty;
+
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(ex.Message)}{includeChain}");
             return 1;
         }
 

@@ -5,9 +5,14 @@
       "commandLineArgs": "install",
       "workingDirectory": "$(SolutionDir)"
     },
-    "run --file": {
+    "run --file examples/simple.yaml": {
       "commandName": "Project",
       "commandLineArgs": "run --file examples/simple.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run --file examples/push-minimal.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run --file examples/push-minimal.yaml",
       "workingDirectory": "$(SolutionDir)"
     },
     "uninstall": {

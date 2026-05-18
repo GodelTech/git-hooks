@@ -75,6 +75,7 @@ internal sealed class Program
         // add workflow
         _ = services.AddYamlPipelineParsing();
         _ = services.AddPipelineParameterBinding();
+        _ = services.AddPipelineTemplateExpansion();
 
         return services.BuildServiceProvider();
     }
