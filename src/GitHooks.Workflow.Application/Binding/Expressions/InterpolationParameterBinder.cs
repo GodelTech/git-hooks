@@ -1,5 +1,4 @@
 using GitHooks.Workflow.Application.Ast.Expressions;
-using GitHooks.Workflow.Application.Binding;
 using GitHooks.Workflow.Application.Binding.Core;
 using GitHooks.Workflow.Domain.Model;
 

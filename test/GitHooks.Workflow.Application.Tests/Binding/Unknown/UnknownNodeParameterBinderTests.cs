@@ -1,12 +1,10 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Application.Binding;
+using GitHooks.Workflow.Application.Binding.Core;
 using GitHooks.Workflow.Application.Binding.Exceptions;
 using GitHooks.Workflow.Application.Binding.Unknown;
-using GitHooks.Workflow.Application.DependencyInjection;
 using GitHooks.Workflow.Domain.Model;
-
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GitHooks.Workflow.Application.Tests.Binding.Unknown;
 
@@ -16,13 +14,8 @@ public sealed class UnknownNodeParameterBinderTests
     public void Bind_WithUnsupportedExpressionInUnknownField_ThrowsPipelineParameterBindingException()
     {
         var binder = CreateBinder();
-        var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
-        var parameters = new List<ParameterNode>()
-        {
-            new("owner", null, ParameterType.Text, "contoso", [], [], span)
-        };
-
-        var context = ParameterBindingContext.Create(parameters);
+        var span = CreateSpan();
+        var context = CreateContext(("owner", "contoso"));
 
         var unknownFields = new List<UnknownFieldNode>()
         {
@@ -42,14 +35,11 @@ public sealed class UnknownNodeParameterBinderTests
     public void Bind_WithNestedUnknownNodes_ReplacesInterpolatedScalarValues()
     {
         var binder = CreateBinder();
-        var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
-        var parameters = new List<ParameterNode>()
-        {
-            new("owner", null, ParameterType.Text, "default-owner", [], [], span),
-            new("repo", null, ParameterType.Text, "default-repo", [], [], span)
-        };
-
-        var context = ParameterBindingContext.Create(parameters);
+        var span = CreateSpan();
+        var context = CreateContext(
+            ("owner", "default-owner"),
+            ("repo", "default-repo")
+        );
 
         var unknownFields = new List<UnknownFieldNode>()
         {
@@ -83,6 +73,9 @@ public sealed class UnknownNodeParameterBinderTests
         var result = binder.BindUnknownFields(unknownFields, context);
 
         var stepUnknownField = Assert.Single(result);
+        var metaKey = Assert.IsType<UnknownScalarNode>(stepUnknownField.Key);
+        Assert.Equal("meta", metaKey.Value);
+
         var metaValue = Assert.IsType<UnknownMappingNode>(stepUnknownField.Value);
 
         var ownerEntry = metaValue.Entries[0];
@@ -99,13 +92,75 @@ public sealed class UnknownNodeParameterBinderTests
         Assert.Equal("preserve-me", secondItem.Value);
     }
 
+    [Fact]
+    public void Bind_WithInterpolatedUnknownKey_ReplacesKeyValue()
+    {
+        var binder = CreateBinder();
+        var span = CreateSpan();
+        var context = CreateContext(("fieldName", "metadata"));
+
+        var unknownFields = new List<UnknownFieldNode>()
+        {
+            new(
+                new UnknownScalarNode("${{ parameters.fieldName }}", span),
+                new UnknownScalarNode("literal", span),
+                span
+            )
+        };
+
+        var result = binder.BindUnknownFields(unknownFields, context);
+
+        var unknownField = Assert.Single(result);
+        var key = Assert.IsType<UnknownScalarNode>(unknownField.Key);
+        Assert.Equal("metadata", key.Value);
+
+        var value = Assert.IsType<UnknownScalarNode>(unknownField.Value);
+        Assert.Equal("literal", value.Value);
+    }
+
+    [Fact]
+    public void Bind_WithUnsupportedUnknownNodeType_ThrowsPipelineParameterBindingException()
+    {
+        var binder = CreateBinder();
+        var span = CreateSpan();
+        var context = CreateContext(("owner", "contoso"));
+
+        var unknownFields = new List<UnknownFieldNode>()
+        {
+            new(
+                new UnsupportedUnknownNode(span),
+                new UnknownScalarNode("value", span),
+                span
+            )
+        };
+
+        var exception = Assert.Throws<PipelineParameterBindingException>(() => binder.BindUnknownFields(unknownFields, context));
+
+        Assert.Contains("Unsupported unknown node type", exception.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(UnsupportedUnknownNode), exception.Message, StringComparison.Ordinal);
+    }
+
     private static UnknownNodeParameterBinder CreateBinder()
     {
-        var services = new ServiceCollection();
-        services.AddPipelineParameterBinding();
-
-        var provider = services.BuildServiceProvider();
-
-        return provider.GetRequiredService<UnknownNodeParameterBinder>();
+        return new UnknownNodeParameterBinder(new StringParameterBinder());
     }
+
+    private static ParameterBindingContext CreateContext(params (string Name, string? DefaultValue)[] parameters)
+    {
+        var span = CreateSpan();
+
+        var declarations = parameters
+            .Select(parameter => new ParameterNode(parameter.Name, null, ParameterType.Text, parameter.DefaultValue, [], [], span))
+            .ToList();
+
+        return ParameterBindingContext.Create(declarations);
+    }
+
+    private static SourceSpan CreateSpan()
+    {
+        return SourceSpan.Unknown(new SourceRef("pipeline.yml"));
+    }
+
+    private sealed record UnsupportedUnknownNode(SourceSpan Span)
+        : UnknownNode(Span);
 }

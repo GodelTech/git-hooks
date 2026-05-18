@@ -2,13 +2,12 @@ using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Expressions;
 using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Application.Binding;
+using GitHooks.Workflow.Application.Binding.Core;
 using GitHooks.Workflow.Application.Binding.Exceptions;
-using GitHooks.Workflow.Application.Binding.Pipeline.Steps;
+using GitHooks.Workflow.Application.Binding.Expressions;
 using GitHooks.Workflow.Application.Binding.Pipeline.Steps.Binders;
-using GitHooks.Workflow.Application.DependencyInjection;
+using GitHooks.Workflow.Application.Binding.Unknown;
 using GitHooks.Workflow.Domain.Model;
-
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GitHooks.Workflow.Application.Tests.Binding.Pipeline.Steps.Binders;
 
@@ -18,7 +17,7 @@ public sealed class TemplateStepNodeParameterBinderTests
     public void CanBind_WithTemplateStep_ReturnsTrue()
     {
         var binder = CreateBinder();
-        var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
+        var span = CreateSpan();
         var templateStep = new TemplateStepNode(
             Template: "template.yml",
             Parameters: new Dictionary<string, InterpolatedStringNode>(),
@@ -35,7 +34,7 @@ public sealed class TemplateStepNodeParameterBinderTests
     public void CanBind_WithNonTemplateStep_ReturnsFalse()
     {
         var binder = CreateBinder();
-        var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
+        var span = CreateSpan();
         var scriptStep = new ScriptStepNode(
             Script: new InterpolatedStringNode("echo hello"),
             UnknownFields: [],
@@ -51,15 +50,12 @@ public sealed class TemplateStepNodeParameterBinderTests
     public void Bind_WithTemplateStep_RebindsTemplateParametersAndUnknownFields()
     {
         var binder = CreateBinder();
-        var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
-        var parameters = new List<ParameterNode>()
-        {
-            new("templateName", null, ParameterType.Text, "deploy.yml", [], [], span),
-            new("env", null, ParameterType.Text, "stage", [], [], span),
-            new("region", null, ParameterType.Text, "eu", [], [], span)
-        };
-
-        var context = ParameterBindingContext.Create(parameters);
+        var span = CreateSpan();
+        var context = CreateContext(
+            ("templateName", "deploy.yml"),
+            ("env", "stage"),
+            ("region", "eu")
+        );
 
         var templateStep = new TemplateStepNode(
             Template: "templates/${{ parameters.templateName }}",
@@ -95,15 +91,12 @@ public sealed class TemplateStepNodeParameterBinderTests
     public void Bind_WithUnsupportedTemplateExpression_ThrowsPipelineParameterBindingException()
     {
         var binder = CreateBinder();
-        var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
-        var parameters = new List<ParameterNode>()
-        {
-            new("templateName", null, ParameterType.Text, "deploy.yml", [], [], span),
-            new("env", null, ParameterType.Text, "prod", [], [], span),
-            new("region", null, ParameterType.Text, "eu", [], [], span)
-        };
-
-        var context = ParameterBindingContext.Create(parameters);
+        var span = CreateSpan();
+        var context = CreateContext(
+            ("templateName", "deploy.yml"),
+            ("env", "prod"),
+            ("region", "eu")
+        );
 
         var templateStep = new TemplateStepNode(
             Template: "templates/${{ variables.templateName }}",
@@ -119,15 +112,30 @@ public sealed class TemplateStepNodeParameterBinderTests
 
     private static TemplateStepNodeParameterBinder CreateBinder()
     {
-        var services = new ServiceCollection();
-        services.AddPipelineParameterBinding();
+        var stringParameterBinder = new StringParameterBinder();
+        var interpolationParameterBinder = new InterpolationParameterBinder(stringParameterBinder);
+        var unknownNodeParameterBinder = new UnknownNodeParameterBinder(stringParameterBinder);
 
-        var provider = services.BuildServiceProvider();
+        return new TemplateStepNodeParameterBinder(
+            interpolationParameterBinder,
+            stringParameterBinder,
+            unknownNodeParameterBinder
+        );
+    }
 
-        var stepNodeParameterBinders = provider.GetServices<IStepNodeParameterBinder>();
+    private static ParameterBindingContext CreateContext(params (string Name, string? DefaultValue)[] parameters)
+    {
+        var span = CreateSpan();
 
-        return stepNodeParameterBinders
-            .OfType<TemplateStepNodeParameterBinder>()
-            .Single();
+        var declarations = parameters
+            .Select(parameter => new ParameterNode(parameter.Name, null, ParameterType.Text, parameter.DefaultValue, [], [], span))
+            .ToList();
+
+        return ParameterBindingContext.Create(declarations);
+    }
+
+    private static SourceSpan CreateSpan()
+    {
+        return SourceSpan.Unknown(new SourceRef("pipeline.yml"));
     }
 }
