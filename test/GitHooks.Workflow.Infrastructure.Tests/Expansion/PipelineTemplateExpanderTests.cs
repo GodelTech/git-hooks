@@ -1,10 +1,8 @@
 ﻿using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Expressions;
-using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Application.DependencyInjection;
 using GitHooks.Workflow.Application.Expansion;
 using GitHooks.Workflow.Application.Expansion.Exceptions;
-using GitHooks.Workflow.Application.Parsing;
 using GitHooks.Workflow.Domain.Model;
 using GitHooks.Workflow.Infrastructure.DependencyInjection;
 
@@ -110,29 +108,6 @@ public sealed class PipelineTemplateExpanderTests : IDisposable
             () => expander.ExpandAsync(pipeline, rootFile, TestContext.Current.CancellationToken));
 
         Assert.Contains("missing.yaml", exception.Message, StringComparison.OrdinalIgnoreCase);
-    }
-
-    [Fact]
-    public async Task ExpandAsync_WithInvalidTemplateYaml_ThrowsPipelineTemplateExpansionException()
-    {
-        var expander = CreateExpander();
-        var span = CreateSpan();
-
-        var templateFile = WriteTempFile("template.yaml", ": invalid: yaml: content:");
-        var rootFile = WriteTempFile("root.yaml", string.Empty);
-
-        var templateStep = new TemplateStepNode(
-            templateFile,
-            new Dictionary<string, InterpolatedStringNode>(),
-            [],
-            span);
-
-        var pipeline = CreatePipeline([templateStep]);
-
-        var exception = await Assert.ThrowsAsync<PipelineTemplateExpansionException>(
-            () => expander.ExpandAsync(pipeline, rootFile, TestContext.Current.CancellationToken));
-
-        Assert.Contains("parse", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

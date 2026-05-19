@@ -349,3 +349,6 @@ dotnet_diagnostic.IDE0058.severity = none
 # IDE0290: Use primary constructor
 # Explicit constructor preferred in test classes for clarity
 dotnet_diagnostic.IDE0290.severity = none
+# IDE1006: Naming rule violation
+# Test methods and helpers don't need to follow strict naming conventions.
+dotnet_diagnostic.IDE1006.severity = none

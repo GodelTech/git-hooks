@@ -1,21 +1,19 @@
 using GitHooks.Workflow.Application.Ast;
-using GitHooks.Workflow.Application.Binding;
 using GitHooks.Workflow.Application.Binding.Exceptions;
+using GitHooks.Workflow.Application.Compilation;
 using GitHooks.Workflow.Application.Expansion;
 using GitHooks.Workflow.Application.Expansion.Exceptions;
-using GitHooks.Workflow.Application.Parsing;
+using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 namespace GitHooks.Workflow.Infrastructure.Expansion;
 
 internal sealed class PipelineTemplateExpander(
-    IPipelineParser pipelineParser,
-    IPipelineParameterBinder pipelineParameterBinder,
+    IPipelineCompiler pipelineCompiler,
     ITemplatePathResolver templatePathResolver,
     ITemplateExpansionOrchestrator orchestrator)
     : IPipelineTemplateExpander
 {
-    private readonly IPipelineParser _pipelineParser = pipelineParser;
-    private readonly IPipelineParameterBinder _pipelineParameterBinder = pipelineParameterBinder;
+    private readonly IPipelineCompiler _pipelineCompiler = pipelineCompiler;
     private readonly ITemplatePathResolver _templatePathResolver = templatePathResolver;
     private readonly ITemplateExpansionOrchestrator _orchestrator = orchestrator;
 
@@ -59,18 +57,27 @@ internal sealed class PipelineTemplateExpander(
 
         var nextIncludeChain = includeChain.Append(templatePath).ToList();
 
-        var parsedTemplate = await ReadAndParseTemplateAsync(templatePath, templateStep, nextIncludeChain, cancellationToken);
-        var boundTemplate = BindTemplateParameters(parsedTemplate, templateStep, nextIncludeChain);
+        var boundTemplate = await ReadAndCompileTemplateAsync(templatePath, templateStep, nextIncludeChain, cancellationToken);
 
         return new ResolvedTemplate(templatePath, boundTemplate);
     }
 
-    private async Task<PipelineNode> ReadAndParseTemplateAsync(
+    private async Task<PipelineNode> ReadAndCompileTemplateAsync(
         string templatePath,
         TemplateStepNode templateStep,
         IReadOnlyList<string> includeChain,
         CancellationToken cancellationToken)
     {
+        static Dictionary<string, string>? CreateParameterOverrides(TemplateStepNode currentTemplateStep)
+        {
+            return currentTemplateStep.Parameters.Count == 0
+                ? null
+                : currentTemplateStep.Parameters.ToDictionary(
+                    pair => pair.Key,
+                    pair => pair.Value.Value,
+                    StringComparer.Ordinal);
+        }
+
         string templateContent;
 
         try
@@ -88,36 +95,15 @@ internal sealed class PipelineTemplateExpander(
 
         try
         {
-            return _pipelineParser.Parse(templateContent, templatePath);
+            return _pipelineCompiler.Compile(templateContent, templatePath, CreateParameterOverrides(templateStep));
         }
-        catch (Exception ex)
+        catch (YamlParseException ex)
         {
             throw new PipelineTemplateExpansionException(
                 $"Failed to parse template file '{templatePath}': {ex.Message}",
                 templateStep.Span,
                 includeChain,
                 ex);
-        }
-    }
-
-    private PipelineNode BindTemplateParameters(
-        PipelineNode parsedTemplate,
-        TemplateStepNode templateStep,
-        IReadOnlyList<string> includeChain)
-    {
-        Dictionary<string, string>? parameterOverrides = null;
-
-        if (templateStep.Parameters.Count > 0)
-        {
-            parameterOverrides = templateStep.Parameters.ToDictionary(
-                pair => pair.Key,
-                pair => pair.Value.Value,
-                StringComparer.Ordinal);
-        }
-
-        try
-        {
-            return _pipelineParameterBinder.Bind(parsedTemplate, parameterOverrides);
         }
         catch (PipelineParameterBindingException ex)
         {

@@ -1,9 +1,8 @@
 using GitHooks.Infrastructure.Git;
-using GitHooks.Workflow.Application.Binding;
 using GitHooks.Workflow.Application.Binding.Exceptions;
+using GitHooks.Workflow.Application.Compilation;
 using GitHooks.Workflow.Application.Expansion;
 using GitHooks.Workflow.Application.Expansion.Exceptions;
-using GitHooks.Workflow.Application.Parsing;
 using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 using Spectre.Console;
@@ -12,15 +11,13 @@ namespace GitHooks.Handlers;
 
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
-    IPipelineParameterBinder pipelineParameterBinder,
-    IPipelineParser pipelineParser,
+    IPipelineCompiler pipelineCompiler,
     IPipelineTemplateExpander pipelineTemplateExpander,
     IAnsiConsole console)
     : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
-    private readonly IPipelineParameterBinder _pipelineParameterBinder = pipelineParameterBinder;
-    private readonly IPipelineParser _pipelineParser = pipelineParser;
+    private readonly IPipelineCompiler _pipelineCompiler = pipelineCompiler;
     private readonly IPipelineTemplateExpander _pipelineTemplateExpander = pipelineTemplateExpander;
     private readonly IAnsiConsole _console = console;
 
@@ -80,9 +77,8 @@ public sealed class RunHandler(
 
         try
         {
-            var pipeline = _pipelineParser.Parse(yamlContent, absoluteFilePath);
-            var boundPipeline = _pipelineParameterBinder.Bind(pipeline, parameterOverrides);
-            var expandedPipeline = await _pipelineTemplateExpander.ExpandAsync(boundPipeline, absoluteFilePath, cancellationToken);
+            var compiledPipeline = _pipelineCompiler.Compile(yamlContent, absoluteFilePath, parameterOverrides);
+            var expandedPipeline = await _pipelineTemplateExpander.ExpandAsync(compiledPipeline, absoluteFilePath, cancellationToken);
         }
         catch (YamlParseException ex)
         {

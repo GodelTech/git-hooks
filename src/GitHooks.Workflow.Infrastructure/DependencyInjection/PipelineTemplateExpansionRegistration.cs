@@ -10,6 +10,7 @@ public static class PipelineTemplateExpansionRegistration
 {
     public static IServiceCollection AddPipelineTemplateExpansion(this IServiceCollection services)
     {
+        _ = services.AddPipelineCompilation();
         _ = services.AddPipelineTemplateExpansionOrchestration();
         _ = services.AddSingleton<ITemplatePathResolver, TemplatePathResolver>();
         _ = services.AddSingleton<IPipelineTemplateExpander, PipelineTemplateExpander>();
