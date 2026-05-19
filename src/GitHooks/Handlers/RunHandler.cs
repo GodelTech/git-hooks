@@ -1,8 +1,7 @@
 using GitHooks.Infrastructure.Git;
 using GitHooks.Workflow.Application.Binding.Exceptions;
-using GitHooks.Workflow.Application.Compilation;
-using GitHooks.Workflow.Application.Expansion;
 using GitHooks.Workflow.Application.Expansion.Exceptions;
+using GitHooks.Workflow.Application.Resolution;
 using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 using Spectre.Console;
@@ -11,14 +10,12 @@ namespace GitHooks.Handlers;
 
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
-    IPipelineCompiler pipelineCompiler,
-    IPipelineTemplateExpander pipelineTemplateExpander,
+    IPipelineResolver pipelineResolver,
     IAnsiConsole console)
     : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
-    private readonly IPipelineCompiler _pipelineCompiler = pipelineCompiler;
-    private readonly IPipelineTemplateExpander _pipelineTemplateExpander = pipelineTemplateExpander;
+    private readonly IPipelineResolver _pipelineResolver = pipelineResolver;
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
@@ -63,22 +60,14 @@ public sealed class RunHandler(
             return 1;
         }
 
-        string yamlContent;
-
         try
         {
-            yamlContent = await File.ReadAllTextAsync(absoluteFilePath, cancellationToken);
+            var resolvedPipeline = await _pipelineResolver.ResolveAsync(absoluteFilePath, parameterOverrides, cancellationToken);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to read YAML file: {Markup.Escape(ex.Message)}");
             return 1;
-        }
-
-        try
-        {
-            var compiledPipeline = _pipelineCompiler.Compile(yamlContent, absoluteFilePath, parameterOverrides);
-            var expandedPipeline = await _pipelineTemplateExpander.ExpandAsync(compiledPipeline, absoluteFilePath, cancellationToken);
         }
         catch (YamlParseException ex)
         {
