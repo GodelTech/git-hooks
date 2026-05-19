@@ -4,19 +4,22 @@ using GitHooks.Workflow.Application.Binding.Exceptions;
 using GitHooks.Workflow.Application.Expansion;
 using GitHooks.Workflow.Application.Expansion.Exceptions;
 using GitHooks.Workflow.Application.Parsing;
-using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Infrastructure.Expansion;
 
 internal sealed class PipelineTemplateExpander(
     IPipelineParser pipelineParser,
-    IPipelineParameterBinder pipelineParameterBinder)
+    IPipelineParameterBinder pipelineParameterBinder,
+    ITemplatePathResolver templatePathResolver,
+    ITemplateExpansionOrchestrator orchestrator)
     : IPipelineTemplateExpander
 {
     private readonly IPipelineParser _pipelineParser = pipelineParser;
     private readonly IPipelineParameterBinder _pipelineParameterBinder = pipelineParameterBinder;
+    private readonly ITemplatePathResolver _templatePathResolver = templatePathResolver;
+    private readonly ITemplateExpansionOrchestrator _orchestrator = orchestrator;
 
-    public async Task<PipelineNode> ExpandAsync(
+    public Task<PipelineNode> ExpandAsync(
         PipelineNode pipeline,
         string pipelineFilePath,
         CancellationToken cancellationToken = default)
@@ -29,158 +32,100 @@ internal sealed class PipelineTemplateExpander(
         }
 
         var rootFilePath = Path.GetFullPath(pipelineFilePath);
-        var includeChain = new List<string> { rootFilePath };
-        var activePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { rootFilePath };
 
-        return await ExpandPipelineInternalAsync(
+        return _orchestrator.OrchestrateAsync(
             pipeline,
             rootFilePath,
-            includeChain,
-            activePaths,
+            LoadAndBindTemplateAsync,
             cancellationToken);
     }
 
-    private async Task<PipelineNode> ExpandPipelineInternalAsync(
-        PipelineNode pipeline,
+    private async Task<ResolvedTemplate> LoadAndBindTemplateAsync(
+        TemplateStepNode templateStep,
         string currentFilePath,
         IReadOnlyList<string> includeChain,
-        HashSet<string> activePaths,
         CancellationToken cancellationToken)
     {
-        static string ResolveTemplatePath(string sourceFilePath, string templatePath, SourceSpan span)
+        string templatePath;
+
+        try
         {
-            if (string.IsNullOrWhiteSpace(templatePath))
-            {
-                throw new PipelineTemplateExpansionException(
-                    "Template path cannot be empty.",
-                    span);
-            }
-
-            var sourceDirectory = Path.GetDirectoryName(sourceFilePath);
-
-            if (string.IsNullOrWhiteSpace(sourceDirectory))
-            {
-                throw new PipelineTemplateExpansionException(
-                    $"Could not determine directory for source file '{sourceFilePath}'.",
-                    span);
-            }
-
-            var resolvedPath = Path.IsPathRooted(templatePath)
-                ? templatePath
-                : Path.Combine(sourceDirectory, templatePath);
-
-            var fullPath = Path.GetFullPath(resolvedPath);
-
-            if (!File.Exists(fullPath))
-            {
-                throw new PipelineTemplateExpansionException(
-                    $"Template file not found: '{fullPath}'.",
-                    span);
-            }
-
-            return fullPath;
+            templatePath = _templatePathResolver.Resolve(currentFilePath, templateStep.Template, templateStep.Span);
+        }
+        catch (PipelineTemplateExpansionException ex) when (ex.IncludeChain.Count == 0)
+        {
+            throw new PipelineTemplateExpansionException(ex.Message, ex.Span, includeChain, ex);
         }
 
-        var expandedSteps = new List<StepNode>();
+        var nextIncludeChain = includeChain.Append(templatePath).ToList();
 
-        foreach (var step in pipeline.Steps)
+        var parsedTemplate = await ReadAndParseTemplateAsync(templatePath, templateStep, nextIncludeChain, cancellationToken);
+        var boundTemplate = BindTemplateParameters(parsedTemplate, templateStep, nextIncludeChain);
+
+        return new ResolvedTemplate(templatePath, boundTemplate);
+    }
+
+    private async Task<PipelineNode> ReadAndParseTemplateAsync(
+        string templatePath,
+        TemplateStepNode templateStep,
+        IReadOnlyList<string> includeChain,
+        CancellationToken cancellationToken)
+    {
+        string templateContent;
+
+        try
         {
-            if (step is not TemplateStepNode templateStep)
-            {
-                expandedSteps.Add(step);
-                continue;
-            }
-
-            var templatePath = ResolveTemplatePath(currentFilePath, templateStep.Template, templateStep.Span);
-            var nextIncludeChain = includeChain.Append(templatePath).ToList();
-
-            if (activePaths.Contains(templatePath))
-            {
-                throw new PipelineTemplateExpansionException(
-                    $"Template include cycle detected at '{templatePath}'.",
-                    templateStep.Span,
-                    nextIncludeChain);
-            }
-
-            string templateContent;
-
-            try
-            {
-                templateContent = await File.ReadAllTextAsync(templatePath, cancellationToken);
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                throw new PipelineTemplateExpansionException(
-                    $"Failed to read template file '{templatePath}': {ex.Message}",
-                    templateStep.Span,
-                    nextIncludeChain,
-                    ex);
-            }
-
-            PipelineNode parsedTemplate;
-
-            try
-            {
-                parsedTemplate = _pipelineParser.Parse(templateContent, templatePath);
-            }
-            catch (Exception ex)
-            {
-                throw new PipelineTemplateExpansionException(
-                    $"Failed to parse template file '{templatePath}': {ex.Message}",
-                    templateStep.Span,
-                    nextIncludeChain,
-                    ex);
-            }
-
-            Dictionary<string, string>? templateParameterOverrides = null;
-
-            if (templateStep.Parameters.Count > 0)
-            {
-                templateParameterOverrides = templateStep.Parameters.ToDictionary(
-                    pair => pair.Key,
-                    pair => pair.Value.Value,
-                    StringComparer.Ordinal);
-            }
-
-            PipelineNode boundTemplate;
-
-            try
-            {
-                boundTemplate = _pipelineParameterBinder.Bind(parsedTemplate, templateParameterOverrides);
-            }
-            catch (PipelineParameterBindingException ex)
-            {
-                throw new PipelineTemplateExpansionException(
-                    ex.Message,
-                    ex.Span,
-                    nextIncludeChain,
-                    ex);
-            }
-
-            _ = activePaths.Add(templatePath);
-
-            PipelineNode expandedTemplate;
-
-            try
-            {
-                expandedTemplate = await ExpandPipelineInternalAsync(
-                    boundTemplate,
-                    templatePath,
-                    nextIncludeChain,
-                    activePaths,
-                    cancellationToken);
-            }
-            finally
-            {
-                _ = activePaths.Remove(templatePath);
-            }
-
-            expandedSteps.AddRange(expandedTemplate.Steps);
+            templateContent = await File.ReadAllTextAsync(templatePath, cancellationToken);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            throw new PipelineTemplateExpansionException(
+                $"Failed to read template file '{templatePath}': {ex.Message}",
+                templateStep.Span,
+                includeChain,
+                ex);
         }
 
-        return pipeline with
+        try
         {
-            Steps = expandedSteps
-        };
+            return _pipelineParser.Parse(templateContent, templatePath);
+        }
+        catch (Exception ex)
+        {
+            throw new PipelineTemplateExpansionException(
+                $"Failed to parse template file '{templatePath}': {ex.Message}",
+                templateStep.Span,
+                includeChain,
+                ex);
+        }
+    }
+
+    private PipelineNode BindTemplateParameters(
+        PipelineNode parsedTemplate,
+        TemplateStepNode templateStep,
+        IReadOnlyList<string> includeChain)
+    {
+        Dictionary<string, string>? parameterOverrides = null;
+
+        if (templateStep.Parameters.Count > 0)
+        {
+            parameterOverrides = templateStep.Parameters.ToDictionary(
+                pair => pair.Key,
+                pair => pair.Value.Value,
+                StringComparer.Ordinal);
+        }
+
+        try
+        {
+            return _pipelineParameterBinder.Bind(parsedTemplate, parameterOverrides);
+        }
+        catch (PipelineParameterBindingException ex)
+        {
+            throw new PipelineTemplateExpansionException(
+                ex.Message,
+                ex.Span,
+                includeChain,
+                ex);
+        }
     }
 }
