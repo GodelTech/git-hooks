@@ -1,8 +1,8 @@
 using GitHooks.Workflow.Domain.Model;
 
-namespace GitHooks.Workflow.Infrastructure.IO;
+namespace GitHooks.Workflow.Application.IO;
 
-internal interface IPipelineContentSourceReader
+public interface IPipelineSourceContentReader
 {
     public bool CanRead(PipelineSource source);
 

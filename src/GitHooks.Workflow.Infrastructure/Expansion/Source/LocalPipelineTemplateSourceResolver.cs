@@ -1,21 +1,19 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Expansion.Exceptions;
+using GitHooks.Workflow.Application.Expansion.Source;
 using GitHooks.Workflow.Domain.Model;
 
-namespace GitHooks.Workflow.Infrastructure.Expansion;
+namespace GitHooks.Workflow.Infrastructure.Expansion.Source;
 
-/// <summary>
-/// Resolves a template path relative to a local-file pipeline source.
-/// </summary>
-internal sealed class LocalPipelineTemplateSourceResolver : IPipelineTemplateSourceResolverStrategy
+internal sealed class LocalPipelineTemplateSourceResolver : IPipelineTemplateSourceResolver
 {
-    public bool CanResolve(PipelineSource source)
+    public bool CanResolve(PipelineSource currentSource, TemplateStepNode templateStep)
     {
-        return source.Kind is PipelineSourceKind.LocalFile;
+        return !templateStep.Template.Contains('@');
     }
 
     /// <inheritdoc/>
-    public PipelineSource Resolve(PipelineSource source, TemplateStepNode templateStep)
+    public PipelineSource Resolve(PipelineSource currentSource, TemplateStepNode templateStep)
     {
         ArgumentNullException.ThrowIfNull(templateStep);
 
@@ -29,12 +27,12 @@ internal sealed class LocalPipelineTemplateSourceResolver : IPipelineTemplateSou
                 span);
         }
 
-        var sourceDirectory = Path.GetDirectoryName(source.Identifier);
+        var sourceDirectory = Path.GetDirectoryName(currentSource.Identifier);
 
         if (string.IsNullOrWhiteSpace(sourceDirectory))
         {
             throw new PipelineTemplateExpansionException(
-                $"Could not determine directory for source file '{source.Identifier}'.",
+                $"Could not determine directory for source file '{currentSource.Identifier}'.",
                 span);
         }
 

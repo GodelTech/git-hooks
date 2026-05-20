@@ -1,7 +1,8 @@
 using GitHooks.Workflow.Application.DependencyInjection;
 using GitHooks.Workflow.Application.Expansion;
+using GitHooks.Workflow.Application.Expansion.Source;
 using GitHooks.Workflow.Application.IO;
-using GitHooks.Workflow.Infrastructure.Expansion;
+using GitHooks.Workflow.Infrastructure.Expansion.Source;
 using GitHooks.Workflow.Infrastructure.IO;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -15,13 +16,13 @@ public static class PipelineTemplateExpansionRegistration
         _ = services.AddPipelineCompilation();
         _ = services.AddPipelineTemplateExpansionOrchestration();
 
-        _ = services.AddSingleton<IPipelineContentSourceReader, LocalPipelineContentReader>();
-        _ = services.AddSingleton<IPipelineContentSourceReader, RemoteRepositoryPipelineContentReader>();
-        _ = services.AddSingleton<IPipelineContentReader, CompositePipelineContentReader>();
+        _ = services.AddSingleton<IPipelineSourceContentReader, LocalPipelineSourceContentReader>();
+        _ = services.AddSingleton<IPipelineSourceContentReader, RemoteRepositoryPipelineSourceContentReader>();
+        _ = services.AddSingleton<IPipelineContentReader, PipelineContentReader>();
 
-        _ = services.AddSingleton<IPipelineTemplateSourceResolverStrategy, LocalPipelineTemplateSourceResolver>();
-        _ = services.AddSingleton<IPipelineTemplateSourceResolverStrategy, RemoteRepositoryPipelineTemplateSourceResolver>();
-        _ = services.AddSingleton<IPipelineTemplateSourceResolver, CompositePipelineTemplateSourceResolver>();
+        _ = services.AddSingleton<IPipelineTemplateSourceResolver, LocalPipelineTemplateSourceResolver>();
+        _ = services.AddSingleton<IPipelineTemplateSourceResolver, RemoteRepositoryPipelineTemplateSourceResolver>();
+        _ = services.AddSingleton<PipelineTemplateResolver>();
 
         _ = services.AddSingleton<IPipelineTemplateExpander, PipelineTemplateExpander>();
 
