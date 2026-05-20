@@ -1,4 +1,5 @@
 using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Application.Resolution;
 
@@ -8,14 +9,14 @@ namespace GitHooks.Workflow.Application.Resolution;
 public interface IPipelineResolver
 {
     /// <summary>
-    /// Reads, compiles, and expands the pipeline at the supplied file path.
+    /// Reads, compiles, and expands the pipeline at the supplied source.
     /// </summary>
-    /// <param name="filePath">Path to the root pipeline file.</param>
+    /// <param name="source">The canonical source identifying the root pipeline.</param>
     /// <param name="parameterOverrides">Optional parameter overrides applied during compilation.</param>
     /// <param name="cancellationToken">Cancellation token for asynchronous file operations.</param>
     /// <returns>A fully resolved pipeline.</returns>
     public Task<PipelineNode> ResolveAsync(
-        string filePath,
+        PipelineSource source,
         IReadOnlyDictionary<string, string>? parameterOverrides = null,
         CancellationToken cancellationToken = default);
 }

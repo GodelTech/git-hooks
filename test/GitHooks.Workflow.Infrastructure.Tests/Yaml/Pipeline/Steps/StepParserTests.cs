@@ -1,8 +1,8 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Unknown;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Infrastructure.DependencyInjection;
 using GitHooks.Workflow.Infrastructure.Yaml;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -74,9 +74,9 @@ public class StepParserTests
     }
 
     [Fact]
-    public void Parse_WithoutScriptOrTemplate_ThrowsYamlParseException()
+    public void Parse_WithoutScriptOrTemplate_ThrowsPipelineParsingException()
     {
-        var exception = Assert.Throws<YamlParseException>(
+        var exception = Assert.Throws<PipelineParsingException>(
             () => ParseStep(
                 """
                 displayName: build
@@ -88,9 +88,9 @@ public class StepParserTests
     }
 
     [Fact]
-    public void Parse_WithScriptAndTemplate_ThrowsYamlParseException()
+    public void Parse_WithScriptAndTemplate_ThrowsPipelineParsingException()
     {
-        var exception = Assert.Throws<YamlParseException>(
+        var exception = Assert.Throws<PipelineParsingException>(
             () => ParseStep(
                 """
                 script: echo hello
@@ -108,9 +108,9 @@ public class StepParserTests
     [InlineData("timeoutInMinutes: 10", "timeoutInMinutes")]
     [InlineData("workingDirectory: ./artifacts", "workingDirectory")]
     [InlineData("env:\n  NAME: value", "env")]
-    public void Parse_TemplateStepContainsScriptOnlyField_ThrowsYamlParseException(string invalidField, string fieldName)
+    public void Parse_TemplateStepContainsScriptOnlyField_ThrowsPipelineParsingException(string invalidField, string fieldName)
     {
-        var exception = Assert.Throws<YamlParseException>(
+        var exception = Assert.Throws<PipelineParsingException>(
             () => ParseStep(
                 $"""
                 template: templates/build.yml
@@ -123,9 +123,9 @@ public class StepParserTests
     }
 
     [Fact]
-    public void Parse_TemplateStepContainsMultipleScriptOnlyFields_ThrowsYamlParseExceptionWithDeterministicFieldOrder()
+    public void Parse_TemplateStepContainsMultipleScriptOnlyFields_ThrowsPipelineParsingExceptionWithDeterministicFieldOrder()
     {
-        var exception = Assert.Throws<YamlParseException>(
+        var exception = Assert.Throws<PipelineParsingException>(
             () => ParseStep(
                 """
                 template: templates/build.yml

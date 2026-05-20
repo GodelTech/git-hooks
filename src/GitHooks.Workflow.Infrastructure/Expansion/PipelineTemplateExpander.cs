@@ -3,69 +3,70 @@ using GitHooks.Workflow.Application.Binding.Exceptions;
 using GitHooks.Workflow.Application.Compilation;
 using GitHooks.Workflow.Application.Expansion;
 using GitHooks.Workflow.Application.Expansion.Exceptions;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
+using GitHooks.Workflow.Application.IO;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
+using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Infrastructure.Expansion;
 
 internal sealed class PipelineTemplateExpander(
     IPipelineCompiler pipelineCompiler,
-    ITemplatePathResolver templatePathResolver,
+    IPipelineContentReader pipelineContentReader,
+    IPipelineTemplateSourceResolver templateSourceResolver,
     ITemplateExpansionOrchestrator orchestrator)
     : IPipelineTemplateExpander
 {
     private readonly IPipelineCompiler _pipelineCompiler = pipelineCompiler;
-    private readonly ITemplatePathResolver _templatePathResolver = templatePathResolver;
+    private readonly IPipelineContentReader _pipelineContentReader = pipelineContentReader;
+    private readonly IPipelineTemplateSourceResolver _templateSourceResolver = templateSourceResolver;
     private readonly ITemplateExpansionOrchestrator _orchestrator = orchestrator;
 
     public Task<PipelineNode> ExpandAsync(
         PipelineNode pipeline,
-        string pipelineFilePath,
+        PipelineSource source,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(pipeline);
 
-        if (string.IsNullOrWhiteSpace(pipelineFilePath))
-        {
-            throw new ArgumentException("Pipeline file path cannot be empty.", nameof(pipelineFilePath));
-        }
-
-        var rootFilePath = Path.GetFullPath(pipelineFilePath);
-
         return _orchestrator.OrchestrateAsync(
             pipeline,
-            rootFilePath,
+            source,
             LoadAndBindTemplateAsync,
             cancellationToken);
     }
 
     private async Task<ResolvedTemplate> LoadAndBindTemplateAsync(
         TemplateStepNode templateStep,
-        string currentFilePath,
-        IReadOnlyList<string> includeChain,
+        PipelineSource currentSource,
+        IReadOnlyList<PipelineSource> includeChain,
         CancellationToken cancellationToken)
     {
-        string templatePath;
+        PipelineSource templateSource;
 
         try
         {
-            templatePath = _templatePathResolver.Resolve(currentFilePath, templateStep.Template, templateStep.Span);
+            templateSource = _templateSourceResolver.Resolve(currentSource, templateStep);
         }
         catch (PipelineTemplateExpansionException ex) when (ex.IncludeChain.Count == 0)
         {
-            throw new PipelineTemplateExpansionException(ex.Message, ex.Span, includeChain, ex);
+            throw new PipelineTemplateExpansionException(
+                ex.Message,
+                ex.Span,
+                includeChain,
+                ex);
         }
 
-        var nextIncludeChain = includeChain.Append(templatePath).ToList();
+        var nextIncludeChain = includeChain.Append(templateSource).ToList();
 
-        var boundTemplate = await ReadAndCompileTemplateAsync(templatePath, templateStep, nextIncludeChain, cancellationToken);
+        var boundTemplate = await ReadAndCompileTemplateAsync(templateSource, templateStep, nextIncludeChain, cancellationToken);
 
-        return new ResolvedTemplate(templatePath, boundTemplate);
+        return new ResolvedTemplate(templateSource, boundTemplate);
     }
 
     private async Task<PipelineNode> ReadAndCompileTemplateAsync(
-        string templatePath,
+        PipelineSource templateSource,
         TemplateStepNode templateStep,
-        IReadOnlyList<string> includeChain,
+        IReadOnlyList<PipelineSource> includeChain,
         CancellationToken cancellationToken)
     {
         static Dictionary<string, string>? CreateParameterOverrides(TemplateStepNode currentTemplateStep)
@@ -82,12 +83,12 @@ internal sealed class PipelineTemplateExpander(
 
         try
         {
-            templateContent = await File.ReadAllTextAsync(templatePath, cancellationToken);
+            templateContent = await _pipelineContentReader.ReadAsync(templateSource, cancellationToken);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             throw new PipelineTemplateExpansionException(
-                $"Failed to read template file '{templatePath}': {ex.Message}",
+                $"Failed to read template file '{templateSource.Identifier}': {ex.Message}",
                 templateStep.Span,
                 includeChain,
                 ex);
@@ -95,12 +96,12 @@ internal sealed class PipelineTemplateExpander(
 
         try
         {
-            return _pipelineCompiler.Compile(templateContent, templatePath, CreateParameterOverrides(templateStep));
+            return _pipelineCompiler.Compile(templateContent, templateSource, CreateParameterOverrides(templateStep));
         }
-        catch (YamlParseException ex)
+        catch (PipelineParsingException ex)
         {
             throw new PipelineTemplateExpansionException(
-                $"Failed to parse template file '{templatePath}': {ex.Message}",
+                $"Failed to parse template file '{templateSource.Identifier}': {ex.Message}",
                 templateStep.Span,
                 includeChain,
                 ex);

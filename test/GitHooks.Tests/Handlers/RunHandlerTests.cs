@@ -4,9 +4,9 @@ using GitHooks.Infrastructure.Git;
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Binding.Exceptions;
 using GitHooks.Workflow.Application.Expansion.Exceptions;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Application.Resolution;
 using GitHooks.Workflow.Domain.Model;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 using Spectre.Console;
 
@@ -59,19 +59,19 @@ public sealed class RunHandlerTests : IDisposable
 
         Assert.Equal(0, result);
         Assert.True(pipelineResolver.ResolveCalled);
-        Assert.Equal(Path.GetFullPath(pipelineFilePath), pipelineResolver.FilePath);
+        Assert.Equal(PipelineSource.LocalFile(Path.GetFullPath(pipelineFilePath)), pipelineResolver.Source);
         Assert.Same(parameterOverrides, pipelineResolver.ParameterOverrides);
     }
 
     [Fact]
-    public async Task HandleAsync_WhenResolverThrowsYamlParseException_ReturnsOne()
+    public async Task HandleAsync_WhenResolverThrowsPipelineParsingException_ReturnsOne()
     {
         var pipelineFilePath = WriteTempFile("pipeline.yaml", "steps:\n");
         var writer = new StringWriter();
         var gitCommandLine = new FakeGitCommandLine();
         var pipelineResolver = new FakePipelineResolver
         {
-            ExceptionToThrow = new YamlParseException("Invalid YAML.", CreateSpan("pipeline.yaml", 3, 7)),
+            ExceptionToThrow = new PipelineParsingException("Invalid YAML.", CreateSpan("pipeline.yaml", 3, 7)),
         };
 
         var handler = new RunHandler(gitCommandLine, pipelineResolver, CreateConsole(writer));
@@ -112,7 +112,7 @@ public sealed class RunHandlerTests : IDisposable
             ExceptionToThrow = new PipelineTemplateExpansionException(
                 "Template failed.",
                 CreateSpan("pipeline.yaml", 5, 9),
-                ["root.yaml", "template.yaml"]),
+                [PipelineSource.LocalFile("root.yaml"), PipelineSource.LocalFile("template.yaml")]),
         };
 
         var handler = new RunHandler(gitCommandLine, pipelineResolver, CreateConsole(writer));
@@ -182,27 +182,22 @@ public sealed class RunHandlerTests : IDisposable
     {
         public bool ResolveCalled { get; private set; }
 
-        public string? FilePath { get; private set; }
+        public PipelineSource Source { get; private set; }
 
         public IReadOnlyDictionary<string, string>? ParameterOverrides { get; private set; }
 
         public Exception? ExceptionToThrow { get; init; }
 
         public Task<PipelineNode> ResolveAsync(
-            string filePath,
+            PipelineSource source,
             IReadOnlyDictionary<string, string>? parameterOverrides = null,
             CancellationToken cancellationToken = default)
         {
             ResolveCalled = true;
-            FilePath = filePath;
+            Source = source;
             ParameterOverrides = parameterOverrides;
 
-            if (ExceptionToThrow is not null)
-            {
-                throw ExceptionToThrow;
-            }
-
-            return Task.FromResult(CreatePipeline());
+            return ExceptionToThrow is not null ? throw ExceptionToThrow : Task.FromResult(CreatePipeline());
         }
     }
 

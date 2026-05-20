@@ -1,6 +1,6 @@
 using GitHooks.Workflow.Application.Parsing;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Infrastructure.DependencyInjection;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -49,11 +49,11 @@ public class PipelineParserTests
     }
 
     [Fact]
-    public void Parse_WithMultipleDocuments_ThrowsYamlParseException()
+    public void Parse_WithMultipleDocuments_ThrowsPipelineParsingException()
     {
         var parser = CreateParser();
 
-        var exception = Assert.Throws<YamlParseException>(
+        var exception = Assert.Throws<PipelineParsingException>(
             () => parser.Parse(
                 """
                 steps:

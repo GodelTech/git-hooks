@@ -1,4 +1,4 @@
-﻿using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Expressions;
 using GitHooks.Workflow.Application.DependencyInjection;
 using GitHooks.Workflow.Application.Expansion;
@@ -30,17 +30,7 @@ public sealed class PipelineTemplateExpanderTests : IDisposable
         var expander = CreateExpander();
 
         await Assert.ThrowsAsync<ArgumentNullException>(
-            () => expander.ExpandAsync(null!, "/root.yaml", TestContext.Current.CancellationToken));
-    }
-
-    [Fact]
-    public async Task ExpandAsync_WithEmptyFilePath_ThrowsArgumentException()
-    {
-        var expander = CreateExpander();
-        var pipeline = CreateEmptyPipeline();
-
-        await Assert.ThrowsAsync<ArgumentException>(
-            () => expander.ExpandAsync(pipeline, string.Empty, TestContext.Current.CancellationToken));
+            () => expander.ExpandAsync(null!, PipelineSource.LocalFile("/root.yaml"), TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -50,9 +40,9 @@ public sealed class PipelineTemplateExpanderTests : IDisposable
         var span = CreateSpan();
         var scriptStep = new ScriptStepNode(new InterpolatedStringNode("echo hello"), [], span);
         var pipeline = CreatePipeline([scriptStep]);
-        var rootPath = WriteTempFile("root.yaml", string.Empty);
+        var rootSource = PipelineSource.LocalFile(Path.GetFullPath("root.yaml"));
 
-        var result = await expander.ExpandAsync(pipeline, rootPath, TestContext.Current.CancellationToken);
+        var result = await expander.ExpandAsync(pipeline, rootSource, TestContext.Current.CancellationToken);
 
         var step = Assert.Single(result.Steps);
         Assert.Same(scriptStep, step);
@@ -70,7 +60,7 @@ public sealed class PipelineTemplateExpanderTests : IDisposable
             """;
 
         var templateFile = WriteTempFile("template.yaml", templateContent);
-        var rootFile = WriteTempFile("root.yaml", string.Empty);
+        Path.GetFullPath("root.yaml");
 
         var templateStep = new TemplateStepNode(
             templateFile,
@@ -80,7 +70,7 @@ public sealed class PipelineTemplateExpanderTests : IDisposable
 
         var pipeline = CreatePipeline([templateStep]);
 
-        var result = await expander.ExpandAsync(pipeline, rootFile, TestContext.Current.CancellationToken);
+        var result = await expander.ExpandAsync(pipeline, PipelineSource.LocalFile(Path.GetFullPath("root.yaml")), TestContext.Current.CancellationToken);
 
         var expandedStep = Assert.Single(result.Steps);
         var scriptStep = Assert.IsType<ScriptStepNode>(expandedStep);
@@ -94,7 +84,7 @@ public sealed class PipelineTemplateExpanderTests : IDisposable
         var span = CreateSpan();
 
         var missingPath = Path.Combine(_tempDir, "missing.yaml");
-        var rootFile = WriteTempFile("root.yaml", string.Empty);
+        var rootFile = Path.GetFullPath("root.yaml");
 
         var templateStep = new TemplateStepNode(
             missingPath,
@@ -105,7 +95,7 @@ public sealed class PipelineTemplateExpanderTests : IDisposable
         var pipeline = CreatePipeline([templateStep]);
 
         var exception = await Assert.ThrowsAsync<PipelineTemplateExpansionException>(
-            () => expander.ExpandAsync(pipeline, rootFile, TestContext.Current.CancellationToken));
+            () => expander.ExpandAsync(pipeline, PipelineSource.LocalFile(rootFile), TestContext.Current.CancellationToken));
 
         Assert.Contains("missing.yaml", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -135,7 +125,7 @@ public sealed class PipelineTemplateExpanderTests : IDisposable
         var pipeline = CreatePipeline([templateStep]);
 
         var exception = await Assert.ThrowsAsync<PipelineTemplateExpansionException>(
-            () => expander.ExpandAsync(pipeline, rootFile, TestContext.Current.CancellationToken));
+            () => expander.ExpandAsync(pipeline, PipelineSource.LocalFile(rootFile), TestContext.Current.CancellationToken));
 
         Assert.Contains("cycle", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -147,7 +137,7 @@ public sealed class PipelineTemplateExpanderTests : IDisposable
         var span = CreateSpan();
 
         var missingPath = Path.Combine(_tempDir, "nonexistent.yaml");
-        var rootFile = WriteTempFile("root.yaml", string.Empty);
+        var rootFile = Path.GetFullPath("root.yaml");
 
         var templateStep = new TemplateStepNode(
             missingPath,
@@ -158,10 +148,10 @@ public sealed class PipelineTemplateExpanderTests : IDisposable
         var pipeline = CreatePipeline([templateStep]);
 
         var exception = await Assert.ThrowsAsync<PipelineTemplateExpansionException>(
-            () => expander.ExpandAsync(pipeline, rootFile, TestContext.Current.CancellationToken));
+            () => expander.ExpandAsync(pipeline, PipelineSource.LocalFile(rootFile), TestContext.Current.CancellationToken));
 
         Assert.NotEmpty(exception.IncludeChain);
-        Assert.Contains(Path.GetFullPath(rootFile), exception.IncludeChain);
+        Assert.Contains(PipelineSource.LocalFile(Path.GetFullPath(rootFile)), exception.IncludeChain);
     }
 
     private static IPipelineTemplateExpander CreateExpander()
@@ -174,11 +164,6 @@ public sealed class PipelineTemplateExpanderTests : IDisposable
         return services
             .BuildServiceProvider()
             .GetRequiredService<IPipelineTemplateExpander>();
-    }
-
-    private static PipelineNode CreateEmptyPipeline()
-    {
-        return CreatePipeline([]);
     }
 
     private static PipelineNode CreatePipeline(IReadOnlyList<StepNode> steps)

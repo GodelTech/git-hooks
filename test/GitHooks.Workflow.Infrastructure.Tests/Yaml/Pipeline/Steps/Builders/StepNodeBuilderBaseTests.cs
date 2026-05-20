@@ -1,8 +1,8 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Expressions;
 using GitHooks.Workflow.Application.Ast.Unknown;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Domain.Model;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Builders;
 
@@ -27,7 +27,7 @@ public class StepNodeBuilderBaseTests
     }
 
     [Fact]
-    public void Build_WithViolatingFields_ThrowsYamlParseException()
+    public void Build_WithViolatingFields_ThrowsPipelineParsingException()
     {
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var fields = new StepFields
@@ -37,7 +37,7 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
+        var exception = Assert.Throws<PipelineParsingException>(() => builder.Build(fields, [], span));
         Assert.Contains("cannot contain fields", exception.Message);
         Assert.Contains("displayName", exception.Message);
     }
@@ -54,7 +54,7 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
+        var exception = Assert.Throws<PipelineParsingException>(() => builder.Build(fields, [], span));
         Assert.Contains("displayName", exception.Message);
         Assert.Contains("timeoutInMinutes", exception.Message);
     }
@@ -74,7 +74,7 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
+        var exception = Assert.Throws<PipelineParsingException>(() => builder.Build(fields, [], span));
         Assert.Contains("env", exception.Message);
     }
 
@@ -93,7 +93,7 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
+        var exception = Assert.Throws<PipelineParsingException>(() => builder.Build(fields, [], span));
         Assert.Contains("parameters", exception.Message);
     }
 
@@ -107,7 +107,7 @@ public class StepNodeBuilderBaseTests
             Script = new InterpolatedStringNode("echo hello")
         };
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
+        var exception = Assert.Throws<PipelineParsingException>(() => builder.Build(fields, [], span));
         Assert.Contains("script", exception.Message);
     }
 
@@ -122,7 +122,7 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
+        var exception = Assert.Throws<PipelineParsingException>(() => builder.Build(fields, [], span));
         Assert.Contains("template", exception.Message);
     }
 
@@ -137,7 +137,7 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
+        var exception = Assert.Throws<PipelineParsingException>(() => builder.Build(fields, [], span));
         Assert.Contains("condition", exception.Message);
     }
 
@@ -152,7 +152,7 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
+        var exception = Assert.Throws<PipelineParsingException>(() => builder.Build(fields, [], span));
         Assert.Contains("workingDirectory", exception.Message);
     }
 
@@ -197,7 +197,7 @@ public class StepNodeBuilderBaseTests
         };
         var builder = new TestStepNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
+        var exception = Assert.Throws<PipelineParsingException>(() => builder.Build(fields, [], span));
         var errorMessage = exception.Message;
         Assert.Contains("template", errorMessage);
         Assert.Contains("displayName", errorMessage);

@@ -1,6 +1,5 @@
 using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Domain.Model;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -112,7 +111,7 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
 
         if (TryConsumeSafe<ParsingEvent>(out var evt))
         {
-            throw new YamlParseException(
+            throw new Application.Parsing.Exceptions.PipelineParsingException(
                 $"Unsupported token while reading unknown node: {evt.GetType().Name}",
                 SpanOf(evt, evt)
             );
@@ -188,9 +187,9 @@ internal sealed class YamlReader(Parser parser, SourceRef source)
         );
     }
 
-    private YamlParseException Error(string message)
+    private Application.Parsing.Exceptions.PipelineParsingException Error(string message)
     {
-        return new YamlParseException(
+        return new Application.Parsing.Exceptions.PipelineParsingException(
             $"{message}, got {_parser.Current?.GetType().Name ?? "EOF"}",
             CurrentSpan()
         );

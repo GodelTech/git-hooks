@@ -1,8 +1,8 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Expressions;
 using GitHooks.Workflow.Application.Ast.Unknown;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Domain.Model;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Builders;
 
@@ -87,7 +87,7 @@ public class ScriptStepNodeBuilderTests
     }
 
     [Fact]
-    public void Build_TemplateFieldPresent_ThrowsYamlParseException()
+    public void Build_TemplateFieldPresent_ThrowsPipelineParsingException()
     {
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var fields = new StepFields
@@ -98,7 +98,7 @@ public class ScriptStepNodeBuilderTests
 
         var builder = new ScriptStepNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
+        var exception = Assert.Throws<PipelineParsingException>(() => builder.Build(fields, [], span));
 
         Assert.Equal("Script step cannot contain fields: template", exception.Message);
     }

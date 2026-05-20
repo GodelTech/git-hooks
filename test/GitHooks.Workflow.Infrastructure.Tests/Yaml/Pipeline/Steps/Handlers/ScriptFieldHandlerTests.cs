@@ -1,6 +1,6 @@
 using GitHooks.Workflow.Application.Ast.Expressions;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml.Expressions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Handlers;
@@ -36,7 +36,7 @@ public class ScriptFieldHandlerTests
     }
 
     [Fact]
-    public void Apply_WithNonScalarValue_ThrowsYamlParseException()
+    public void Apply_WithNonScalarValue_ThrowsPipelineParsingException()
     {
         var handler = new ScriptFieldHandler(new InterpolationParser());
         var reader = CreateReader(
@@ -48,7 +48,7 @@ public class ScriptFieldHandlerTests
 
         _ = reader.Read<Scalar>();
 
-        var exception = Assert.Throws<YamlParseException>(() => handler.Apply(reader, new StepFields()));
+        var exception = Assert.Throws<PipelineParsingException>(() => handler.Apply(reader, new StepFields()));
 
         Assert.Contains("Expected Scalar", exception.Message);
     }

@@ -1,7 +1,7 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Unknown;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Domain.Model;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters.Builders;
 
@@ -36,13 +36,13 @@ public class ParameterNodeBuilderTests
     }
 
     [Fact]
-    public void Build_NameMissing_ThrowsYamlParseException()
+    public void Build_NameMissing_ThrowsPipelineParsingException()
     {
         var span = SourceSpan.Unknown(new SourceRef("pipeline.yml"));
         var fields = new ParameterFields();
         var builder = new ParameterNodeBuilder();
 
-        var exception = Assert.Throws<YamlParseException>(() => builder.Build(fields, [], span));
+        var exception = Assert.Throws<PipelineParsingException>(() => builder.Build(fields, [], span));
 
         Assert.Equal("Parameter definition must contain 'name'", exception.Message);
         Assert.Equal(span, exception.Span);

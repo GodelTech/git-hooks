@@ -1,4 +1,5 @@
 using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Application.Expansion;
 
@@ -6,5 +7,5 @@ namespace GitHooks.Workflow.Application.Expansion;
 /// Represents a fully resolved template pipeline.
 /// </summary>
 public sealed record ResolvedTemplate(
-    string TemplatePath,
+    PipelineSource TemplateSource,
     PipelineNode Pipeline);

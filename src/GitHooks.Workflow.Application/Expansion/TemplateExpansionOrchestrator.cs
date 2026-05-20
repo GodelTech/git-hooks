@@ -1,5 +1,6 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Expansion.Exceptions;
+using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Application.Expansion;
 
@@ -8,25 +9,25 @@ internal sealed class TemplateExpansionOrchestrator : ITemplateExpansionOrchestr
     /// <inheritdoc/>
     public Task<PipelineNode> OrchestrateAsync(
         PipelineNode pipeline,
-        string startingFilePath,
-        Func<TemplateStepNode, string, IReadOnlyList<string>, CancellationToken, Task<ResolvedTemplate>> resolveTemplateAsync,
+        PipelineSource startingSource,
+        Func<TemplateStepNode, PipelineSource, IReadOnlyList<PipelineSource>, CancellationToken, Task<ResolvedTemplate>> resolveTemplateAsync,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(pipeline);
         ArgumentNullException.ThrowIfNull(resolveTemplateAsync);
 
-        var includeChain = new List<string> { startingFilePath };
-        var activePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { startingFilePath };
+        var includeChain = new List<PipelineSource> { startingSource };
+        var activeSourceIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { startingSource.Identifier };
 
-        return ExpandRecursiveAsync(pipeline, startingFilePath, includeChain, activePaths, resolveTemplateAsync, cancellationToken);
+        return ExpandRecursiveAsync(pipeline, startingSource, includeChain, activeSourceIds, resolveTemplateAsync, cancellationToken);
     }
 
     private static async Task<PipelineNode> ExpandRecursiveAsync(
         PipelineNode pipeline,
-        string currentFilePath,
-        IReadOnlyList<string> includeChain,
-        HashSet<string> activePaths,
-        Func<TemplateStepNode, string, IReadOnlyList<string>, CancellationToken, Task<ResolvedTemplate>> resolveTemplateAsync,
+        PipelineSource currentSource,
+        IReadOnlyList<PipelineSource> includeChain,
+        HashSet<string> activeSourceIds,
+        Func<TemplateStepNode, PipelineSource, IReadOnlyList<PipelineSource>, CancellationToken, Task<ResolvedTemplate>> resolveTemplateAsync,
         CancellationToken cancellationToken)
     {
         var expandedSteps = new List<StepNode>();
@@ -39,26 +40,27 @@ internal sealed class TemplateExpansionOrchestrator : ITemplateExpansionOrchestr
                 continue;
             }
 
-            var resolvedTemplate = await resolveTemplateAsync(templateStep, currentFilePath, includeChain, cancellationToken);
-            var nextIncludeChain = includeChain.Append(resolvedTemplate.TemplatePath).ToList();
+            var resolvedTemplate = await resolveTemplateAsync(templateStep, currentSource, includeChain, cancellationToken);
+            var nextIncludeChain = includeChain.Append(resolvedTemplate.TemplateSource).ToList();
+            var templateSourceId = resolvedTemplate.TemplateSource.Identifier;
 
-            if (activePaths.Contains(resolvedTemplate.TemplatePath))
+            if (activeSourceIds.Contains(templateSourceId))
             {
                 throw new PipelineTemplateExpansionException(
-                    $"Template include cycle detected at '{resolvedTemplate.TemplatePath}'.",
+                    $"Template include cycle detected at '{templateSourceId}'.",
                     templateStep.Span,
                     nextIncludeChain);
             }
 
-            _ = activePaths.Add(resolvedTemplate.TemplatePath);
+            _ = activeSourceIds.Add(templateSourceId);
 
             try
             {
                 var expanded = await ExpandRecursiveAsync(
                     resolvedTemplate.Pipeline,
-                    resolvedTemplate.TemplatePath,
+                    resolvedTemplate.TemplateSource,
                     nextIncludeChain,
-                    activePaths,
+                    activeSourceIds,
                     resolveTemplateAsync,
                     cancellationToken);
 
@@ -66,7 +68,7 @@ internal sealed class TemplateExpansionOrchestrator : ITemplateExpansionOrchestr
             }
             finally
             {
-                _ = activePaths.Remove(resolvedTemplate.TemplatePath);
+                _ = activeSourceIds.Remove(templateSourceId);
             }
         }
 

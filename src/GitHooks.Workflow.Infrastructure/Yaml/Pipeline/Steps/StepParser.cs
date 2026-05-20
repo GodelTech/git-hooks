@@ -1,7 +1,6 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Domain.Model;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 using YamlDotNet.Core.Events;
 
@@ -56,11 +55,11 @@ internal sealed class StepParser(IEnumerable<IStepFieldHandler> handlers, IEnume
         return applicableBuilders.Count switch
         {
             1 => applicableBuilders[0].Build(fields, unknownFields, span),
-            0 => throw new YamlParseException(
+            0 => throw new Application.Parsing.Exceptions.PipelineParsingException(
                 "Step must contain 'script' or 'template'",
                 span
             ),
-            _ => throw new YamlParseException(
+            _ => throw new Application.Parsing.Exceptions.PipelineParsingException(
                 "Step can contain only one of 'script' or 'template'",
                 span
             )

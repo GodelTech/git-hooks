@@ -1,4 +1,5 @@
 using GitHooks.Workflow.Application.Ast;
+using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Application.Compilation;
 
@@ -11,11 +12,11 @@ public interface IPipelineCompiler
     /// Parses the supplied pipeline content and binds parameter values.
     /// </summary>
     /// <param name="content">Pipeline YAML content.</param>
-    /// <param name="sourceName">Name or path of the source used for diagnostics.</param>
+    /// <param name="source">The source of the pipeline content.</param>
     /// <param name="parameterOverrides">Optional parameter overrides applied during binding.</param>
     /// <returns>A bound pipeline AST.</returns>
     public PipelineNode Compile(
         string content,
-        string sourceName,
+        PipelineSource source,
         IReadOnlyDictionary<string, string>? parameterOverrides = null);
 }

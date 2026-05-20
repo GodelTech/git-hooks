@@ -1,6 +1,5 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Unknown;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps;
 
@@ -53,7 +52,7 @@ internal sealed class PipelineRootParser(
         var span = reader.SpanOf(start, end);
 
         return steps is null
-            ? throw new YamlParseException("Pipeline must contain 'steps'", span)
+            ? throw new Application.Parsing.Exceptions.PipelineParsingException("Pipeline must contain 'steps'", span)
             : new PipelineNode(parameters, steps, unknownFields, span);
     }
 }

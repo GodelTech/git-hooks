@@ -1,5 +1,5 @@
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Parameters.Handlers;
 
@@ -59,7 +59,7 @@ public class DefaultFieldHandlerTests
     }
 
     [Fact]
-    public void Apply_WithNonScalarValue_ThrowsYamlParseException()
+    public void Apply_WithNonScalarValue_ThrowsPipelineParsingException()
     {
         var handler = new DefaultFieldHandler();
         var reader = CreateReader(
@@ -71,7 +71,7 @@ public class DefaultFieldHandlerTests
 
         _ = reader.Read<Scalar>();
 
-        var exception = Assert.Throws<YamlParseException>(() => handler.Apply(reader, new ParameterFields()));
+        var exception = Assert.Throws<PipelineParsingException>(() => handler.Apply(reader, new ParameterFields()));
 
         Assert.Contains("Expected Scalar", exception.Message);
     }

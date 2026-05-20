@@ -1,8 +1,8 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Unknown;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Infrastructure.DependencyInjection;
 using GitHooks.Workflow.Infrastructure.Yaml;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -14,9 +14,9 @@ namespace GitHooks.Workflow.Infrastructure.Tests.Yaml.Pipeline;
 public class PipelineRootParserTests
 {
     [Fact]
-    public void Parse_WithoutSteps_ThrowsYamlParseException()
+    public void Parse_WithoutSteps_ThrowsPipelineParsingException()
     {
-        var exception = Assert.Throws<YamlParseException>(
+        var exception = Assert.Throws<PipelineParsingException>(
             () => ParseRoot(
                 """
                 name: ci

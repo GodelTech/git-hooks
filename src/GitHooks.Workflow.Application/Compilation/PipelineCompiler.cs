@@ -1,6 +1,7 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Binding;
 using GitHooks.Workflow.Application.Parsing;
+using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Application.Compilation;
 
@@ -15,13 +16,12 @@ internal sealed class PipelineCompiler(
     /// <inheritdoc/>
     public PipelineNode Compile(
         string content,
-        string sourceName,
+        PipelineSource source,
         IReadOnlyDictionary<string, string>? parameterOverrides = null)
     {
         ArgumentNullException.ThrowIfNull(content);
-        ArgumentException.ThrowIfNullOrWhiteSpace(sourceName);
 
-        var pipeline = _pipelineParser.Parse(content, sourceName);
+        var pipeline = _pipelineParser.Parse(content, source.Identifier);
 
         return _pipelineParameterBinder.Bind(pipeline, parameterOverrides);
     }

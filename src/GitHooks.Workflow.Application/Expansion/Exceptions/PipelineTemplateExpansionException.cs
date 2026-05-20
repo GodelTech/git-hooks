@@ -8,7 +8,7 @@ namespace GitHooks.Workflow.Application.Expansion.Exceptions;
 public sealed class PipelineTemplateExpansionException(
     string message,
     SourceSpan span,
-    IReadOnlyList<string>? includeChain = null,
+    IReadOnlyList<PipelineSource>? includeChain = null,
     Exception? innerException = null)
     : Exception(message, innerException)
 {
@@ -20,5 +20,5 @@ public sealed class PipelineTemplateExpansionException(
     /// <summary>
     /// Gets the include chain used to reach the failed template, if available.
     /// </summary>
-    public IReadOnlyList<string> IncludeChain { get; } = includeChain ?? [];
+    public IReadOnlyList<PipelineSource> IncludeChain { get; } = includeChain ?? [];
 }

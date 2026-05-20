@@ -1,7 +1,7 @@
 using GitHooks.Workflow.Application.Ast.Unknown;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Domain.Model;
 using GitHooks.Workflow.Infrastructure.Yaml;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 using YamlDotNet.Core.Events;
 
@@ -31,11 +31,11 @@ public class YamlReaderTests
     }
 
     [Fact]
-    public void Read_WithMismatchType_ThrowsYamlParseException()
+    public void Read_WithMismatchType_ThrowsPipelineParsingException()
     {
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
-        var exception = Assert.Throws<YamlParseException>(reader.Read<MappingStart>);
+        var exception = Assert.Throws<PipelineParsingException>(reader.Read<MappingStart>);
 
         Assert.Equal("Expected MappingStart, got StreamStart", exception.Message);
         Assert.Equal(new SourceRef("pipeline.yml"), exception.Span.Source);
@@ -62,11 +62,11 @@ public class YamlReaderTests
     }
 
     [Fact]
-    public void Require_WithMismatchType_ThrowsYamlParseException()
+    public void Require_WithMismatchType_ThrowsPipelineParsingException()
     {
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
-        var exception = Assert.Throws<YamlParseException>(reader.Require<MappingStart>);
+        var exception = Assert.Throws<PipelineParsingException>(reader.Require<MappingStart>);
 
         Assert.Equal("Expected MappingStart, got StreamStart", exception.Message);
         Assert.Equal(new SourceRef("pipeline.yml"), exception.Span.Source);
@@ -118,11 +118,11 @@ public class YamlReaderTests
     }
 
     [Fact]
-    public void Peek_WithMismatchType_ThrowsYamlParseException()
+    public void Peek_WithMismatchType_ThrowsPipelineParsingException()
     {
         var reader = YamlReader.Create("key: value", "pipeline.yml");
 
-        var exception = Assert.Throws<YamlParseException>(reader.Peek<MappingStart>);
+        var exception = Assert.Throws<PipelineParsingException>(reader.Peek<MappingStart>);
 
         Assert.Equal("Expected MappingStart, got StreamStart", exception.Message);
         Assert.Equal(new SourceRef("pipeline.yml"), exception.Span.Source);
@@ -214,25 +214,25 @@ public class YamlReaderTests
     }
 
     [Fact]
-    public void ReadUnknownNode_WithDocumentEnd_ThrowsYamlParseException()
+    public void ReadUnknownNode_WithDocumentEnd_ThrowsPipelineParsingException()
     {
         var reader = YamlReader.Create("value", "pipeline.yml");
         ReadEnvelopeStart(reader);
         _ = reader.ReadUnknownNode();
 
-        var exception = Assert.Throws<YamlParseException>(reader.ReadUnknownNode);
+        var exception = Assert.Throws<PipelineParsingException>(reader.ReadUnknownNode);
 
         Assert.Contains("Unsupported token while reading unknown node", exception.Message);
         Assert.Contains(nameof(DocumentEnd), exception.Message);
     }
 
     [Fact]
-    public void ReadUnknownNode_AtExhaustedParser_ThrowsYamlParseException()
+    public void ReadUnknownNode_AtExhaustedParser_ThrowsPipelineParsingException()
     {
         var reader = YamlReader.Create("value", "pipeline.yml");
         ConsumeToEnd(reader);
 
-        var exception = Assert.Throws<YamlParseException>(reader.ReadUnknownNode);
+        var exception = Assert.Throws<PipelineParsingException>(reader.ReadUnknownNode);
 
         Assert.Equal("Unexpected token while reading unknown node, got EOF", exception.Message);
     }

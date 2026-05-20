@@ -1,7 +1,6 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Domain.Model;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Builders;
 
@@ -32,7 +31,7 @@ internal abstract class StepNodeBuilderBase
         var violatingFields = GetViolatingFields(fields);
 
         return violatingFields.Count is > 0
-            ? throw new YamlParseException(
+            ? throw new Application.Parsing.Exceptions.PipelineParsingException(
                 $"{StepType} step cannot contain fields: {string.Join(", ", violatingFields)}",
                 span
             )

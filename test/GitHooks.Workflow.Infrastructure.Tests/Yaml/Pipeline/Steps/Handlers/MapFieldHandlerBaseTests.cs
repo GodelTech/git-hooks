@@ -1,6 +1,6 @@
 using GitHooks.Workflow.Application.Ast.Expressions;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
 using GitHooks.Workflow.Infrastructure.Yaml.Expressions;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps;
 using GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Handlers;
@@ -47,7 +47,7 @@ public class MapFieldHandlerBaseTests
     }
 
     [Fact]
-    public void ReadMap_WithNonScalarKey_ThrowsYamlParseException()
+    public void ReadMap_WithNonScalarKey_ThrowsPipelineParsingException()
     {
         var handler = new TestMapFieldHandler(new InterpolationParser());
         var reader = CreateReader(
@@ -60,13 +60,13 @@ public class MapFieldHandlerBaseTests
 
         _ = reader.Read<Scalar>();
 
-        var exception = Assert.Throws<YamlParseException>(() => handler.ReadMapForTest(reader));
+        var exception = Assert.Throws<PipelineParsingException>(() => handler.ReadMapForTest(reader));
 
         Assert.Contains("Expected Scalar", exception.Message);
     }
 
     [Fact]
-    public void ReadMap_WithNonScalarValue_ThrowsYamlParseException()
+    public void ReadMap_WithNonScalarValue_ThrowsPipelineParsingException()
     {
         var handler = new TestMapFieldHandler(new InterpolationParser());
         var reader = CreateReader(
@@ -79,7 +79,7 @@ public class MapFieldHandlerBaseTests
 
         _ = reader.Read<Scalar>();
 
-        var exception = Assert.Throws<YamlParseException>(() => handler.ReadMapForTest(reader));
+        var exception = Assert.Throws<PipelineParsingException>(() => handler.ReadMapForTest(reader));
 
         Assert.Contains("Expected Scalar", exception.Message);
     }

@@ -1,5 +1,4 @@
 using GitHooks.Workflow.Application.Resolution;
-using GitHooks.Workflow.Infrastructure.Resolution;
 
 using Microsoft.Extensions.DependencyInjection;
 

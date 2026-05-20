@@ -1,8 +1,9 @@
 using GitHooks.Infrastructure.Git;
 using GitHooks.Workflow.Application.Binding.Exceptions;
 using GitHooks.Workflow.Application.Expansion.Exceptions;
+using GitHooks.Workflow.Application.Parsing.Exceptions;
 using GitHooks.Workflow.Application.Resolution;
-using GitHooks.Workflow.Infrastructure.Yaml.Exceptions;
+using GitHooks.Workflow.Domain.Model;
 
 using Spectre.Console;
 
@@ -62,14 +63,15 @@ public sealed class RunHandler(
 
         try
         {
-            var resolvedPipeline = await _pipelineResolver.ResolveAsync(absoluteFilePath, parameterOverrides, cancellationToken);
+            var pipelineSource = PipelineSource.LocalFile(absoluteFilePath);
+            var resolvedPipeline = await _pipelineResolver.ResolveAsync(pipelineSource, parameterOverrides, cancellationToken);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to read YAML file: {Markup.Escape(ex.Message)}");
             return 1;
         }
-        catch (YamlParseException ex)
+        catch (PipelineParsingException ex)
         {
             var location = ex.Span.Start.Line > 0
                 ? $"{Markup.Escape(ex.Span.Source.Name)}:{ex.Span.Start.Line}:{ex.Span.Start.Column}: "
@@ -94,7 +96,7 @@ public sealed class RunHandler(
                 : string.Empty;
 
             var includeChain = ex.IncludeChain.Count > 0
-                ? $" Include chain: {string.Join(" -> ", ex.IncludeChain.Select(Markup.Escape))}."
+                ? $" Include chain: {string.Join(" -> ", ex.IncludeChain.Select(source => Markup.Escape(source.Identifier)))}."
                 : string.Empty;
 
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(ex.Message)}{includeChain}");

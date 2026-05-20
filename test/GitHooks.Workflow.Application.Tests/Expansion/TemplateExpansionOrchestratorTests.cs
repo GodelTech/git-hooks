@@ -1,6 +1,5 @@
 using GitHooks.Workflow.Application.Ast;
 using GitHooks.Workflow.Application.Ast.Expressions;
-using GitHooks.Workflow.Application.Ast.Unknown;
 using GitHooks.Workflow.Application.DependencyInjection;
 using GitHooks.Workflow.Application.Expansion;
 using GitHooks.Workflow.Application.Expansion.Exceptions;
@@ -18,7 +17,7 @@ public sealed class TemplateExpansionOrchestratorTests
         var orchestrator = CreateOrchestrator();
 
         await Assert.ThrowsAsync<ArgumentNullException>(
-            () => orchestrator.OrchestrateAsync(null!, "/root.yaml", NeverCalledCallback, TestContext.Current.CancellationToken));
+            () => orchestrator.OrchestrateAsync(null!, PipelineSource.LocalFile("/root.yaml"), NeverCalledCallback, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -28,7 +27,7 @@ public sealed class TemplateExpansionOrchestratorTests
         var pipeline = CreateEmptyPipeline();
 
         await Assert.ThrowsAsync<ArgumentNullException>(
-            () => orchestrator.OrchestrateAsync(pipeline, "/root.yaml", null!, TestContext.Current.CancellationToken));
+            () => orchestrator.OrchestrateAsync(pipeline, PipelineSource.LocalFile("/root.yaml"), null!, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -39,7 +38,7 @@ public sealed class TemplateExpansionOrchestratorTests
         var scriptStep = new ScriptStepNode(new InterpolatedStringNode("echo hello"), [], span);
         var pipeline = CreatePipeline([scriptStep]);
 
-        var result = await orchestrator.OrchestrateAsync(pipeline, "/root.yaml", NeverCalledCallback, TestContext.Current.CancellationToken);
+        var result = await orchestrator.OrchestrateAsync(pipeline, PipelineSource.LocalFile("/root.yaml"), NeverCalledCallback, TestContext.Current.CancellationToken);
 
         var step = Assert.Single(result.Steps);
         Assert.Same(scriptStep, step);
@@ -59,11 +58,11 @@ public sealed class TemplateExpansionOrchestratorTests
 
         var result = await orchestrator.OrchestrateAsync(
             pipeline,
-            "/root.yaml",
+            PipelineSource.LocalFile("/root.yaml"),
             (_, _, _, _) =>
             {
                 callbackInvoked = true;
-                return Task.FromResult(new ResolvedTemplate("/template.yaml", templatePipeline));
+                return Task.FromResult(new ResolvedTemplate(PipelineSource.LocalFile("/template.yaml"), templatePipeline));
             },
             TestContext.Current.CancellationToken);
 
@@ -89,8 +88,8 @@ public sealed class TemplateExpansionOrchestratorTests
 
         var result = await orchestrator.OrchestrateAsync(
             pipeline,
-            "/root.yaml",
-            (_, _, _, _) => Task.FromResult(new ResolvedTemplate("/template.yaml", templatePipeline)),
+            PipelineSource.LocalFile("/root.yaml"),
+            (_, _, _, _) => Task.FromResult(new ResolvedTemplate(PipelineSource.LocalFile("/template.yaml"), templatePipeline)),
             TestContext.Current.CancellationToken);
 
         Assert.Equal(3, result.Steps.Count);
@@ -112,12 +111,12 @@ public sealed class TemplateExpansionOrchestratorTests
         var exception = await Assert.ThrowsAsync<PipelineTemplateExpansionException>(
             () => orchestrator.OrchestrateAsync(
                 pipeline,
-                "/root.yaml",
+                PipelineSource.LocalFile("/root.yaml"),
                 (_, _, _, _) =>
                 {
                     // Returning the root path triggers cycle detection
                     var selfReferencedTemplate = CreatePipeline([]);
-                    return Task.FromResult(new ResolvedTemplate("/root.yaml", selfReferencedTemplate));
+                    return Task.FromResult(new ResolvedTemplate(PipelineSource.LocalFile("/root.yaml"), selfReferencedTemplate));
                 },
                 TestContext.Current.CancellationToken));
 
@@ -137,15 +136,15 @@ public sealed class TemplateExpansionOrchestratorTests
         var exception = await Assert.ThrowsAsync<PipelineTemplateExpansionException>(
             () => orchestrator.OrchestrateAsync(
                 pipeline,
-                "/root.yaml",
+                PipelineSource.LocalFile("/root.yaml"),
                 (_, _, _, _) =>
                 {
                     var selfReferencedTemplate = CreatePipeline([]);
-                    return Task.FromResult(new ResolvedTemplate("/root.yaml", selfReferencedTemplate));
+                    return Task.FromResult(new ResolvedTemplate(PipelineSource.LocalFile("/root.yaml"), selfReferencedTemplate));
                 },
                 TestContext.Current.CancellationToken));
 
-        Assert.Contains("/root.yaml", exception.IncludeChain);
+        Assert.Contains(PipelineSource.LocalFile("/root.yaml"), exception.IncludeChain);
     }
 
     [Fact]
@@ -165,10 +164,12 @@ public sealed class TemplateExpansionOrchestratorTests
 
         var result = await orchestrator.OrchestrateAsync(
             root,
-            "/root.yaml",
+            PipelineSource.LocalFile("/root.yaml"),
             (step, _, _, _) =>
             {
-                var templatePath = step.Template == "outer.yaml" ? "/outer.yaml" : "/inner.yaml";
+                var templatePath = step.Template == "outer.yaml"
+                    ? PipelineSource.LocalFile("/outer.yaml")
+                    : PipelineSource.LocalFile("/inner.yaml");
                 var templatePipeline = step.Template == "outer.yaml" ? outerTemplate : innerTemplate;
                 return Task.FromResult(new ResolvedTemplate(templatePath, templatePipeline));
             },
@@ -187,19 +188,19 @@ public sealed class TemplateExpansionOrchestratorTests
         var templateStep = new TemplateStepNode("template.yaml", new Dictionary<string, InterpolatedStringNode>(), [], span);
         var pipeline = CreatePipeline([templateStep]);
 
-        string? receivedFilePath = null;
+        PipelineSource? receivedSource = null;
 
         await orchestrator.OrchestrateAsync(
             pipeline,
-            "/root.yaml",
-            (_, currentFilePath, _, _) =>
+            PipelineSource.LocalFile("/root.yaml"),
+            (_, currentSource, _, _) =>
             {
-                receivedFilePath = currentFilePath;
-                return Task.FromResult(new ResolvedTemplate("/template.yaml", CreateEmptyPipeline()));
+                receivedSource = currentSource;
+                return Task.FromResult(new ResolvedTemplate(PipelineSource.LocalFile("/template.yaml"), CreateEmptyPipeline()));
             },
             TestContext.Current.CancellationToken);
 
-        Assert.Equal("/root.yaml", receivedFilePath);
+        Assert.Equal(PipelineSource.LocalFile("/root.yaml"), receivedSource);
     }
 
     [Fact]
@@ -211,20 +212,20 @@ public sealed class TemplateExpansionOrchestratorTests
         var templateStep = new TemplateStepNode("template.yaml", new Dictionary<string, InterpolatedStringNode>(), [], span);
         var pipeline = CreatePipeline([templateStep]);
 
-        IReadOnlyList<string>? receivedChain = null;
+        IReadOnlyList<PipelineSource>? receivedChain = null;
 
         await orchestrator.OrchestrateAsync(
             pipeline,
-            "/root.yaml",
+            PipelineSource.LocalFile("/root.yaml"),
             (_, _, includeChain, _) =>
             {
                 receivedChain = includeChain;
-                return Task.FromResult(new ResolvedTemplate("/template.yaml", CreateEmptyPipeline()));
+                return Task.FromResult(new ResolvedTemplate(PipelineSource.LocalFile("/template.yaml"), CreateEmptyPipeline()));
             },
             TestContext.Current.CancellationToken);
 
         Assert.NotNull(receivedChain);
-        Assert.Contains("/root.yaml", receivedChain);
+        Assert.Contains(PipelineSource.LocalFile("/root.yaml"), receivedChain);
     }
 
     private static ITemplateExpansionOrchestrator CreateOrchestrator()
@@ -254,8 +255,8 @@ public sealed class TemplateExpansionOrchestratorTests
 
     private static Task<ResolvedTemplate> NeverCalledCallback(
         TemplateStepNode templateStep,
-        string currentFilePath,
-        IReadOnlyList<string> includeChain,
+        PipelineSource currentSource,
+        IReadOnlyList<PipelineSource> includeChain,
         CancellationToken cancellationToken)
     {
         throw new InvalidOperationException("Callback should not have been called.");
