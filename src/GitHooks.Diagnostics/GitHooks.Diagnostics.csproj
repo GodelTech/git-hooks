@@ -1,0 +1,5 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\GitHooks.Domain\GitHooks.Domain.csproj" />
+  </ItemGroup>
+</Project>

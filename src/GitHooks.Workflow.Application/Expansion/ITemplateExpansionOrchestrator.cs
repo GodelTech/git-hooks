@@ -3,10 +3,6 @@ using GitHooks.Workflow.Domain.Model;
 
 namespace GitHooks.Workflow.Application.Expansion;
 
-/// <summary>
-/// Orchestrates recursive template expansion, managing cycle detection and step flattening.
-/// Template resolution is delegated to the <paramref name="resolveTemplateAsync"/> callback.
-/// </summary>
 public interface ITemplateExpansionOrchestrator
 {
     /// <summary>
