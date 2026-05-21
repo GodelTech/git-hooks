@@ -1,0 +1,92 @@
+using GitHooks.Domain.Common;
+
+using YamlDotNet.Core;
+using YamlDotNet.Core.Events;
+
+namespace GitHooks.Infrastructure.Yaml.Parsing;
+
+internal sealed class YamlParserCursor(
+    Parser parser,
+    string sourceName)
+{
+    private readonly Parser _parser = parser;
+    private readonly string _sourceName = sourceName;
+
+    public static YamlParserCursor Create(
+        string yaml,
+        string sourceName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceName);
+
+        return new(
+            new Parser(new StringReader(yaml)),
+            sourceName);
+    }
+
+    public T Read<T>()
+        where T : ParsingEvent
+    {
+        return !_parser.TryConsume<T>(out var parsingEvent)
+            ? throw CreateInvalidOperationException($"Expected {typeof(T).Name}")
+            : parsingEvent;
+    }
+
+    public SourceSpan CreateSpan(
+        ParsingEvent start,
+        ParsingEvent end)
+    {
+        ArgumentNullException.ThrowIfNull(start);
+        ArgumentNullException.ThrowIfNull(end);
+
+        return CreateSpan(
+            start.Start,
+            end.End);
+    }
+
+    public SourceSpan CreateSpan(
+        YamlException exception)
+    {
+        ArgumentNullException.ThrowIfNull(exception);
+
+        return CreateSpan(
+            exception.Start,
+            exception.End);
+    }
+
+#pragma warning disable CA1822 // Mark members as static
+    public SourceSpan CreateSpan(
+        Mark start,
+        Mark end)
+#pragma warning restore CA1822 // Mark members as static
+    {
+        return new SourceSpan(
+            new SourcePosition(
+                start.Line,
+                start.Column),
+            new SourcePosition(
+                end.Line,
+                end.Column));
+    }
+
+    private SourceSpan CurrentSpan()
+    {
+        var mark = _parser.Current?.Start;
+
+        return mark is null
+            ? SourceSpan.Unknown
+            : CreateSpan(mark.Value, mark.Value);
+    }
+
+    private InvalidOperationException CreateInvalidOperationException(string message)
+    {
+        var span = CurrentSpan();
+
+        return new InvalidOperationException(
+            $"{message}, " +
+            $"got {_parser.Current?.GetType().Name ?? "EOF"} " +
+            $"in {_sourceName} " +
+            $"at {span.Start.Line}:{span.Start.Column}"
+        );
+    }
+}

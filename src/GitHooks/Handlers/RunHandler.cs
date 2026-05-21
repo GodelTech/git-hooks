@@ -66,40 +66,40 @@ public sealed class RunHandler(
             var pipelineSource = PipelineSource.LocalFile(absoluteFilePath);
             var resolvedPipeline = await _pipelineResolver.ResolveAsync(pipelineSource, parameterOverrides, cancellationToken);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to read YAML file: {Markup.Escape(ex.Message)}");
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to read YAML file: {Markup.Escape(exception.Message)}");
             return 1;
         }
-        catch (PipelineParsingException ex)
+        catch (PipelineParsingException exception)
         {
-            var location = ex.Span.Start.Line > 0
-                ? $"{Markup.Escape(ex.Span.Source.Name)}:{ex.Span.Start.Line}:{ex.Span.Start.Column}: "
+            var location = exception.Span.Start.Line > 0
+                ? $"{Markup.Escape(exception.Span.Source.Name)}:{exception.Span.Start.Line}:{exception.Span.Start.Column}: "
                 : string.Empty;
 
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(ex.Message)}");
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(exception.Message)}");
             return 1;
         }
-        catch (PipelineParameterBindingException ex)
+        catch (PipelineParameterBindingException exception)
         {
-            var location = ex.Span.Start.Line > 0
-                ? $"{Markup.Escape(ex.Span.Source.Name)}:{ex.Span.Start.Line}:{ex.Span.Start.Column}: "
+            var location = exception.Span.Start.Line > 0
+                ? $"{Markup.Escape(exception.Span.Source.Name)}:{exception.Span.Start.Line}:{exception.Span.Start.Column}: "
                 : string.Empty;
 
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(ex.Message)}");
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(exception.Message)}");
             return 1;
         }
-        catch (PipelineTemplateExpansionException ex)
+        catch (PipelineTemplateExpansionException exception)
         {
-            var location = ex.Span.Start.Line > 0
-                ? $"{Markup.Escape(ex.Span.Source.Name)}:{ex.Span.Start.Line}:{ex.Span.Start.Column}: "
+            var location = exception.Span.Start.Line > 0
+                ? $"{Markup.Escape(exception.Span.Source.Name)}:{exception.Span.Start.Line}:{exception.Span.Start.Column}: "
                 : string.Empty;
 
-            var includeChain = ex.IncludeChain.Count > 0
-                ? $" Include chain: {string.Join(" -> ", ex.IncludeChain.Select(source => Markup.Escape(source.Identifier)))}."
+            var includeChain = exception.IncludeChain.Count > 0
+                ? $" Include chain: {string.Join(" -> ", exception.IncludeChain.Select(source => Markup.Escape(source.Identifier)))}."
                 : string.Empty;
 
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(ex.Message)}{includeChain}");
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(exception.Message)}{includeChain}");
             return 1;
         }
 
@@ -124,9 +124,9 @@ public sealed class RunHandler(
         // _console.MarkupLine("[green][[SUCCESS]][/] Pipeline completed successfully.");
         //    return 0;
         // }
-        // catch (PipelineException ex)
+        // catch (PipelineException exception)
         // {
-        //    _console.MarkupLineInterpolated($"[red][[ERROR]][/] {Markup.Escape(ex.Message)}");
+        //    _console.MarkupLineInterpolated($"[red][[ERROR]][/] {Markup.Escape(exception.Message)}");
         //    return 1;
         // }
         return 0;

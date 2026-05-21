@@ -70,15 +70,15 @@ public sealed class GitHookScaffolder(
         {
             throw;
         }
-        catch (Exception ex) when (
-            ex is IOException
+        catch (Exception exception) when (
+            exception is IOException
             or UnauthorizedAccessException
             or ArgumentException
             or NotSupportedException
             or System.Security.SecurityException
         )
         {
-            return GitHookScaffoldResult.Failure($"Failed to create hook scaffold files: {ex.Message}");
+            return GitHookScaffoldResult.Failure($"Failed to create hook scaffold files: {exception.Message}");
         }
     }
 }

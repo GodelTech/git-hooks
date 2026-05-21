@@ -44,13 +44,13 @@ public sealed class PipelineTemplateExpander(
         {
             templateSource = _templateResolver.Resolve(currentSource, templateStep);
         }
-        catch (PipelineTemplateExpansionException ex) when (ex.IncludeChain.Count == 0)
+        catch (PipelineTemplateExpansionException exception) when (exception.IncludeChain.Count == 0)
         {
             throw new PipelineTemplateExpansionException(
-                ex.Message,
-                ex.Span,
+                exception.Message,
+                exception.Span,
                 includeChain,
-                ex);
+                exception);
         }
 
         IReadOnlyDictionary<string, string>? parameterOverrides = null;
@@ -79,21 +79,21 @@ public sealed class PipelineTemplateExpander(
         {
             return await _pipelineCompiler.CompileAsync(templateSource, parameterOverrides, cancellationToken);
         }
-        catch (PipelineParsingException ex)
+        catch (PipelineParsingException exception)
         {
             throw new PipelineTemplateExpansionException(
-                ex.Message,
-                ex.Span,
+                exception.Message,
+                exception.Span,
                 includeChain,
-                ex);
+                exception);
         }
-        catch (PipelineParameterBindingException ex)
+        catch (PipelineParameterBindingException exception)
         {
             throw new PipelineTemplateExpansionException(
-                ex.Message,
-                ex.Span,
+                exception.Message,
+                exception.Span,
                 includeChain,
-                ex);
+                exception);
         }
     }
 }

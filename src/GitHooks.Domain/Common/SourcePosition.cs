@@ -1,8 +1,8 @@
 namespace GitHooks.Domain.Common;
 
 public readonly record struct SourcePosition(
-    int Line,
-    int Column)
+    long Line,
+    long Column)
 {
     public static SourcePosition Unknown { get; }
         = new(-1, -1);

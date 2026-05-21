@@ -65,13 +65,13 @@ public sealed class CommandLine
         {
             throw;
         }
-        catch (Exception ex) when (
-            ex is Win32Exception
+        catch (Exception exception) when (
+            exception is Win32Exception
             or InvalidOperationException
             or ObjectDisposedException
         )
         {
-            return CommandLineResult.FromException(ex);
+            return CommandLineResult.FromException(exception);
         }
     }
 }
