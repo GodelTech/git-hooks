@@ -46,8 +46,7 @@ internal sealed class AstPrinterStringBuilder(
         if (_indentLevel == 0)
         {
             throw new InvalidOperationException(
-                "Cannot decrease indentation below zero."
-            );
+                "Cannot decrease indentation below zero.");
         }
 
         _indentLevel--;

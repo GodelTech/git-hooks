@@ -32,8 +32,7 @@ public sealed class AstPrinter
 
         AppendNodeHeader(
             node,
-            "Pipeline"
-        );
+            "Pipeline");
 
         using (_builder.Indent())
         {
@@ -55,8 +54,7 @@ public sealed class AstPrinter
 
         AppendNodeHeader(
             node,
-            $"Parameter({node.Name})"
-        );
+            $"Parameter({node.Name})");
 
         using (_builder.Indent())
         {
@@ -70,8 +68,7 @@ public sealed class AstPrinter
 
         AppendNodeHeader(
             node,
-            "ScriptStep"
-        );
+            "ScriptStep");
 
         using (_builder.Indent())
         {
@@ -85,8 +82,7 @@ public sealed class AstPrinter
 
         AppendNodeHeader(
             node,
-            $"Boolean({node.Value})"
-        );
+            $"Boolean({node.Value})");
     }
 
     public void Visit(IntegerLiteralExpressionNode node)
@@ -95,8 +91,7 @@ public sealed class AstPrinter
 
         AppendNodeHeader(
             node,
-            $"Integer({node.Value})"
-        );
+            $"Integer({node.Value})");
     }
 
     public void Visit(StringLiteralExpressionNode node)
@@ -105,8 +100,7 @@ public sealed class AstPrinter
 
         AppendNodeHeader(
             node,
-            $"String({Quote(node.Value)})"
-        );
+            $"String({Quote(node.Value)})");
     }
 
     private static string Quote(string value)

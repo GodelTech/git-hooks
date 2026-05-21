@@ -18,8 +18,7 @@ public sealed class AstCreationTests
             [
                 TestAst.Script(
                     script: "dotnet test")
-            ]
-        );
+            ]);
 
         Assert.Single(pipeline.Parameters);
         Assert.Single(pipeline.Steps);

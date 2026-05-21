@@ -26,6 +26,15 @@ public static class TestAst
     }
 
     public static PipelineNode Pipeline(
+        SourceSpan span)
+    {
+        return Pipeline(
+            EmptyParameters,
+            EmptySteps,
+            span);
+    }
+
+    public static PipelineNode Pipeline(
         IEnumerable<ParameterNode>? parameters = null,
         IEnumerable<StepNode>? steps = null)
     {
