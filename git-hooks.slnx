@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/GitHooks.Diagnostics/GitHooks.Diagnostics.csproj" Id="6c8cc5b8-b7c8-4754-b748-f56eeba85795" />
     <Project Path="src/GitHooks.Domain/GitHooks.Domain.csproj" Id="caceaabd-4786-4dd8-af4c-d625abef9fed" />
+    <Project Path="src/GitHooks.Infrastructure.Yaml/GitHooks.Infrastructure.Yaml.csproj" Id="f10530b7-0312-46ff-907c-8b4dca21d46c" />
     <Project Path="src/GitHooks.Infrastructure/GitHooks.Infrastructure.csproj" Id="f3c7d8d3-8e11-4208-b80c-0310bde43317" />
     <Project Path="src/GitHooks.Templates/GitHooks.Templates.csproj" Id="ee3c1915-89aa-4acc-810b-3a3c95339015" />
     <Project Path="src/GitHooks.Workflow.Application/GitHooks.Workflow.Application.csproj" Id="02572336-2177-4566-9e57-a650807237a3" />

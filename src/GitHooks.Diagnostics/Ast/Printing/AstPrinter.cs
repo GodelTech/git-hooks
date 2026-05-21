@@ -1,7 +1,7 @@
+using GitHooks.Diagnostics.Rendering;
 using GitHooks.Domain.Ast;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Visitors;
-using GitHooks.Domain.Common;
 
 namespace GitHooks.Diagnostics.Ast.Printing;
 
@@ -118,33 +118,6 @@ public sealed class AstPrinter
             .Replace("\t", "\\t");
     }
 
-    private static string RenderSpan(
-        SourceSpan span)
-    {
-        return span.IsUnknown
-            ? "<unknown>"
-            : $"({RenderPosition(span.Start)}-{RenderPosition(span.End)})";
-    }
-
-    private static string RenderPosition(
-        SourcePosition position)
-    {
-        if (position.IsUnknown)
-        {
-            return "<unknown>";
-        }
-
-        var line = position.HasKnownLine
-            ? position.Line.ToString()
-            : "?";
-
-        var column = position.HasKnownColumn
-            ? position.Column.ToString()
-            : "?";
-
-        return $"{line}:{column}";
-    }
-
     private void AppendNodeHeader(
         AstNode node,
         string text)
@@ -158,7 +131,7 @@ public sealed class AstPrinter
 
         if (_options.IncludeSourceSpans)
         {
-            output += $" @ {RenderSpan(node.Span)}";
+            output += $" @ {SourceSpanRenderer.Render(node.Span)}";
         }
 
         _builder.AppendLine(output);
