@@ -10,7 +10,8 @@ namespace GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 
 internal sealed class PipelineParser(
     ParametersParser parametersParser,
-    StepsParser stepsParser)
+    StepsParser stepsParser,
+    UnknownNodeParser unknownNodeParser)
 {
     private readonly ParametersParser _parametersParser =
         parametersParser
@@ -19,6 +20,10 @@ internal sealed class PipelineParser(
     private readonly StepsParser _stepsParser =
         stepsParser
         ?? throw new ArgumentNullException(nameof(stepsParser));
+
+    private readonly UnknownNodeParser _unknownNodeParser =
+        unknownNodeParser
+        ?? throw new ArgumentNullException(nameof(unknownNodeParser));
 
     public PipelineNode Parse(
         YamlParserCursor cursor)
@@ -35,9 +40,8 @@ internal sealed class PipelineParser(
         {
             if (!cursor.Is<Scalar>())
             {
-                // var keyNode = cursor.ReadUnknownNode();
-                // unknownFields.Add(cursor.ReadUnknownField(keyNode));
-                continue;
+                throw cursor.CreateInvalidOperationException(
+                    "Expected scalar mapping key");
             }
 
             var key = cursor.Read<Scalar>();
@@ -52,7 +56,10 @@ internal sealed class PipelineParser(
             }
             else
             {
-                // unknownFields.Add(cursor.ReadUnknownField(key));
+                var unknownField = _unknownNodeParser.ParseField(cursor, key);
+
+                unknownFields.Add(unknownField);
+
                 break;
             }
         }

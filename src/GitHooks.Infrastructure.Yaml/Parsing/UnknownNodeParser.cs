@@ -26,7 +26,7 @@ internal sealed class UnknownNodeParser
         };
     }
 
-    public UnknownNode ParseNode(
+    private UnknownNode ParseNode(
         YamlParserCursor cursor)
     {
         ArgumentNullException.ThrowIfNull(cursor);
