@@ -1,7 +1,7 @@
-namespace GitHooks.Domain.Ast;
+namespace GitHooks.Domain.Ast.Mappings.Steps;
 
 public abstract record StepNode
-    : AstNode
+    : MappingNode
 {
     public string? Name { get; init; }
 }

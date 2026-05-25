@@ -1,12 +1,14 @@
 using GitHooks.Diagnostics;
-using GitHooks.Domain.Ast;
+using GitHooks.Domain.Ast.Mappings;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing;
 
 public sealed record YamlParserResult
 {
-    public PipelineNode? Root { get; init; }
+    public required PipelineNode? Root { get; init; }
 
-    public IReadOnlyList<Diagnostic> Diagnostics { get; init; }
-        = [];
+    public required IReadOnlyList<Diagnostic> Diagnostics { get; init; }
+
+    public bool HasErrors =>
+        Diagnostics.Any(static x => x.Severity == DiagnosticSeverity.Error);
 }

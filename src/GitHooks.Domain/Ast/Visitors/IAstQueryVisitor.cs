@@ -1,4 +1,7 @@
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Mappings;
+using GitHooks.Domain.Ast.Mappings.Steps;
+using GitHooks.Domain.Ast.Unknown;
 
 namespace GitHooks.Domain.Ast.Visitors;
 
@@ -16,4 +19,7 @@ public interface IAstQueryVisitor<out TResult>
     public TResult Visit(IntegerLiteralExpressionNode node);
 
     public TResult Visit(StringLiteralExpressionNode node);
+
+    // Unknown
+    public TResult VisitUnknownNode(UnknownNode node);
 }

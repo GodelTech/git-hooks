@@ -1,17 +1,17 @@
-using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Ast.Visitors;
 
-namespace GitHooks.Domain.Ast;
+namespace GitHooks.Domain.Ast.Mappings;
 
-public sealed record ParameterNode
-    : AstNode
+public sealed record PipelineNode
+    : MappingNode
 {
     public override AstNodeKind Kind
-        => AstNodeKind.Parameter;
+        => AstNodeKind.Pipeline;
 
-    public required string Name { get; init; }
+    public required IReadOnlyList<ParameterNode> Parameters { get; init; }
 
-    public required ExpressionNode Value { get; init; }
+    public required IReadOnlyList<StepNode> Steps { get; init; }
 
     public override void Accept(
         IAstCommandVisitor visitor)

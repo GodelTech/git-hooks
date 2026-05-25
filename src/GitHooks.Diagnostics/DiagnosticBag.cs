@@ -9,8 +9,6 @@ public sealed class DiagnosticBag
 
     public void Report(Diagnostic diagnostic)
     {
-        ArgumentNullException.ThrowIfNull(diagnostic);
-
         _diagnostics.Add(diagnostic);
     }
 }

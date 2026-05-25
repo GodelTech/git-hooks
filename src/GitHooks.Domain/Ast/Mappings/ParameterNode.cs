@@ -1,15 +1,17 @@
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Visitors;
 
-namespace GitHooks.Domain.Ast;
+namespace GitHooks.Domain.Ast.Mappings;
 
-public sealed record ScriptStepNode
-    : StepNode
+public sealed record ParameterNode
+    : MappingNode
 {
     public override AstNodeKind Kind
-        => AstNodeKind.ScriptStep;
+        => AstNodeKind.Parameter;
 
-    public required ExpressionNode Script { get; init; }
+    public required string Name { get; init; }
+
+    public required ExpressionNode Value { get; init; }
 
     public override void Accept(
         IAstCommandVisitor visitor)

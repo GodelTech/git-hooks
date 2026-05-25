@@ -10,4 +10,13 @@ public readonly record struct SourceSpan(
     public bool IsUnknown
         => Start.IsUnknown &&
            End.IsUnknown;
+
+    public static SourceSpan Combine(
+        SourceSpan start,
+        SourceSpan end)
+    {
+        return new SourceSpan(
+            start.Start,
+            end.End);
+    }
 }

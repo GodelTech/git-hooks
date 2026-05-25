@@ -9,8 +9,13 @@ internal sealed class YamlParserCursor(
     Parser parser,
     string sourceName)
 {
-    private readonly Parser _parser = parser;
-    private readonly string _sourceName = sourceName;
+    private readonly Parser _parser
+        = parser
+        ?? throw new ArgumentNullException(nameof(parser));
+
+    private readonly string _sourceName
+        = sourceName
+        ?? throw new ArgumentNullException(nameof(sourceName));
 
     public static YamlParserCursor Create(
         string yaml,
@@ -30,6 +35,12 @@ internal sealed class YamlParserCursor(
         return !_parser.TryConsume<T>(out var parsingEvent)
             ? throw CreateInvalidOperationException($"Expected {typeof(T).Name}")
             : parsingEvent;
+    }
+
+    public bool Is<T>()
+        where T : ParsingEvent
+    {
+        return _parser.Accept<T>(out _);
     }
 
     public SourceSpan CreateSpan(
@@ -69,16 +80,7 @@ internal sealed class YamlParserCursor(
                 end.Column));
     }
 
-    private SourceSpan CurrentSpan()
-    {
-        var mark = _parser.Current?.Start;
-
-        return mark is null
-            ? SourceSpan.Unknown
-            : CreateSpan(mark.Value, mark.Value);
-    }
-
-    private InvalidOperationException CreateInvalidOperationException(string message)
+    internal InvalidOperationException CreateInvalidOperationException(string message)
     {
         var span = CurrentSpan();
 
@@ -88,5 +90,14 @@ internal sealed class YamlParserCursor(
             $"in {_sourceName} " +
             $"at {span.Start.Line}:{span.Start.Column}"
         );
+    }
+
+    private SourceSpan CurrentSpan()
+    {
+        var mark = _parser.Current?.Start;
+
+        return mark is null
+            ? SourceSpan.Unknown
+            : CreateSpan(mark.Value, mark.Value);
     }
 }

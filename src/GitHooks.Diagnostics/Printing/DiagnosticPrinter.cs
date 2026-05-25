@@ -29,8 +29,6 @@ public sealed class DiagnosticPrinter(
     private string FormatDiagnostic(
         Diagnostic diagnostic)
     {
-        ArgumentNullException.ThrowIfNull(diagnostic);
-
         var builder = new StringBuilder();
 
         if (_options.IncludeSeverity)

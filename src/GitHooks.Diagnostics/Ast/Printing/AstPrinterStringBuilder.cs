@@ -13,8 +13,6 @@ internal sealed class AstPrinterStringBuilder(
 
     public void AppendLine(string text)
     {
-        ArgumentNullException.ThrowIfNull(text);
-
         AppendIndent();
 
         _ = _builder.Append(text);
@@ -26,6 +24,13 @@ internal sealed class AstPrinterStringBuilder(
         _indentLevel++;
 
         return new IndentScope(this);
+    }
+
+    public void Clear()
+    {
+        _ = _builder.Clear();
+
+        _indentLevel = 0;
     }
 
     public override string ToString()

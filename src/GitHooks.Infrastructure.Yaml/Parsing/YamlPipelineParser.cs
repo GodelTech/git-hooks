@@ -10,7 +10,9 @@ namespace GitHooks.Infrastructure.Yaml.Parsing;
 internal sealed class YamlPipelineParser(
     PipelineParser pipelineParser)
 {
-    private readonly PipelineParser _pipelineParser = pipelineParser;
+    private readonly PipelineParser _pipelineParser =
+        pipelineParser
+        ?? throw new ArgumentNullException(nameof(pipelineParser));
 
     public YamlParserResult Parse(
         string yaml,
@@ -31,7 +33,7 @@ internal sealed class YamlPipelineParser(
             _ = cursor.Read<StreamStart>();
             _ = cursor.Read<DocumentStart>();
 
-            var pipeline = _pipelineParser.Parse(cursor, diagnostics);
+            var pipeline = _pipelineParser.Parse(cursor);
 
             _ = cursor.Read<DocumentEnd>();
             _ = cursor.Read<StreamEnd>();
