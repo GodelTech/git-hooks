@@ -9,6 +9,6 @@ public sealed record YamlParserResult
 
     public required IReadOnlyList<Diagnostic> Diagnostics { get; init; }
 
-    public bool HasErrors =>
-        Diagnostics.Any(static x => x.Severity == DiagnosticSeverity.Error);
+    public bool HasErrors
+        => Diagnostics.Any(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
 }

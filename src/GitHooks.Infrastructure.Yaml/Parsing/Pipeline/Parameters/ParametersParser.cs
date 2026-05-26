@@ -7,12 +7,10 @@ namespace GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 internal sealed class ParametersParser(
     ParameterParser parameterParser)
 {
-    private readonly ParameterParser _parameterParser =
-        parameterParser
-        ?? throw new ArgumentNullException(nameof(parameterParser));
+    private readonly ParameterParser _parameterParser
+        = parameterParser ?? throw new ArgumentNullException(nameof(parameterParser));
 
-    public IReadOnlyList<ParameterNode> Parse(
-        YamlParserCursor cursor)
+    public IReadOnlyList<ParameterNode> Parse(YamlParserCursor cursor)
     {
         ArgumentNullException.ThrowIfNull(cursor);
 

@@ -14,20 +14,16 @@ internal sealed class PipelineParser(
     StepsParser stepsParser,
     UnknownNodeParser unknownNodeParser)
 {
-    private readonly ParametersParser _parametersParser =
-        parametersParser
-        ?? throw new ArgumentNullException(nameof(parametersParser));
+    private readonly ParametersParser _parametersParser
+        = parametersParser ?? throw new ArgumentNullException(nameof(parametersParser));
 
-    private readonly StepsParser _stepsParser =
-        stepsParser
-        ?? throw new ArgumentNullException(nameof(stepsParser));
+    private readonly StepsParser _stepsParser
+        = stepsParser ?? throw new ArgumentNullException(nameof(stepsParser));
 
-    private readonly UnknownNodeParser _unknownNodeParser =
-        unknownNodeParser
-        ?? throw new ArgumentNullException(nameof(unknownNodeParser));
+    private readonly UnknownNodeParser _unknownNodeParser
+        = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
 
-    public PipelineNode Parse(
-        YamlParserCursor cursor)
+    public PipelineNode Parse(YamlParserCursor cursor)
     {
         ArgumentNullException.ThrowIfNull(cursor);
 

@@ -2,7 +2,8 @@ namespace GitHooks.Diagnostics;
 
 public sealed class DiagnosticBag
 {
-    private readonly List<Diagnostic> _diagnostics = [];
+    private readonly List<Diagnostic> _diagnostics
+        = [];
 
     public IReadOnlyList<Diagnostic> Diagnostics
         => _diagnostics;

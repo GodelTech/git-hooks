@@ -11,13 +11,10 @@ namespace GitHooks.Infrastructure.Yaml.Parsing;
 internal sealed class YamlPipelineParser(
     PipelineParser pipelineParser)
 {
-    private readonly PipelineParser _pipelineParser =
-        pipelineParser
-        ?? throw new ArgumentNullException(nameof(pipelineParser));
+    private readonly PipelineParser _pipelineParser
+        = pipelineParser ?? throw new ArgumentNullException(nameof(pipelineParser));
 
-    public YamlParserResult Parse(
-        string yaml,
-        string sourceName)
+    public YamlParserResult Parse(string yaml, string sourceName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceName);

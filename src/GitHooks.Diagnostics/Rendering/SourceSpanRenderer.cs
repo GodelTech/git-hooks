@@ -4,16 +4,14 @@ namespace GitHooks.Diagnostics.Rendering;
 
 public static class SourceSpanRenderer
 {
-    public static string Render(
-        SourceSpan span)
+    public static string Render(SourceSpan span)
     {
         return span.IsUnknown
             ? "<unknown>"
-            : $"({Render(span.Start)}-{Render(span.End)})";
+            : $"({RenderPosition(span.Start)}-{RenderPosition(span.End)})";
     }
 
-    private static string Render(
-        SourcePosition position)
+    private static string RenderPosition(SourcePosition position)
     {
         if (position.IsUnknown)
         {

@@ -57,7 +57,8 @@ internal sealed class AstPrinterStringBuilder(
         _indentLevel--;
     }
 
-    private sealed class IndentScope(AstPrinterStringBuilder builder)
+    private sealed class IndentScope(
+        AstPrinterStringBuilder builder)
         : IDisposable
     {
         private readonly AstPrinterStringBuilder _builder = builder;

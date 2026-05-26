@@ -11,31 +11,32 @@ internal sealed class YamlParserCursor(
     string sourceName)
 {
     private readonly Parser _parser
-        = parser
-        ?? throw new ArgumentNullException(nameof(parser));
+        = parser ?? throw new ArgumentNullException(nameof(parser));
 
     private readonly string _sourceName
-        = sourceName
-        ?? throw new ArgumentNullException(nameof(sourceName));
+        = sourceName ?? throw new ArgumentNullException(nameof(sourceName));
 
-    public static YamlParserCursor Create(
-        string yaml,
-        string sourceName)
+    public static YamlParserCursor Create(string yaml, string sourceName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceName);
 
         return new(
-            new Parser(new StringReader(yaml)),
+            new Parser(
+                new StringReader(yaml)),
             sourceName);
     }
 
     public T Read<T>()
         where T : ParsingEvent
     {
-        return !_parser.TryConsume<T>(out var parsingEvent)
-            ? throw CreateParsingException($"Expected {typeof(T).Name}")
-            : parsingEvent;
+        if (!_parser.TryConsume<T>(out var parsingEvent))
+        {
+            throw CreateParsingException(
+                $"Expected {typeof(T).Name}");
+        }
+
+        return parsingEvent;
     }
 
     public bool Is<T>()
@@ -44,9 +45,7 @@ internal sealed class YamlParserCursor(
         return _parser.Accept<T>(out _);
     }
 
-    public SourceSpan CreateSpan(
-        ParsingEvent start,
-        ParsingEvent end)
+    public SourceSpan CreateSpan(ParsingEvent start, ParsingEvent end)
     {
         ArgumentNullException.ThrowIfNull(start);
         ArgumentNullException.ThrowIfNull(end);
@@ -56,8 +55,7 @@ internal sealed class YamlParserCursor(
             end.End);
     }
 
-    public SourceSpan CreateSpan(
-        YamlException exception)
+    public SourceSpan CreateSpan(YamlException exception)
     {
         ArgumentNullException.ThrowIfNull(exception);
 
@@ -67,9 +65,7 @@ internal sealed class YamlParserCursor(
     }
 
 #pragma warning disable CA1822 // Mark members as static
-    public SourceSpan CreateSpan(
-        Mark start,
-        Mark end)
+    public SourceSpan CreateSpan(Mark start, Mark end)
 #pragma warning restore CA1822 // Mark members as static
     {
         return new SourceSpan(
@@ -99,7 +95,6 @@ internal sealed class YamlParserCursor(
             $"got {_parser.Current?.GetType().Name ?? "EOF"} " +
             $"in {_sourceName} " +
             $"at {span.Start.Line}:{span.Start.Column}",
-            span
-        );
+            span);
     }
 }

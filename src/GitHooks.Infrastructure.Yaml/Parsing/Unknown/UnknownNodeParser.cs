@@ -7,9 +7,7 @@ namespace GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
 internal sealed class UnknownNodeParser
 {
-    public UnknownFieldNode ParseField(
-        Scalar key,
-        YamlParserCursor cursor)
+    public UnknownFieldNode ParseField(Scalar key, YamlParserCursor cursor)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(cursor);
@@ -26,8 +24,7 @@ internal sealed class UnknownNodeParser
         };
     }
 
-    private UnknownNode ParseNode(
-        YamlParserCursor cursor)
+    private UnknownNode ParseNode(YamlParserCursor cursor)
     {
         if (cursor.Is<Scalar>())
         {
@@ -39,20 +36,17 @@ internal sealed class UnknownNodeParser
             return ParseSequence(cursor);
         }
 
-#pragma warning disable IDE0046 // Convert to conditional expression
         if (cursor.Is<MappingStart>())
         {
             return ParseMapping(cursor);
         }
-#pragma warning restore IDE0046 // Convert to conditional expression
 
         throw cursor.CreateParsingException(
             "Unsupported unknown node");
     }
 
 #pragma warning disable CA1822 // Mark members as static
-    private UnknownScalarNode ParseScalar(
-        YamlParserCursor cursor)
+    private UnknownScalarNode ParseScalar(YamlParserCursor cursor)
 #pragma warning restore CA1822 // Mark members as static
     {
         var scalar = cursor.Read<Scalar>();
@@ -66,8 +60,7 @@ internal sealed class UnknownNodeParser
         };
     }
 
-    private UnknownSequenceNode ParseSequence(
-        YamlParserCursor cursor)
+    private UnknownSequenceNode ParseSequence(YamlParserCursor cursor)
     {
         var start = cursor.Read<SequenceStart>();
 
@@ -89,8 +82,7 @@ internal sealed class UnknownNodeParser
         };
     }
 
-    private UnknownMappingNode ParseMapping(
-        YamlParserCursor cursor)
+    private UnknownMappingNode ParseMapping(YamlParserCursor cursor)
     {
         var start = cursor.Read<MappingStart>();
 

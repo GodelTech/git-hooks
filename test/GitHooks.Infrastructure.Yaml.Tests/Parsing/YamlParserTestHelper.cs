@@ -16,10 +16,7 @@ internal static class YamlParserTestHelper
 
         var parser = TestParserFactory.Create();
 
-        var result =
-            parser.Parse(
-                yaml,
-                "test.yaml");
+        var result = parser.Parse(yaml, "test.yaml");
 
         var root = Assert.IsType<PipelineNode>(result.Root);
 
@@ -28,10 +25,10 @@ internal static class YamlParserTestHelper
         var testClass = Path.GetFileNameWithoutExtension(sourceFilePath);
 
         await Verify(output)
-             .UseDirectory(
+            .UseDirectory(
                 Path.Combine(
                     "Snapshots",
                     testClass))
-             .UseFileName(memberName);
+            .UseFileName(memberName);
     }
 }

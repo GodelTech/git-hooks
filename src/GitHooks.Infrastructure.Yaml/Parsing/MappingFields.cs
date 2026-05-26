@@ -9,21 +9,19 @@ namespace GitHooks.Infrastructure.Yaml.Parsing;
 internal sealed class MappingFields(
     UnknownNodeParser unknownNodeParser)
 {
-    private readonly UnknownNodeParser _unknownNodeParser =
-        unknownNodeParser
-        ?? throw new ArgumentNullException(nameof(unknownNodeParser));
+    private readonly UnknownNodeParser _unknownNodeParser
+        = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
 
-    private readonly Dictionary<string, SourceSpan> _fields =
-        new(StringComparer.Ordinal);
+    private readonly Dictionary<string, SourceSpan> _fields
+        = new(StringComparer.Ordinal);
 
-    private readonly List<UnknownFieldNode> _unknownFields = [];
+    private readonly List<UnknownFieldNode> _unknownFields
+        = [];
 
-    public IReadOnlyList<UnknownFieldNode> UnknownFields =>
-        _unknownFields;
+    public IReadOnlyList<UnknownFieldNode> UnknownFields
+        => _unknownFields;
 
-    public void MarkSeen(
-        string fieldName,
-        YamlParserCursor cursor)
+    public void MarkSeen(string fieldName, YamlParserCursor cursor)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(fieldName);
         ArgumentNullException.ThrowIfNull(cursor);
@@ -41,9 +39,7 @@ internal sealed class MappingFields(
             cursor.CurrentSpan());
     }
 
-    public void AddUnknownField(
-        Scalar key,
-        YamlParserCursor cursor)
+    public void AddUnknownField(Scalar key, YamlParserCursor cursor)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(cursor);

@@ -96,6 +96,7 @@ csharp_preserve_single_line_statements = false
 csharp_style_unused_value_assignment_preference = discard_variable:warning
 
 dotnet_style_prefer_collection_expression = when_types_loosely_match:warning
+dotnet_style_prefer_conditional_expression_over_return = false
 dotnet_style_readonly_field = true:warning
 
 # Analyzer categories
