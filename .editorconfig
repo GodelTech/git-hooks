@@ -143,6 +143,8 @@ dotnet_diagnostic.CA1822.severity = warning
 
 # CA1713: Events should not have Before or After prefix
 dotnet_diagnostic.CA1713.severity = error
+# CA1720: Identifiers should not contain type names
+dotnet_diagnostic.CA1720.severity = none
 # CA1724: Type names should not match namespaces
 dotnet_diagnostic.CA1724.severity = error
 # IDE1006: Naming rule violation

@@ -14,7 +14,7 @@ public sealed class AstPrinterTests
             [
                 TestAst.Parameter(
                     name: "configuration",
-                    value: "Release")
+                    defaultValue: "Release")
             ],
             steps:
             [
@@ -30,7 +30,8 @@ public sealed class AstPrinterTests
             """
             Pipeline
               Parameter(configuration)
-                String("Release")
+                Type(String)
+                DefaultValue("Release")
               ScriptStep
                 String("dotnet test")
             """,
@@ -104,7 +105,7 @@ public sealed class AstPrinterTests
             [
                 TestAst.Parameter(
                     name: "configuration",
-                    value: "Release")
+                    defaultValue: "Release")
             ]);
 
         var printer = new AstPrinter(
@@ -119,7 +120,8 @@ public sealed class AstPrinterTests
             """
             Pipeline
                 Parameter(configuration)
-                    String("Release")
+                    Type(String)
+                    DefaultValue("Release")
             """,
             result);
     }

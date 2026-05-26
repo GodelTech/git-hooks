@@ -2,6 +2,7 @@ using GitHooks.Diagnostics.Rendering;
 using GitHooks.Domain.Ast;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Mappings;
+using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Domain.Ast.Visitors;
@@ -36,25 +37,14 @@ public sealed class AstPrinter
         ArgumentNullException.ThrowIfNull(node);
 
         AppendNodeHeader(
-            node,
-            "Pipeline");
+            "Pipeline",
+            node);
 
         using (_builder.Indent())
         {
-            foreach (var parameter in node.Parameters)
-            {
-                parameter.Accept(this);
-            }
-
-            foreach (var step in node.Steps)
-            {
-                step.Accept(this);
-            }
-
-            foreach (var unknownField in node.UnknownFields)
-            {
-                unknownField.Accept(this);
-            }
+            VisitNodes(node.Parameters);
+            VisitNodes(node.Steps);
+            VisitNodes(node.UnknownFields);
         }
     }
 
@@ -63,17 +53,17 @@ public sealed class AstPrinter
         ArgumentNullException.ThrowIfNull(node);
 
         AppendNodeHeader(
-            node,
-            $"Parameter({node.Name})");
+            $"Parameter({node.Name})",
+            node);
 
         using (_builder.Indent())
         {
-            node.Value.Accept(this);
+            AppendField("DisplayName", node.DisplayName);
+            AppendField("Type", node.Type);
+            AppendField("DefaultValue", node.DefaultValue);
+            AppendField("Values", node.Values);
 
-            foreach (var unknownField in node.UnknownFields)
-            {
-                unknownField.Accept(this);
-            }
+            VisitNodes(node.UnknownFields);
         }
     }
 
@@ -82,17 +72,14 @@ public sealed class AstPrinter
         ArgumentNullException.ThrowIfNull(node);
 
         AppendNodeHeader(
-            node,
-            "ScriptStep");
+            "ScriptStep",
+            node);
 
         using (_builder.Indent())
         {
             node.Script.Accept(this);
 
-            foreach (var unknownField in node.UnknownFields)
-            {
-                unknownField.Accept(this);
-            }
+            VisitNodes(node.UnknownFields);
         }
     }
 
@@ -101,8 +88,8 @@ public sealed class AstPrinter
         ArgumentNullException.ThrowIfNull(node);
 
         AppendNodeHeader(
-            node,
-            $"Boolean({node.Value})");
+            $"Boolean({node.Value})",
+            node);
     }
 
     public void Visit(IntegerLiteralExpressionNode node)
@@ -110,8 +97,8 @@ public sealed class AstPrinter
         ArgumentNullException.ThrowIfNull(node);
 
         AppendNodeHeader(
-            node,
-            $"Integer({node.Value})");
+            $"Integer({node.Value})",
+            node);
     }
 
     public void Visit(StringLiteralExpressionNode node)
@@ -119,8 +106,8 @@ public sealed class AstPrinter
         ArgumentNullException.ThrowIfNull(node);
 
         AppendNodeHeader(
-            node,
-            $"String({Quote(node.Value)})");
+            $"String({StringRenderer.RenderQuoted(node.Value)})",
+            node);
     }
 
     public void VisitUnknownNode(UnknownNode node)
@@ -151,24 +138,7 @@ public sealed class AstPrinter
         }
     }
 
-    private static string Quote(string value)
-    {
-        return $"\"{Escape(value)}\"";
-    }
-
-    private static string Escape(string value)
-    {
-        return value
-            .Replace("\\", "\\\\", StringComparison.Ordinal)
-            .Replace("\"", "\\\"", StringComparison.Ordinal)
-            .Replace("\n", "\\n", StringComparison.Ordinal)
-            .Replace("\r", "\\r", StringComparison.Ordinal)
-            .Replace("\t", "\\t", StringComparison.Ordinal);
-    }
-
-    private void AppendNodeHeader(
-        AstNode node,
-        string text)
+    private void AppendNodeHeader(string text, AstNode node)
     {
         var output = text;
 
@@ -185,11 +155,53 @@ public sealed class AstPrinter
         _builder.AppendLine(output);
     }
 
+    private void AppendField(string name, string? value)
+    {
+        if (value is not null)
+        {
+            _builder.AppendLine($"{name}({StringRenderer.RenderQuoted(value)})");
+        }
+    }
+
+    private void AppendField(string name, Enum? value)
+    {
+        if (value is not null)
+        {
+            _builder.AppendLine($"{name}({value})");
+        }
+    }
+
+    private void AppendField(string name, IReadOnlyList<string> values)
+    {
+        if (values.Count == 0)
+        {
+            return;
+        }
+
+        _builder.AppendLine(name);
+
+        using (_builder.Indent())
+        {
+            foreach (var value in values)
+            {
+                _builder.AppendLine(StringRenderer.RenderQuoted(value));
+            }
+        }
+    }
+
+    private void VisitNodes(IEnumerable<AstNode> nodes)
+    {
+        foreach (var node in nodes)
+        {
+            node.Accept(this);
+        }
+    }
+
     private void VisitUnknownField(UnknownFieldNode node)
     {
         AppendNodeHeader(
-            node,
-            $"UnknownField({node.Key})");
+            $"UnknownField({node.Key})",
+            node);
 
         using (_builder.Indent())
         {
@@ -200,15 +212,15 @@ public sealed class AstPrinter
     private void VisitUnknownScalar(UnknownScalarNode node)
     {
         AppendNodeHeader(
-            node,
-            $"UnknownScalar({Quote(node.Value)})");
+            $"UnknownScalar({StringRenderer.RenderQuoted(node.Value)})",
+            node);
     }
 
     private void VisitUnknownSequence(UnknownSequenceNode node)
     {
         AppendNodeHeader(
-            node,
-            "UnknownSequence");
+            "UnknownSequence",
+            node);
 
         using (_builder.Indent())
         {
@@ -222,8 +234,8 @@ public sealed class AstPrinter
     private void VisitUnknownMapping(UnknownMappingNode node)
     {
         AppendNodeHeader(
-            node,
-            "UnknownMapping");
+            "UnknownMapping",
+            node);
 
         using (_builder.Indent())
         {

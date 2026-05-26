@@ -1,5 +1,6 @@
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Mappings;
+using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Domain.Common;
@@ -55,18 +56,18 @@ public static class TestAst
 
     public static ParameterNode Parameter(
         string name,
-        string value,
+        string defaultValue,
         IEnumerable<UnknownFieldNode> unknownFields,
         SourceSpan span)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+        ArgumentException.ThrowIfNullOrWhiteSpace(defaultValue);
         ArgumentNullException.ThrowIfNull(unknownFields);
 
         return new()
         {
             Name = name,
-            Value = StringLiteral(value, span),
+            DefaultValue = defaultValue,
             UnknownFields = [.. unknownFields],
             Span = span
         };
@@ -74,12 +75,12 @@ public static class TestAst
 
     public static ParameterNode Parameter(
         string name = "configuration",
-        string value = "Release",
+        string defaultValue = "Release",
         IEnumerable<UnknownFieldNode>? unknownFields = null)
     {
         return Parameter(
             name,
-            value,
+            defaultValue,
             unknownFields ?? EmptyUnknownFields,
             SourceSpan.Unknown);
     }

@@ -12,7 +12,7 @@ public sealed class AstCreationTests
             [
                 TestAst.Parameter(
                     name: "configuration",
-                    value: "Release")
+                    defaultValue: "Release")
             ],
             steps:
             [

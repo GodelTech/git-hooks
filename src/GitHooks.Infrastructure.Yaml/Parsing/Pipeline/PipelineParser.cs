@@ -1,4 +1,5 @@
 using GitHooks.Domain.Ast.Mappings;
+using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;

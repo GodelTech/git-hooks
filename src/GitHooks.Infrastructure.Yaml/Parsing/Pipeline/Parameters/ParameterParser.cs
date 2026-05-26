@@ -1,4 +1,4 @@
-using GitHooks.Domain.Ast.Mappings;
+using GitHooks.Domain.Ast.Mappings.Parameters;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 
