@@ -27,7 +27,7 @@ public sealed class AstPrinter
 
         _builder.Clear();
 
-        node.Accept(this);
+        VisitNode(node);
 
         return _builder.ToString();
     }
@@ -77,7 +77,7 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            node.Script.Accept(this);
+            VisitNode(node.Script);
 
             VisitNodes(node.UnknownFields);
         }
@@ -189,11 +189,16 @@ public sealed class AstPrinter
         }
     }
 
+    private void VisitNode(AstNode node)
+    {
+        node.Accept(this);
+    }
+
     private void VisitNodes(IEnumerable<AstNode> nodes)
     {
         foreach (var node in nodes)
         {
-            node.Accept(this);
+            VisitNode(node);
         }
     }
 
@@ -205,7 +210,7 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            node.Value.Accept(this);
+            VisitNode(node.Value);
         }
     }
 
@@ -224,10 +229,7 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            foreach (var item in node.Items)
-            {
-                item.Accept(this);
-            }
+            VisitNodes(node.Items);
         }
     }
 
@@ -239,10 +241,7 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            foreach (var field in node.Fields)
-            {
-                field.Accept(this);
-            }
+            VisitNodes(node.Fields);
         }
     }
 }
