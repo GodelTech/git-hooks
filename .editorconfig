@@ -122,8 +122,6 @@ dotnet_diagnostic.CA1052.severity = warning
 dotnet_diagnostic.CA1062.severity = warning
 # CA1063: Implement IDisposable correctly
 dotnet_diagnostic.CA1063.severity = warning
-# CA1064: Exceptions should be public
-dotnet_diagnostic.CA1064.severity = warning
 # CA1065: Do not raise exceptions in unexpected locations
 dotnet_diagnostic.CA1065.severity = warning
 

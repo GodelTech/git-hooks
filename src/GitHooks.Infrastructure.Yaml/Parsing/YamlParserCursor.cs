@@ -1,4 +1,5 @@
 using GitHooks.Domain.Common;
+using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -33,7 +34,7 @@ internal sealed class YamlParserCursor(
         where T : ParsingEvent
     {
         return !_parser.TryConsume<T>(out var parsingEvent)
-            ? throw CreateInvalidOperationException($"Expected {typeof(T).Name}")
+            ? throw CreateParsingException($"Expected {typeof(T).Name}")
             : parsingEvent;
     }
 
@@ -80,24 +81,25 @@ internal sealed class YamlParserCursor(
                 end.Column));
     }
 
-    internal InvalidOperationException CreateInvalidOperationException(string message)
-    {
-        var span = CurrentSpan();
-
-        return new InvalidOperationException(
-            $"{message}, " +
-            $"got {_parser.Current?.GetType().Name ?? "EOF"} " +
-            $"in {_sourceName} " +
-            $"at {span.Start.Line}:{span.Start.Column}"
-        );
-    }
-
-    private SourceSpan CurrentSpan()
+    public SourceSpan CurrentSpan()
     {
         var mark = _parser.Current?.Start;
 
         return mark is null
             ? SourceSpan.Unknown
             : CreateSpan(mark.Value, mark.Value);
+    }
+
+    internal YamlPipelineParsingException CreateParsingException(string message)
+    {
+        var span = CurrentSpan();
+
+        return new YamlPipelineParsingException(
+            $"{message}, " +
+            $"got {_parser.Current?.GetType().Name ?? "EOF"} " +
+            $"in {_sourceName} " +
+            $"at {span.Start.Line}:{span.Start.Column}",
+            span
+        );
     }
 }

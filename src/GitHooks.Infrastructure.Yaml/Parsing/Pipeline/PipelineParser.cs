@@ -1,8 +1,8 @@
 using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Ast.Mappings.Steps;
-using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
+using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
 using YamlDotNet.Core.Events;
 
@@ -32,15 +32,16 @@ internal sealed class PipelineParser(
 
         var start = cursor.Read<MappingStart>();
 
+        var fields = new MappingFields(_unknownNodeParser);
+
         IReadOnlyList<ParameterNode> parameters = [];
         IReadOnlyList<StepNode> steps = [];
-        var unknownFields = new List<UnknownFieldNode>();
 
         while (!cursor.Is<MappingEnd>())
         {
             if (!cursor.Is<Scalar>())
             {
-                throw cursor.CreateInvalidOperationException(
+                throw cursor.CreateParsingException(
                     "Expected scalar mapping key");
             }
 
@@ -48,17 +49,19 @@ internal sealed class PipelineParser(
 
             if (key.Value == "parameters")
             {
+                fields.MarkSeen("parameters", cursor);
+
                 parameters = _parametersParser.Parse(cursor);
             }
             else if (key.Value == "steps")
             {
+                fields.MarkSeen("steps", cursor);
+
                 steps = _stepsParser.Parse(cursor);
             }
             else
             {
-                var unknownField = _unknownNodeParser.ParseField(cursor, key);
-
-                unknownFields.Add(unknownField);
+                fields.AddUnknownField(key, cursor);
 
                 break;
             }
@@ -72,7 +75,7 @@ internal sealed class PipelineParser(
         {
             Parameters = parameters,
             Steps = steps,
-            UnknownFields = unknownFields,
+            UnknownFields = fields.UnknownFields,
             Span = span
         };
     }

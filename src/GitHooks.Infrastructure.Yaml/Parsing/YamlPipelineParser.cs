@@ -1,5 +1,6 @@
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Common;
+using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 
 using YamlDotNet.Core;
@@ -57,6 +58,23 @@ internal sealed class YamlPipelineParser(
                     Message = exception.Message,
                     Severity = DiagnosticSeverity.Error,
                     Span = span
+                });
+
+            return new YamlParserResult
+            {
+                Root = null,
+                Diagnostics = diagnostics.Diagnostics
+            };
+        }
+        catch (YamlPipelineParsingException exception)
+        {
+            diagnostics.Report(
+                new Diagnostic
+                {
+                    Code = DiagnosticCodes.InvalidYaml,
+                    Message = exception.Message,
+                    Severity = DiagnosticSeverity.Error,
+                    Span = exception.Span
                 });
 
             return new YamlParserResult

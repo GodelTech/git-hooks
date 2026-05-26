@@ -3,16 +3,16 @@ using GitHooks.Domain.Common;
 
 using YamlDotNet.Core.Events;
 
-namespace GitHooks.Infrastructure.Yaml.Parsing;
+namespace GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
 internal sealed class UnknownNodeParser
 {
     public UnknownFieldNode ParseField(
-        YamlParserCursor cursor,
-        Scalar key)
+        Scalar key,
+        YamlParserCursor cursor)
     {
-        ArgumentNullException.ThrowIfNull(cursor);
         ArgumentNullException.ThrowIfNull(key);
+        ArgumentNullException.ThrowIfNull(cursor);
 
         var value = ParseNode(cursor);
 
@@ -29,8 +29,6 @@ internal sealed class UnknownNodeParser
     private UnknownNode ParseNode(
         YamlParserCursor cursor)
     {
-        ArgumentNullException.ThrowIfNull(cursor);
-
         if (cursor.Is<Scalar>())
         {
             return ParseScalar(cursor);
@@ -48,7 +46,7 @@ internal sealed class UnknownNodeParser
         }
 #pragma warning restore IDE0046 // Convert to conditional expression
 
-        throw cursor.CreateInvalidOperationException(
+        throw cursor.CreateParsingException(
             "Unsupported unknown node");
     }
 
@@ -109,7 +107,7 @@ internal sealed class UnknownNodeParser
 
             var key = cursor.Read<Scalar>();
 
-            fields.Add(ParseField(cursor, key));
+            fields.Add(ParseField(key, cursor));
         }
 
         var end = cursor.Read<MappingEnd>();
