@@ -1,0 +1,6 @@
+﻿Pipeline
+  ScriptStep
+    String("echo first")
+
+  ScriptStep
+    String("echo second")

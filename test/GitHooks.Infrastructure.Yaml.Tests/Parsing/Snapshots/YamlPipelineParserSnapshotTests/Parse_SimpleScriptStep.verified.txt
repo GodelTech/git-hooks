@@ -1,0 +1,3 @@
+﻿Pipeline
+  ScriptStep
+    String("echo hello")

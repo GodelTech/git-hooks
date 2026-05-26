@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="10.0.0" />
+    <PackageVersion Include="DiffEngine" Version="19.2.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="10.0.7" />
@@ -11,6 +12,7 @@
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <PackageVersion Include="Spectre.Console" Version="0.55.2" />
     <PackageVersion Include="System.CommandLine" Version="2.0.7" />
+    <PackageVersion Include="Verify.XunitV3" Version="31.18.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
     <PackageVersion Include="YamlDotNet" Version="18.0.0" />

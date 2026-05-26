@@ -13,6 +13,7 @@
   <Folder Name="/test/">
     <Project Path="test/GitHooks.Diagnostics.Tests/GitHooks.Diagnostics.Tests.csproj" Id="9486d7dd-23a1-4f1c-8df4-2b34cea89c6a" />
     <Project Path="test/GitHooks.Domain.Tests/GitHooks.Domain.Tests.csproj" Id="19bdbd66-3569-436a-86ba-5109288cfeca" />
+    <Project Path="test/GitHooks.Infrastructure.Yaml.Tests/GitHooks.Infrastructure.Yaml.Tests.csproj" Id="bea66777-fbab-41d5-ba52-113f93c36064" />
     <Project Path="test/GitHooks.Testing/GitHooks.Testing.csproj" Id="511de8c3-6fcc-40e2-8a3c-0c6dd172f4c1" />
     <Project Path="test/GitHooks.Tests/GitHooks.Tests.csproj" Id="b3138dc6-0147-4d0f-b1ae-a14b1ca2e984" />
     <Project Path="test/GitHooks.Workflow.Application.Tests/GitHooks.Workflow.Application.Tests.csproj" Id="512cef9d-5d8a-4e90-8838-e11c7b463b0b" />

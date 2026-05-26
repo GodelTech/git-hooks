@@ -1,0 +1,8 @@
+﻿Pipeline
+  Parameter(configuration)
+    DisplayName("Build configuration")
+    Type(String)
+    Default("Debug")
+    Values
+      "Debug"
+      "Release"

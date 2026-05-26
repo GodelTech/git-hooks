@@ -1,0 +1,9 @@
+﻿Pipeline
+  ScriptStep
+    String("echo hello")
+
+  UnknownField(custom)
+    UnknownMapping
+      UnknownField(nested)
+        UnknownSequence
+          UnknownScalar("value")

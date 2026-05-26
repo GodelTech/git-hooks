@@ -1,0 +1,9 @@
+Pipeline
+  UnknownField(unknown)
+    UnknownMapping
+      UnknownField(nested)
+        UnknownMapping
+          UnknownField(child)
+            UnknownMapping
+              UnknownField(value)
+                UnknownScalar("test")

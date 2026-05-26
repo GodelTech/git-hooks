@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="DiffEngine" />
+    <PackageReference Include="Verify.XunitV3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GitHooks.Infrastructure.Yaml\GitHooks.Infrastructure.Yaml.csproj" />
+  </ItemGroup>
+
+</Project>

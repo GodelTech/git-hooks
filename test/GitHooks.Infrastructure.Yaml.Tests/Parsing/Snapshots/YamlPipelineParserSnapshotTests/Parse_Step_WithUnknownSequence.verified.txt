@@ -1,0 +1,6 @@
+﻿Pipeline
+  ScriptStep
+    String("echo hello")
+
+    UnknownField(retry)
+      UnknownScalar("3")
