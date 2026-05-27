@@ -1,3 +1,5 @@
+using System.Globalization;
+
 using GitHooks.Domain.Common;
 
 namespace GitHooks.Diagnostics.Rendering;
@@ -19,11 +21,11 @@ public static class SourceSpanRenderer
         }
 
         var line = position.HasKnownLine
-            ? position.Line.ToString()
+            ? position.Line.ToString(CultureInfo.InvariantCulture)
             : "?";
 
         var column = position.HasKnownColumn
-            ? position.Column.ToString()
+            ? position.Column.ToString(CultureInfo.InvariantCulture)
             : "?";
 
         return $"{line}:{column}";

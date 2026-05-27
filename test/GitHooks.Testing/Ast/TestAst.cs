@@ -9,9 +9,9 @@ namespace GitHooks.Testing.Ast;
 
 public static class TestAst
 {
-    private static readonly ParameterNode[] EmptyParameters = [];
-    private static readonly StepNode[] EmptySteps = [];
-    private static readonly UnknownFieldNode[] EmptyUnknownFields = [];
+    private static readonly ParameterNode[] s_emptyParameters = [];
+    private static readonly StepNode[] s_emptySteps = [];
+    private static readonly UnknownFieldNode[] s_emptyUnknownFields = [];
 
     public static PipelineNode Pipeline(
         IEnumerable<ParameterNode> parameters,
@@ -36,9 +36,9 @@ public static class TestAst
         SourceSpan span)
     {
         return Pipeline(
-            EmptyParameters,
-            EmptySteps,
-            EmptyUnknownFields,
+            s_emptyParameters,
+            s_emptySteps,
+            s_emptyUnknownFields,
             span);
     }
 
@@ -48,9 +48,9 @@ public static class TestAst
         IEnumerable<UnknownFieldNode>? unknownFields = null)
     {
         return Pipeline(
-            parameters ?? EmptyParameters,
-            steps ?? EmptySteps,
-            unknownFields ?? EmptyUnknownFields,
+            parameters ?? s_emptyParameters,
+            steps ?? s_emptySteps,
+            unknownFields ?? s_emptyUnknownFields,
             SourceSpan.Unknown);
     }
 
@@ -81,7 +81,7 @@ public static class TestAst
         return Parameter(
             name,
             defaultValue,
-            unknownFields ?? EmptyUnknownFields,
+            unknownFields ?? s_emptyUnknownFields,
             SourceSpan.Unknown);
     }
 
@@ -106,7 +106,7 @@ public static class TestAst
     {
         return Script(
             script,
-            unknownFields ?? EmptyUnknownFields,
+            unknownFields ?? s_emptyUnknownFields,
             SourceSpan.Unknown);
     }
 

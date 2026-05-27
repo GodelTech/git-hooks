@@ -350,6 +350,7 @@ dotnet_diagnostic.IDE0058.severity = none
 # IDE0290: Use primary constructor
 # Explicit constructor preferred in test classes for clarity
 dotnet_diagnostic.IDE0290.severity = none
-# IDE1006: Naming rule violation
-# Test methods and helpers don't need to follow strict naming conventions.
-dotnet_diagnostic.IDE1006.severity = none
+
+[test/**/*Tests.cs]
+# Async test methods do not require Async suffix
+dotnet_naming_rule.async_methods_must_end_with_async.severity = none

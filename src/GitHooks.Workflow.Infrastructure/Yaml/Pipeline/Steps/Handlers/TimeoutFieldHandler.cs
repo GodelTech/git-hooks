@@ -1,3 +1,5 @@
+using System.Globalization;
+
 using YamlDotNet.Core.Events;
 
 namespace GitHooks.Workflow.Infrastructure.Yaml.Pipeline.Steps.Handlers;
@@ -11,7 +13,7 @@ internal sealed class TimeoutFieldHandler
     {
         return fields with
         {
-            TimeoutInMinutes = int.Parse(reader.Read<Scalar>().Value)
+            TimeoutInMinutes = int.Parse(reader.Read<Scalar>().Value, CultureInfo.InvariantCulture)
         };
     }
 }

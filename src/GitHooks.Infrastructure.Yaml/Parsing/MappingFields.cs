@@ -13,7 +13,7 @@ internal sealed class MappingFields(
         = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
 
     private readonly Dictionary<string, SourceSpan> _fields
-        = new(StringComparer.Ordinal);
+        = new(StringComparer.OrdinalIgnoreCase);
 
     private readonly List<UnknownFieldNode> _unknownFields
         = [];
@@ -21,10 +21,12 @@ internal sealed class MappingFields(
     public IReadOnlyList<UnknownFieldNode> UnknownFields
         => _unknownFields;
 
-    public void MarkSeen(string fieldName, YamlParserCursor cursor)
+    public void MarkSeen(Scalar key, YamlParserCursor cursor)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(fieldName);
+        ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(cursor);
+
+        var fieldName = key.Value;
 
         if (_fields.TryGetValue(fieldName, out var existing))
         {

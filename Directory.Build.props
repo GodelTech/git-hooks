@@ -8,8 +8,9 @@
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <AnalysisLevel>latest</AnalysisLevel>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 

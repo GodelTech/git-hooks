@@ -31,22 +31,22 @@ public sealed class DiagnosticPrinter(
 
         if (_options.IncludeSeverity)
         {
-            _ = builder.Append(
-                $"{diagnostic.Severity} ");
+            _ = builder.Append(diagnostic.Severity);
+            _ = builder.Append(' ');
         }
 
         if (_options.IncludeCodes)
         {
-            _ = builder.Append(
-                $"{diagnostic.Code}: ");
+            _ = builder.Append(diagnostic.Code);
+            _ = builder.Append(": ");
         }
 
         _ = builder.Append(diagnostic.Message);
 
         if (_options.IncludeSourceSpans)
         {
-            _ = builder.Append(
-                $" @ {SourceSpanRenderer.Render(diagnostic.Span)}");
+            _ = builder.Append(" @ ");
+            _ = builder.Append(SourceSpanRenderer.Render(diagnostic.Span));
         }
 
         return builder.ToString();

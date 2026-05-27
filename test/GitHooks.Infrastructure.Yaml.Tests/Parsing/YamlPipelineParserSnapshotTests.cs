@@ -7,14 +7,14 @@ public sealed class YamlPipelineParserSnapshotTests
     [Fact]
     public async Task Parse_EmptyPipeline()
     {
-        await VerifyAst(
+        await VerifyAstAsync(
             "{}");
     }
 
     [Fact]
     public async Task Parse_SimpleScriptStep()
     {
-        await VerifyAst(
+        await VerifyAstAsync(
             """
             steps:
               - script: echo hello
@@ -24,7 +24,7 @@ public sealed class YamlPipelineParserSnapshotTests
     [Fact]
     public async Task Parse_Parameter()
     {
-        await VerifyAst(
+        await VerifyAstAsync(
             """
             parameters:
               - name: configuration
@@ -40,7 +40,7 @@ public sealed class YamlPipelineParserSnapshotTests
     [Fact]
     public async Task Parse_UnknownField()
     {
-        await VerifyAst(
+        await VerifyAstAsync(
             """
             steps:
               - script: echo hello
@@ -54,7 +54,7 @@ public sealed class YamlPipelineParserSnapshotTests
     [Fact]
     public async Task Parse_UnknownStepField()
     {
-        await VerifyAst(
+        await VerifyAstAsync(
             """
             steps:
               - script: echo hello
@@ -65,7 +65,7 @@ public sealed class YamlPipelineParserSnapshotTests
     [Fact]
     public async Task Parse_UnknownNestedSequence()
     {
-        await VerifyAst(
+        await VerifyAstAsync(
             """
             unknown:
               - - - value
@@ -75,7 +75,7 @@ public sealed class YamlPipelineParserSnapshotTests
     [Fact]
     public async Task Parse_UnknownNestedMapping()
     {
-        await VerifyAst(
+        await VerifyAstAsync(
             """
             unknown:
               nested:
@@ -87,7 +87,7 @@ public sealed class YamlPipelineParserSnapshotTests
     [Fact]
     public async Task Parse_MultipleSteps()
     {
-        await VerifyAst(
+        await VerifyAstAsync(
             """
             steps:
               - script: echo first
@@ -99,7 +99,7 @@ public sealed class YamlPipelineParserSnapshotTests
     [Fact]
     public async Task Parse_Parameter_WithUnknownField()
     {
-        await VerifyAst(
+        await VerifyAstAsync(
             """
             parameters:
               - name: configuration
@@ -110,7 +110,7 @@ public sealed class YamlPipelineParserSnapshotTests
     [Fact]
     public async Task Parse_Step_WithUnknownSequence()
     {
-        await VerifyAst(
+        await VerifyAstAsync(
             """
             steps:
               - script: echo hello

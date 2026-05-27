@@ -44,23 +44,21 @@ internal sealed class PipelineParser(
 
             var key = cursor.Read<Scalar>();
 
-            if (key.Value == "parameters")
+            switch (key.Value.ToLowerInvariant())
             {
-                fields.MarkSeen("parameters", cursor);
+                case "parameters":
+                    fields.MarkSeen(key, cursor);
+                    parameters = _parametersParser.Parse(cursor);
+                    break;
 
-                parameters = _parametersParser.Parse(cursor);
-            }
-            else if (key.Value == "steps")
-            {
-                fields.MarkSeen("steps", cursor);
+                case "steps":
+                    fields.MarkSeen(key, cursor);
+                    steps = _stepsParser.Parse(cursor);
+                    break;
 
-                steps = _stepsParser.Parse(cursor);
-            }
-            else
-            {
-                fields.AddUnknownField(key, cursor);
-
-                break;
+                default:
+                    fields.AddUnknownField(key, cursor);
+                    break;
             }
         }
 

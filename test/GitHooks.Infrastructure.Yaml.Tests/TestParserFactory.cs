@@ -16,7 +16,8 @@ internal static class TestParserFactory
 
         // parameters
         var parameterParser =
-            new ParameterParser();
+            new ParameterParser(
+                unknownNodeParser);
 
         var parametersParser =
             new ParametersParser(
