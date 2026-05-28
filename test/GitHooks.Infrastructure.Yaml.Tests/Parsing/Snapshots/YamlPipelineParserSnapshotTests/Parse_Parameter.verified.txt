@@ -1,8 +1,0 @@
-Pipeline
-  Parameter(configuration)
-    DisplayName("Build configuration")
-    Type(String)
-    DefaultValue("Debug")
-    Values
-      "Debug"
-      "Release"

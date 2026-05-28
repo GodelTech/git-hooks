@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using GitHooks.Diagnostics.Ast.Printing;
 using GitHooks.Diagnostics.Printing;
 using GitHooks.Domain.Ast.Mappings;
+using GitHooks.Testing.Snapshots;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
 
@@ -26,13 +27,9 @@ internal static class YamlParserTestHelper
             ? s_astPrinter.Print(root)
             : s_diagnosticPrinter.Print(result.Diagnostics);
 
-        var testClass = Path.GetFileNameWithoutExtension(sourceFilePath);
-
-        await Verify(output)
-            .UseDirectory(
-                Path.Combine(
-                    "Snapshots",
-                    testClass))
-            .UseFileName(memberName);
+        await SnapshotVerifier.VerifyAsync(
+            output,
+            memberName,
+            sourceFilePath);
     }
 }

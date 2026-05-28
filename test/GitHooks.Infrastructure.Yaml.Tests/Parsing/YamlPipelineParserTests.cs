@@ -2,7 +2,7 @@ using static GitHooks.Infrastructure.Yaml.Tests.Parsing.YamlParserTestHelper;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
 
-public sealed class YamlPipelineParserSnapshotTests
+public sealed class YamlPipelineParserTests
 {
     [Fact]
     public async Task Parse_EmptyPipeline()

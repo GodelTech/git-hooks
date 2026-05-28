@@ -1,4 +1,5 @@
 using GitHooks.Infrastructure.Yaml.Parsing;
+using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
@@ -14,9 +15,14 @@ internal static class TestParserFactory
         var unknownNodeParser =
             new UnknownNodeParser();
 
+        // expressions
+        var expressionParser =
+            new ExpressionParser();
+
         // parameters
         var parameterParser =
             new ParameterParser(
+                expressionParser,
                 unknownNodeParser);
 
         var parametersParser =
@@ -24,8 +30,12 @@ internal static class TestParserFactory
                 parameterParser);
 
         // steps
+        var stepParser =
+            new StepParser();
+
         var stepsParser =
-            new StepsParser();
+            new StepsParser(
+                stepParser);
 
         var pipelineParser =
             new PipelineParser(

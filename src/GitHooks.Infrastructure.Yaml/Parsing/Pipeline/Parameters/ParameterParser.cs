@@ -1,4 +1,6 @@
+using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Mappings.Parameters;
+using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
 using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
 using YamlDotNet.Core.Events;
@@ -6,10 +8,14 @@ using YamlDotNet.Core.Events;
 namespace GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 
 internal sealed class ParameterParser(
+    ExpressionParser expressionParser,
     UnknownNodeParser unknownNodeParser)
 {
-    private static readonly IReadOnlyList<string> s_emptyValues
+    private static readonly IReadOnlyList<ExpressionNode> s_emptyValues
         = [];
+
+    private readonly ExpressionParser _expressionParser
+        = expressionParser ?? throw new ArgumentNullException(nameof(expressionParser));
 
     private readonly UnknownNodeParser _unknownNodeParser
         = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
@@ -25,8 +31,8 @@ internal sealed class ParameterParser(
         string? name = null;
         string? displayName = null;
         var type = ParameterType.String;
-        string? defaultValue = null;
-        List<string>? values = null;
+        ExpressionNode? defaultValue = null;
+        List<ExpressionNode>? values = null;
 
         while (!cursor.Is<MappingEnd>())
         {
@@ -57,7 +63,7 @@ internal sealed class ParameterParser(
 
                 case "default":
                     fields.MarkSeen(key, cursor);
-                    defaultValue = cursor.Read<Scalar>().Value;
+                    defaultValue = _expressionParser.Parse(cursor);
                     break;
 
                 case "values":
@@ -109,15 +115,15 @@ internal sealed class ParameterParser(
         };
     }
 
-    private static List<string> ParseValues(YamlParserCursor cursor)
+    private List<ExpressionNode> ParseValues(YamlParserCursor cursor)
     {
-        var values = new List<string>();
+        var values = new List<ExpressionNode>();
 
         _ = cursor.Read<SequenceStart>();
 
         while (!cursor.Is<SequenceEnd>())
         {
-            var value = cursor.Read<Scalar>().Value;
+            var value = _expressionParser.Parse(cursor);
 
             values.Add(value);
         }

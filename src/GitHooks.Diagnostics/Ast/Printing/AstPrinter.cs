@@ -60,8 +60,8 @@ public sealed class AstPrinter
         {
             AppendField("DisplayName", node.DisplayName);
             AppendField("Type", node.Type);
-            AppendField("DefaultValue", node.DefaultValue);
-            AppendField("Values", node.Values);
+            AppendExpression("DefaultValue", node.DefaultValue);
+            AppendExpressionCollection("Values", node.Values);
 
             VisitNodes(node.UnknownFields);
         }
@@ -171,20 +171,35 @@ public sealed class AstPrinter
         }
     }
 
-    private void AppendField(string name, IReadOnlyList<string> values)
+    private void AppendExpression(string fieldName, ExpressionNode? expression)
     {
-        if (values.Count == 0)
+        if (expression is null)
         {
             return;
         }
 
-        _builder.AppendLine(name);
+        _builder.AppendLine($"{fieldName}:");
 
         using (_builder.Indent())
         {
-            foreach (var value in values)
+            expression.Accept(this);
+        }
+    }
+
+    private void AppendExpressionCollection(string fieldName, IReadOnlyList<ExpressionNode> expressions)
+    {
+        if (expressions.Count is 0)
+        {
+            return;
+        }
+
+        _builder.AppendLine($"{fieldName}:");
+
+        using (_builder.Indent())
+        {
+            foreach (var expression in expressions)
             {
-                _builder.AppendLine(StringRenderer.RenderQuoted(value));
+                expression.Accept(this);
             }
         }
     }

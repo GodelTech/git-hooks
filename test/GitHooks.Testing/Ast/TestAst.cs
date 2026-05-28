@@ -56,12 +56,12 @@ public static class TestAst
 
     public static ParameterNode Parameter(
         string name,
-        string defaultValue,
+        ExpressionNode defaultValue,
         IEnumerable<UnknownFieldNode> unknownFields,
         SourceSpan span)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        ArgumentException.ThrowIfNullOrWhiteSpace(defaultValue);
+        ArgumentNullException.ThrowIfNull(defaultValue);
         ArgumentNullException.ThrowIfNull(unknownFields);
 
         return new()
@@ -75,17 +75,17 @@ public static class TestAst
 
     public static ParameterNode Parameter(
         string name = "configuration",
-        string defaultValue = "Release",
+        ExpressionNode? defaultValue = null,
         IEnumerable<UnknownFieldNode>? unknownFields = null)
     {
         return Parameter(
             name,
-            defaultValue,
+            defaultValue ?? StringLiteral("Release", SourceSpan.Unknown),
             unknownFields ?? s_emptyUnknownFields,
             SourceSpan.Unknown);
     }
 
-    public static ScriptStepNode Script(
+    public static ScriptStepNode ScriptStep(
         string script,
         IEnumerable<UnknownFieldNode> unknownFields,
         SourceSpan span)
@@ -100,17 +100,17 @@ public static class TestAst
         };
     }
 
-    public static ScriptStepNode Script(
+    public static ScriptStepNode ScriptStep(
         string script = "dotnet test",
         IEnumerable<UnknownFieldNode>? unknownFields = null)
     {
-        return Script(
+        return ScriptStep(
             script,
             unknownFields ?? s_emptyUnknownFields,
             SourceSpan.Unknown);
     }
 
-    private static StringLiteralExpressionNode StringLiteral(
+    public static StringLiteralExpressionNode StringLiteral(
         string value,
         SourceSpan span)
     {
@@ -119,5 +119,13 @@ public static class TestAst
             Value = value,
             Span = span
         };
+    }
+
+    public static StringLiteralExpressionNode StringLiteral(
+        string value)
+    {
+        return StringLiteral(
+            value,
+            SourceSpan.Unknown);
     }
 }

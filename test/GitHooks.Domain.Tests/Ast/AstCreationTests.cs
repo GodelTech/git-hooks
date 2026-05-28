@@ -12,11 +12,12 @@ public sealed class AstCreationTests
             [
                 TestAst.Parameter(
                     name: "configuration",
-                    defaultValue: "Release")
+                    defaultValue: TestAst.StringLiteral(
+                        "Release"))
             ],
             steps:
             [
-                TestAst.Script(
+                TestAst.ScriptStep(
                     script: "dotnet test")
             ]);
 

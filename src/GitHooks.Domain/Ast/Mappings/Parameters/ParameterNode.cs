@@ -1,3 +1,4 @@
+using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Mappings.Parameters;
@@ -14,9 +15,9 @@ public sealed record ParameterNode
 
     public ParameterType Type { get; init; }
 
-    public string? DefaultValue { get; init; }
+    public ExpressionNode? DefaultValue { get; init; }
 
-    public IReadOnlyList<string> Values { get; init; }
+    public IReadOnlyList<ExpressionNode> Values { get; init; }
         = [];
 
     public override void Accept(IAstCommandVisitor visitor)

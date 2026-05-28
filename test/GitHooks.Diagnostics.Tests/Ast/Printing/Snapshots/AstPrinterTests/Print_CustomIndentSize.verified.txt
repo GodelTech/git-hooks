@@ -1,0 +1,5 @@
+﻿Pipeline
+    Parameter(configuration)
+        Type(String)
+        DefaultValue:
+            String("Release")

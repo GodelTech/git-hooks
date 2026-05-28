@@ -2,80 +2,56 @@ using GitHooks.Diagnostics.Ast.Printing;
 using GitHooks.Domain.Common;
 using GitHooks.Testing.Ast;
 
+using static GitHooks.Diagnostics.Tests.Ast.Printing.AstPrinterTestHelper;
+
 namespace GitHooks.Diagnostics.Tests.Ast.Printing;
 
 public sealed class AstPrinterTests
 {
     [Fact]
-    public void Print_PipelineProvided_ReturnsFormattedTree()
+    public async Task Print_Pipeline()
     {
         var pipeline = TestAst.Pipeline(
             parameters:
             [
                 TestAst.Parameter(
                     name: "configuration",
-                    defaultValue: "Release")
+                    defaultValue: TestAst.StringLiteral(
+                        "Release"))
             ],
             steps:
             [
-                TestAst.Script(
+                TestAst.ScriptStep(
                     script: "dotnet test")
             ]);
 
-        var printer = new AstPrinter();
-
-        var result = printer.Print(pipeline);
-
-        Assert.Equal(
-            """
-            Pipeline
-              Parameter(configuration)
-                Type(String)
-                DefaultValue("Release")
-              ScriptStep
-                String("dotnet test")
-            """,
-            result);
+        await VerifyAstAsync(pipeline);
     }
 
     [Fact]
-    public void Print_StringContainsEscapedCharacters_ReturnsEscapedString()
+    public async Task Print_StringContainsEscapedCharacters()
     {
-        var step = TestAst.Script(
+        var step = TestAst.ScriptStep(
             script: "echo \"Hello\"\nexit 0");
 
-        var printer = new AstPrinter();
-
-        var result = printer.Print(step);
-
-        Assert.Equal(
-            """
-            ScriptStep
-              String("echo \"Hello\"\nexit 0")
-            """,
-            result);
+        await VerifyAstAsync(step);
     }
 
     [Fact]
-    public void Print_IncludeNodeKindsEnabled_ReturnsNodeKinds()
+    public async Task Print_IncludeNodeKinds()
     {
         var pipeline = TestAst.Pipeline();
 
-        var printer = new AstPrinter(
+        await VerifyAstAsync(
+            pipeline,
             new AstPrinterOptions
             {
                 IncludeNodeKinds = true
             });
-
-        var result = printer.Print(pipeline);
-
-        Assert.Equal(
-            "Pipeline [Pipeline]",
-            result);
     }
 
     [Fact]
-    public void Print_IncludeSourceSpansEnabled_ReturnsRenderedSpans()
+    public async Task Print_IncludeSourceSpans()
     {
         var span = new SourceSpan(
             new SourcePosition(1, 1),
@@ -84,68 +60,49 @@ public sealed class AstPrinterTests
         var pipeline = TestAst.Pipeline(
             span: span);
 
-        var printer = new AstPrinter(
+        await VerifyAstAsync(
+            pipeline,
             new AstPrinterOptions
             {
                 IncludeSourceSpans = true
             });
-
-        var result = printer.Print(pipeline);
-
-        Assert.Equal(
-            "Pipeline @ (1:1-1:10)",
-            result);
     }
 
     [Fact]
-    public void Print_CustomIndentSizeProvided_ReturnsIndentedOutput()
+    public async Task Print_CustomIndentSize()
     {
         var pipeline = TestAst.Pipeline(
             parameters:
             [
                 TestAst.Parameter(
                     name: "configuration",
-                    defaultValue: "Release")
+                    defaultValue: TestAst.StringLiteral(
+                        "Release"))
             ]);
 
-        var printer = new AstPrinter(
+        await VerifyAstAsync(
+            pipeline,
             new AstPrinterOptions
             {
                 IndentSize = 4
             });
-
-        var result = printer.Print(pipeline);
-
-        Assert.Equal(
-            """
-            Pipeline
-                Parameter(configuration)
-                    Type(String)
-                    DefaultValue("Release")
-            """,
-            result);
     }
 
     [Fact]
-    public void Print_UnknownSourceSpanProvided_ReturnsUnknownSpan()
+    public async Task Print_UnknownSourceSpan()
     {
         var pipeline = TestAst.Pipeline();
 
-        var printer = new AstPrinter(
+        await VerifyAstAsync(
+            pipeline,
             new AstPrinterOptions
             {
                 IncludeSourceSpans = true
             });
-
-        var result = printer.Print(pipeline);
-
-        Assert.Equal(
-            "Pipeline @ <unknown>",
-            result);
     }
 
     [Fact]
-    public void Print_PartiallyKnownSourceSpanProvided_ReturnsPartialSpan()
+    public async Task Print_PartiallyKnownSourceSpan()
     {
         var span = new SourceSpan(
             new SourcePosition(1, -1),
@@ -154,16 +111,11 @@ public sealed class AstPrinterTests
         var pipeline = TestAst.Pipeline(
             span: span);
 
-        var printer = new AstPrinter(
+        await VerifyAstAsync(
+            pipeline,
             new AstPrinterOptions
             {
                 IncludeSourceSpans = true
             });
-
-        var result = printer.Print(pipeline);
-
-        Assert.Equal(
-            "Pipeline @ (1:?-<unknown>)",
-            result);
     }
 }

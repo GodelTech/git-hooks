@@ -1,0 +1,7 @@
+Pipeline
+  Parameter(configuration)
+    Type(String)
+    DefaultValue:
+      String("Release")
+  ScriptStep
+    String("dotnet test")

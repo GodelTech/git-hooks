@@ -1,6 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="DiffEngine" />
+    <PackageReference Include="Verify.XunitV3" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\..\src\GitHooks.Domain\GitHooks.Domain.csproj" />
   </ItemGroup>
 
