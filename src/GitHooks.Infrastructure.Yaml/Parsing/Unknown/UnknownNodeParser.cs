@@ -7,14 +7,31 @@ namespace GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
 internal sealed class UnknownNodeParser
 {
-    public UnknownFieldNode ParseField(Scalar key, YamlParserCursor cursor)
+    public UnknownFieldNode ParseField(YamlParserCursor cursor)
+    {
+        ArgumentNullException.ThrowIfNull(cursor);
+
+        var key = ParseNode(cursor);
+        var value = ParseNode(cursor);
+
+        return new UnknownComplexFieldNode
+        {
+            Key = key,
+            Value = value,
+            Span = SourceSpan.Combine(
+                key.Span,
+                value.Span)
+        };
+    }
+
+    public UnknownSimpleFieldNode ParseField(Scalar key, YamlParserCursor cursor)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(cursor);
 
         var value = ParseNode(cursor);
 
-        return new UnknownFieldNode
+        return new UnknownSimpleFieldNode
         {
             Key = key.Value ?? string.Empty,
             Value = value,
@@ -90,16 +107,21 @@ internal sealed class UnknownNodeParser
 
         while (!cursor.Is<MappingEnd>())
         {
-            if (!cursor.Is<Scalar>())
+            if (cursor.Is<Scalar>())
             {
-                _ = ParseNode(cursor);
+                var key = cursor.Read<Scalar>();
 
-                continue;
+                fields.Add(
+                    ParseField(
+                        key,
+                        cursor));
             }
-
-            var key = cursor.Read<Scalar>();
-
-            fields.Add(ParseField(key, cursor));
+            else
+            {
+                fields.Add(
+                    ParseField(
+                        cursor));
+            }
         }
 
         var end = cursor.Read<MappingEnd>();

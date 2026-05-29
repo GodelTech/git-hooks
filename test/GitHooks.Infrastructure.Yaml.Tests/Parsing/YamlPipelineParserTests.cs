@@ -1,9 +1,14 @@
-using static GitHooks.Infrastructure.Yaml.Tests.Parsing.YamlParserTestHelper;
+using System.Runtime.CompilerServices;
+
+using GitHooks.Infrastructure.Yaml.Parsing;
+using GitHooks.Infrastructure.Yaml.Tests.Testing;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
 
 public sealed class YamlPipelineParserTests
 {
+    private readonly YamlPipelineParser _parser = TestParserFactory.CreateYamlPipelineParser();
+
     [Fact]
     public async Task Parse_EmptyPipeline()
     {
@@ -118,5 +123,17 @@ public sealed class YamlPipelineParserTests
                   - linux
                   - windows
             """);
+    }
+
+    private async Task VerifyAstAsync(
+        string yaml,
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string sourceFilePath = "")
+    {
+        await TestParserSnapshotVerifier.VerifyAstAsync(
+            yaml,
+            _parser.Parse,
+            memberName,
+            sourceFilePath);
     }
 }

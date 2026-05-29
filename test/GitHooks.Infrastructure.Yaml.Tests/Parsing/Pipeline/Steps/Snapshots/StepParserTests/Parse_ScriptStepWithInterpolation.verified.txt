@@ -1,0 +1,7 @@
+﻿ScriptStep
+  Script:
+    String("dotnet test")
+  WorkingDirectory:
+    InterpolatedString
+      String("/src/")
+      Variable(parameters.project)

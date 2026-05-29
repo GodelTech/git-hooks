@@ -86,6 +86,7 @@ internal sealed class YamlParserCursor(
             : CreateSpan(mark.Value, mark.Value);
     }
 
+    // TODO: recoverable parsing instead of throwing exceptions
     internal YamlPipelineParsingException CreateParsingException(string message)
     {
         var span = CurrentSpan();

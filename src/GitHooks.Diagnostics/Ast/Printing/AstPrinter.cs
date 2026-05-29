@@ -77,7 +77,31 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            VisitNode(node.Script);
+            AppendExpression("Script", node.Script);
+            AppendExpression("DisplayName", node.DisplayName);
+            AppendExpression("Condition", node.Condition);
+            AppendExpression("TimeoutInMinutes", node.TimeoutInMinutes);
+            AppendExpression("WorkingDirectory", node.WorkingDirectory);
+
+            AppendExpressionDictionary("Env", node.Env);
+
+            VisitNodes(node.UnknownFields);
+        }
+    }
+
+    public void Visit(TemplateStepNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            "TemplateStep",
+            node);
+
+        using (_builder.Indent())
+        {
+            AppendExpression("Template", node.Template);
+
+            AppendExpressionDictionary("Parameters", node.Parameters);
 
             VisitNodes(node.UnknownFields);
         }
@@ -110,14 +134,44 @@ public sealed class AstPrinter
             node);
     }
 
+    public void Visit(VariableExpressionNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            $"Variable({node.Path})",
+            node);
+    }
+
+    public void Visit(InterpolatedStringExpressionNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            "InterpolatedString",
+            node);
+
+        using (_builder.Indent())
+        {
+            foreach (var part in node.Parts)
+            {
+                part.Accept(this);
+            }
+        }
+    }
+
     public void VisitUnknownNode(UnknownNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
         switch (node)
         {
-            case UnknownFieldNode field:
-                VisitUnknownField(field);
+            case UnknownSimpleFieldNode field:
+                VisitUnknownSimpleField(field);
+                break;
+
+            case UnknownComplexFieldNode field:
+                VisitUnknownComplexField(field);
                 break;
 
             case UnknownScalarNode scalar:
@@ -204,6 +258,29 @@ public sealed class AstPrinter
         }
     }
 
+    private void AppendExpressionDictionary(string fieldName, IReadOnlyDictionary<string, ExpressionNode> expressions)
+    {
+        if (expressions.Count is 0)
+        {
+            return;
+        }
+
+        _builder.AppendLine($"{fieldName}:");
+
+        using (_builder.Indent())
+        {
+            foreach (var (key, expression) in expressions)
+            {
+                _builder.AppendLine($"{key}:");
+
+                using (_builder.Indent())
+                {
+                    expression.Accept(this);
+                }
+            }
+        }
+    }
+
     private void VisitNode(AstNode node)
     {
         node.Accept(this);
@@ -217,7 +294,7 @@ public sealed class AstPrinter
         }
     }
 
-    private void VisitUnknownField(UnknownFieldNode node)
+    private void VisitUnknownSimpleField(UnknownSimpleFieldNode node)
     {
         AppendNodeHeader(
             $"UnknownField({node.Key})",
@@ -226,6 +303,30 @@ public sealed class AstPrinter
         using (_builder.Indent())
         {
             VisitNode(node.Value);
+        }
+    }
+
+    private void VisitUnknownComplexField(UnknownComplexFieldNode node)
+    {
+        AppendNodeHeader(
+            "UnknownComplexField",
+            node);
+
+        using (_builder.Indent())
+        {
+            _builder.AppendLine("Key:");
+
+            using (_builder.Indent())
+            {
+                VisitNode(node.Key);
+            }
+
+            _builder.AppendLine("Value:");
+
+            using (_builder.Indent())
+            {
+                VisitNode(node.Value);
+            }
         }
     }
 

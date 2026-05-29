@@ -1,5 +1,4 @@
 using GitHooks.Domain.Ast.Unknown;
-using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
 using YamlDotNet.Core.Events;
@@ -9,46 +8,29 @@ namespace GitHooks.Infrastructure.Yaml.Parsing;
 internal sealed class MappingFields(
     UnknownNodeParser unknownNodeParser)
 {
-    private readonly UnknownNodeParser _unknownNodeParser
-        = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
+    private readonly FieldTracker _fieldTracker
+        = new();
 
-    private readonly Dictionary<string, SourceSpan> _fields
-        = new(StringComparer.OrdinalIgnoreCase);
-
-    private readonly List<UnknownFieldNode> _unknownFields
-        = [];
-
-    public IReadOnlyList<UnknownFieldNode> UnknownFields
-        => _unknownFields;
+    private readonly UnknownFieldTracker _unknownFieldTracker
+        = new(unknownNodeParser);
 
     public void MarkSeen(Scalar key, YamlParserCursor cursor)
     {
-        ArgumentNullException.ThrowIfNull(key);
-        ArgumentNullException.ThrowIfNull(cursor);
+        _fieldTracker.MarkSeen(key, cursor);
+    }
 
-        var fieldName = key.Value;
-
-        if (_fields.TryGetValue(fieldName, out var existing))
-        {
-            throw cursor.CreateParsingException(
-                $"Duplicate '{fieldName}' field. " +
-                $"First declared at " +
-                $"{existing.Start.Line}:{existing.Start.Column}");
-        }
-
-        _fields.Add(
-            fieldName,
-            cursor.CurrentSpan());
+    public void AddUnknownField(YamlParserCursor cursor)
+    {
+        _unknownFieldTracker.AddUnknownField(cursor);
     }
 
     public void AddUnknownField(Scalar key, YamlParserCursor cursor)
     {
-        ArgumentNullException.ThrowIfNull(key);
-        ArgumentNullException.ThrowIfNull(cursor);
+        _unknownFieldTracker.AddUnknownField(key, cursor);
+    }
 
-        _unknownFields.Add(
-            _unknownNodeParser.ParseField(
-                key,
-                cursor));
+    public IReadOnlyList<UnknownFieldNode> GetUnknownFields()
+    {
+        return _unknownFieldTracker.GetUnknownFields();
     }
 }

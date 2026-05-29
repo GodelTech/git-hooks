@@ -1,0 +1,8 @@
+Parameter(configuration)
+  DisplayName("Configuration")
+  Type(String)
+  DefaultValue:
+    String("Release")
+  Values:
+    String("Debug")
+    String("Release")

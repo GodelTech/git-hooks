@@ -1,6 +1,8 @@
 ﻿Pipeline
   ScriptStep
-    String("echo hello")
-
-    UnknownField(retry)
-      UnknownScalar("3")
+    Script:
+      String("echo hello")
+    UnknownField(matrix)
+      UnknownSequence
+        UnknownScalar("linux")
+        UnknownScalar("windows")

@@ -1,0 +1,7 @@
+﻿Parameter(configuration)
+  Type(String)
+  UnknownField(custom)
+    UnknownMapping
+      UnknownField(nested)
+        UnknownSequence
+          UnknownScalar("value")

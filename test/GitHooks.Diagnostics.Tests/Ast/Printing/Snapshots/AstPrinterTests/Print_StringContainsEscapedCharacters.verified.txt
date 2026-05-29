@@ -1,2 +1,3 @@
 ﻿ScriptStep
-  String("echo \"Hello\"\nexit 0")
+  Script:
+    String("echo \"Hello\"\nexit 0")

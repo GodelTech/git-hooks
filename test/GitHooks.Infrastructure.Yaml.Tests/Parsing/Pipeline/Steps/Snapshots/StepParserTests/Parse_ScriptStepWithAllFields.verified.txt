@@ -1,0 +1,16 @@
+﻿ScriptStep
+  Script:
+    String("dotnet test")
+  DisplayName:
+    String("Run tests")
+  Condition:
+    String("succeeded()")
+  TimeoutInMinutes:
+    Integer(10)
+  WorkingDirectory:
+    String("/src/tests")
+  Env:
+    CONFIGURATION:
+      String("Release")
+    FRAMEWORK:
+      String("net9.0")

@@ -6,17 +6,26 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing.Expressions;
 
-internal sealed class ExpressionParser
+internal sealed class ExpressionParser(
+    InterpolatedStringParser interpolatedStringParser)
 {
-#pragma warning disable CA1822 // Mark members as static
+    private readonly InterpolatedStringParser _interpolatedStringParser
+        = interpolatedStringParser ?? throw new ArgumentNullException(nameof(interpolatedStringParser));
+
     public ExpressionNode Parse(YamlParserCursor cursor)
-#pragma warning restore CA1822 // Mark members as static
     {
         ArgumentNullException.ThrowIfNull(cursor);
 
         var scalar = cursor.Read<Scalar>();
 
         var span = cursor.CreateSpan(scalar.Start, scalar.End);
+
+        if (InterpolatedStringParser.ContainsInterpolation(scalar.Value))
+        {
+            return _interpolatedStringParser.Parse(
+                scalar.Value,
+                span);
+        }
 
         if (bool.TryParse(scalar.Value, out var boolean))
         {

@@ -1,0 +1,8 @@
+﻿TemplateStep
+  Template:
+    String("build.yml")
+  UnknownField(custom)
+    UnknownMapping
+      UnknownField(nested)
+        UnknownSequence
+          UnknownScalar("value")

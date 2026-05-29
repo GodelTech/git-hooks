@@ -1,0 +1,6 @@
+﻿TemplateStep
+  Template:
+    String("build.yml")
+  Parameters:
+    configuration:
+      Variable(parameters.configuration)

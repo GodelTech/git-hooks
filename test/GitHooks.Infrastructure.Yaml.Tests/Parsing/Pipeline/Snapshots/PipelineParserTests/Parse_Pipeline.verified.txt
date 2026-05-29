@@ -1,0 +1,6 @@
+﻿Pipeline
+  Parameter(configuration)
+    Type(String)
+  ScriptStep
+    Script:
+      String("dotnet test")

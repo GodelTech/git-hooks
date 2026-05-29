@@ -14,12 +14,18 @@ public interface IAstCommandVisitor
 
     public void Visit(ScriptStepNode node);
 
+    public void Visit(TemplateStepNode node);
+
     // TODO: split into IExpressionVisitor (decide later)
     public void Visit(BooleanLiteralExpressionNode node);
 
     public void Visit(IntegerLiteralExpressionNode node);
 
     public void Visit(StringLiteralExpressionNode node);
+
+    public void Visit(VariableExpressionNode node);
+
+    public void Visit(InterpolatedStringExpressionNode node);
 
     // Unknown
     public void VisitUnknownNode(UnknownNode node);

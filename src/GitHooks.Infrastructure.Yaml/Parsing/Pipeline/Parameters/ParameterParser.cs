@@ -38,8 +38,9 @@ internal sealed class ParameterParser(
         {
             if (!cursor.Is<Scalar>())
             {
-                throw cursor.CreateParsingException(
-                    "Expected scalar mapping key");
+                fields.AddUnknownField(cursor);
+
+                continue;
             }
 
             var key = cursor.Read<Scalar>();
@@ -79,13 +80,13 @@ internal sealed class ParameterParser(
 
         var end = cursor.Read<MappingEnd>();
 
-        var span = cursor.CreateSpan(start, end);
-
         if (name is null)
         {
             throw cursor.CreateParsingException(
                 "Parameter requires 'name'");
         }
+
+        var span = cursor.CreateSpan(start, end);
 
         return new ParameterNode
         {
@@ -94,7 +95,7 @@ internal sealed class ParameterParser(
             Type = type,
             DefaultValue = defaultValue,
             Values = values ?? s_emptyValues,
-            UnknownFields = fields.UnknownFields,
+            UnknownFields = fields.GetUnknownFields(),
             Span = span
         };
     }
@@ -107,7 +108,7 @@ internal sealed class ParameterParser(
         {
             "string" => ParameterType.String,
             "boolean" => ParameterType.Boolean,
-            "number" => ParameterType.Integer,
+            "number" => ParameterType.Number,
             "object" => ParameterType.Object,
 
             _ => throw cursor.CreateParsingException(

@@ -1,0 +1,3 @@
+﻿TemplateStep
+  Template:
+    String("build.yml")

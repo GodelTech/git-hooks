@@ -1,0 +1,11 @@
+﻿Pipeline
+  Parameter(configuration)
+    Type(String)
+  ScriptStep
+    Script:
+      String("dotnet test")
+  UnknownField(custom)
+    UnknownMapping
+      UnknownField(nested)
+        UnknownSequence
+          UnknownScalar("value")

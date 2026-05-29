@@ -38,8 +38,9 @@ internal sealed class PipelineParser(
         {
             if (!cursor.Is<Scalar>())
             {
-                throw cursor.CreateParsingException(
-                    "Expected scalar mapping key");
+                fields.AddUnknownField(cursor);
+
+                continue;
             }
 
             var key = cursor.Read<Scalar>();
@@ -64,13 +65,19 @@ internal sealed class PipelineParser(
 
         var end = cursor.Read<MappingEnd>();
 
+        if (steps.Count == 0)
+        {
+            throw cursor.CreateParsingException(
+                "Pipeline must contain at least one step");
+        }
+
         var span = cursor.CreateSpan(start, end);
 
         return new PipelineNode
         {
             Parameters = parameters,
             Steps = steps,
-            UnknownFields = fields.UnknownFields,
+            UnknownFields = fields.GetUnknownFields(),
             Span = span
         };
     }

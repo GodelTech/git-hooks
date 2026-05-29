@@ -6,7 +6,7 @@ public enum ParameterType
 
     Boolean,
 
-    Integer,
+    Number,
 
     Object
 }

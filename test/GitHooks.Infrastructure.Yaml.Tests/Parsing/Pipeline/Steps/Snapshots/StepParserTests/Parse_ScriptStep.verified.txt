@@ -1,0 +1,3 @@
+﻿ScriptStep
+  Script:
+    String("dotnet test")

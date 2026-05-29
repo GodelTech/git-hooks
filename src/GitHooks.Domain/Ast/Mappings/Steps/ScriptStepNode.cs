@@ -11,6 +11,17 @@ public sealed record ScriptStepNode
 
     public required ExpressionNode Script { get; init; }
 
+    public ExpressionNode? DisplayName { get; init; }
+
+    public ExpressionNode? Condition { get; init; }
+
+    public ExpressionNode? TimeoutInMinutes { get; init; }
+
+    public ExpressionNode? WorkingDirectory { get; init; }
+
+    public IReadOnlyDictionary<string, ExpressionNode> Env { get; init; }
+        = new Dictionary<string, ExpressionNode>();
+
     public override void Accept(IAstCommandVisitor visitor)
     {
         visitor.Visit(this);

@@ -14,12 +14,18 @@ public interface IAstQueryVisitor<out TResult>
 
     public TResult Visit(ScriptStepNode node);
 
+    public TResult Visit(TemplateStepNode node);
+
     // TODO: split into IExpressionVisitor (decide later)
     public TResult Visit(BooleanLiteralExpressionNode node);
 
     public TResult Visit(IntegerLiteralExpressionNode node);
 
     public TResult Visit(StringLiteralExpressionNode node);
+
+    public TResult Visit(VariableExpressionNode node);
+
+    public TResult Visit(InterpolatedStringExpressionNode node);
 
     // Unknown
     public TResult VisitUnknownNode(UnknownNode node);

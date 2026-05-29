@@ -4,4 +4,5 @@ Pipeline
     DefaultValue:
       String("Release")
   ScriptStep
-    String("dotnet test")
+    Script:
+      String("dotnet test")

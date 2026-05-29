@@ -1,0 +1,13 @@
+﻿Pipeline
+  Parameter(configuration)
+    Type(String)
+  ScriptStep
+    Script:
+      String("dotnet test")
+  UnknownComplexField
+    Key:
+      UnknownSequence
+        UnknownScalar("1")
+        UnknownScalar("2")
+    Value:
+      UnknownScalar("value")

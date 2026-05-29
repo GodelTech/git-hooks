@@ -7,12 +7,16 @@ public enum AstNodeKind
     Parameter,
 
     ScriptStep,
+    TemplateStep,
 
     StringLiteralExpression,
     IntegerLiteralExpression,
     BooleanLiteralExpression,
+    VariableExpression,
+    InterpolatedStringExpression,
 
-    UnknownField,
+    UnknownSimpleField,
+    UnknownComplexField,
     UnknownScalar,
     UnknownSequence,
     UnknownMapping

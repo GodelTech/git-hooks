@@ -1,6 +1,7 @@
 ﻿Pipeline
   ScriptStep
-    String("echo first")
-
+    Script:
+      String("echo first")
   ScriptStep
-    String("echo second")
+    Script:
+      String("echo second")

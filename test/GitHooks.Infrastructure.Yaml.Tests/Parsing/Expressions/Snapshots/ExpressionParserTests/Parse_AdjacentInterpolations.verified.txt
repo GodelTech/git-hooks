@@ -1,0 +1,3 @@
+﻿InterpolatedString
+  Variable(parameters.os)
+  Variable(parameters.configuration)
