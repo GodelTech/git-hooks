@@ -1,10 +1,12 @@
 ﻿UnknownComplexField
   Key:
-    UnknownSequence
-      UnknownScalar("1")
-      UnknownScalar("2")
+    UnknownScalar("nested")
   Value:
     UnknownMapping
-      UnknownField(nested)
-        UnknownSequence
+      UnknownComplexField
+        Key:
+          UnknownSequence
+            UnknownScalar("1")
+            UnknownScalar("2")
+        Value:
           UnknownScalar("value")

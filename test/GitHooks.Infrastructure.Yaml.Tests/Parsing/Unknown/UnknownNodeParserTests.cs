@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 
+using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 
@@ -65,6 +66,12 @@ public sealed class UnknownNodeParserTests
     }
 
     [Fact]
+    public async Task ParseField_WithScalarValue()
+    {
+        await VerifySimpleFieldAsync("value");
+    }
+
+    [Fact]
     public async Task ParseField_WithComplexKey()
     {
         await VerifyComplexFieldAsync(
@@ -79,10 +86,9 @@ public sealed class UnknownNodeParserTests
     {
         await VerifyComplexFieldAsync(
             """
-            ? [1, 2]
-            :
-              nested:
-                - value
+            nested:
+              ? [1, 2]
+              : value
             """);
     }
 
@@ -104,6 +110,28 @@ public sealed class UnknownNodeParserTests
             nested:
               child: value
             """);
+    }
+
+    [Fact]
+    public void ParseField_WithUnsupportedNode_Throws()
+    {
+        var cursor =
+            TestParserFactory.CreateCursor(
+                """
+                test
+                """);
+
+        cursor.StartDocument();
+
+        _ = cursor.Read<Scalar>();
+
+        var exception =
+            Assert.Throws<YamlPipelineParsingException>(
+                () => _parser.ParseField(cursor));
+
+        Assert.StartsWith(
+            "Unsupported unknown node",
+            exception.Message);
     }
 
     private async Task VerifySimpleFieldAsync(

@@ -33,7 +33,7 @@ internal sealed class UnknownNodeParser
 
         return new UnknownSimpleFieldNode
         {
-            Key = key.Value ?? string.Empty,
+            Key = key.Value,
             Value = value,
             Span = SourceSpan.Combine(
                 cursor.CreateSpan(key, key),
@@ -70,7 +70,7 @@ internal sealed class UnknownNodeParser
 
         return new UnknownScalarNode
         {
-            Value = scalar.Value ?? string.Empty,
+            Value = scalar.Value,
             Span = cursor.CreateSpan(
                 scalar,
                 scalar)
