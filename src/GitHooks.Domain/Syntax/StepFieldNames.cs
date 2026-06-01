@@ -11,7 +11,7 @@ public static class StepFieldNames
     public const string Env = "env";
     public const string Parameters = "parameters";
 
-    public static readonly IReadOnlySet<string> All =
+    public static IReadOnlySet<string> All { get; } =
         new HashSet<string>(
         [
             Script,
@@ -25,7 +25,7 @@ public static class StepFieldNames
         ],
         StringComparer.OrdinalIgnoreCase);
 
-    public static readonly IReadOnlySet<string> ScriptStepFields =
+    public static IReadOnlySet<string> ScriptStepFields { get; } =
         new HashSet<string>(
         [
             Script,
@@ -37,7 +37,7 @@ public static class StepFieldNames
         ],
         StringComparer.OrdinalIgnoreCase);
 
-    public static readonly IReadOnlySet<string> TemplateStepFields =
+    public static IReadOnlySet<string> TemplateStepFields { get; } =
         new HashSet<string>(
         [
             Template,

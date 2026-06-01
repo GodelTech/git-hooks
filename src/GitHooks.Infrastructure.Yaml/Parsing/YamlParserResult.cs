@@ -3,7 +3,7 @@ using GitHooks.Domain.Ast.Mappings;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing;
 
-public sealed record YamlParserResult
+public sealed class YamlParserResult
 {
     public required PipelineNode? Root { get; init; }
 

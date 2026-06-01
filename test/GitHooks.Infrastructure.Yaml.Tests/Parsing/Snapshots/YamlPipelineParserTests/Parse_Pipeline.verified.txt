@@ -1,0 +1,13 @@
+﻿Pipeline
+  Parameter(configuration)
+    Type(String)
+    DefaultValue:
+      String("Release")
+  ScriptStep
+    Script:
+      String("dotnet restore")
+  ScriptStep
+    Script:
+      String("dotnet build")
+    DisplayName:
+      String("Build")

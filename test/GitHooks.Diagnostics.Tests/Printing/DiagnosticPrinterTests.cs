@@ -11,7 +11,7 @@ public sealed class DiagnosticPrinterTests
     {
         var diagnostic = new Diagnostic
         {
-            Code = DiagnosticCodes.InvalidYaml,
+            Code = DiagnosticCode.InvalidYaml,
             Message = "Invalid YAML syntax.",
             Severity = DiagnosticSeverity.Error,
             Span = SourceSpan.Unknown
@@ -33,7 +33,7 @@ public sealed class DiagnosticPrinterTests
         [
             new Diagnostic
             {
-                Code = DiagnosticCodes.InvalidYaml,
+                Code = DiagnosticCode.InvalidYaml,
                 Message = "Invalid YAML syntax.",
                 Severity = DiagnosticSeverity.Error,
                 Span = SourceSpan.Unknown
@@ -41,7 +41,7 @@ public sealed class DiagnosticPrinterTests
 
             new Diagnostic
             {
-                Code = DiagnosticCodes.UnknownStepType,
+                Code = DiagnosticCode.UnknownStepType,
                 Message = "Unknown step type.",
                 Severity = DiagnosticSeverity.Warning,
                 Span = new SourceSpan(
@@ -67,7 +67,7 @@ public sealed class DiagnosticPrinterTests
     {
         var diagnostic = new Diagnostic
         {
-            Code = DiagnosticCodes.InvalidYaml,
+            Code = DiagnosticCode.InvalidYaml,
             Message = "Invalid YAML syntax.",
             Severity = DiagnosticSeverity.Error,
             Span = SourceSpan.Unknown
@@ -91,7 +91,7 @@ public sealed class DiagnosticPrinterTests
     {
         var diagnostic = new Diagnostic
         {
-            Code = DiagnosticCodes.InvalidYaml,
+            Code = DiagnosticCode.InvalidYaml,
             Message = "Invalid YAML syntax.",
             Severity = DiagnosticSeverity.Error,
             Span = SourceSpan.Unknown
@@ -115,7 +115,7 @@ public sealed class DiagnosticPrinterTests
     {
         var diagnostic = new Diagnostic
         {
-            Code = DiagnosticCodes.InvalidYaml,
+            Code = DiagnosticCode.InvalidYaml,
             Message = "Invalid YAML syntax.",
             Severity = DiagnosticSeverity.Error,
             Span = SourceSpan.Unknown

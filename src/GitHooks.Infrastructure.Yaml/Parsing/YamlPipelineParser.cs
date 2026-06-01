@@ -1,5 +1,4 @@
 using GitHooks.Diagnostics;
-using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 
@@ -19,8 +18,11 @@ internal sealed class YamlPipelineParser(
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceName);
 
-        YamlParserCursor? cursor = null;
         var diagnostics = new DiagnosticBag();
+
+        var cursor = YamlParserCursor.Create(
+                yaml,
+                sourceName);
 
         try
         {
@@ -44,17 +46,13 @@ internal sealed class YamlPipelineParser(
         }
         catch (YamlException exception)
         {
-            var span = cursor is null
-                ? SourceSpan.Unknown
-                : cursor.CreateSpan(exception);
-
             diagnostics.Report(
                 new Diagnostic
                 {
-                    Code = DiagnosticCodes.InvalidYaml,
+                    Code = DiagnosticCode.InvalidYaml,
                     Message = exception.Message,
                     Severity = DiagnosticSeverity.Error,
-                    Span = span
+                    Span = cursor.CreateSpan(exception)
                 });
 
             return new YamlParserResult
@@ -68,7 +66,7 @@ internal sealed class YamlPipelineParser(
             diagnostics.Report(
                 new Diagnostic
                 {
-                    Code = DiagnosticCodes.InvalidYaml,
+                    Code = DiagnosticCode.InvalidYaml,
                     Message = exception.Message,
                     Severity = DiagnosticSeverity.Error,
                     Span = exception.Span

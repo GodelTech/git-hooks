@@ -1,5 +1,0 @@
-﻿Pipeline
-  Parameter(configuration)
-    Type(String)
-    UnknownField(custom)
-      UnknownScalar("value")

@@ -14,6 +14,11 @@ internal sealed class UnknownFieldTracker(
     private readonly List<UnknownFieldNode> _unknownFields
         = [];
 
+    public IReadOnlyList<UnknownFieldNode> GetUnknownFields()
+    {
+        return _unknownFields;
+    }
+
     public void AddUnknownField(
         YamlParserCursor cursor)
     {
@@ -35,10 +40,5 @@ internal sealed class UnknownFieldTracker(
             _unknownNodeParser.ParseField(
                 key,
                 cursor));
-    }
-
-    public IReadOnlyList<UnknownFieldNode> GetUnknownFields()
-    {
-        return _unknownFields;
     }
 }

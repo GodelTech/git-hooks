@@ -1,0 +1,75 @@
+using GitHooks.Domain.Ast.Unknown;
+using GitHooks.Infrastructure.Yaml.Parsing;
+using GitHooks.Infrastructure.Yaml.Tests.Testing;
+
+using YamlDotNet.Core.Events;
+
+namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
+
+public sealed class UnknownFieldTrackerTests
+{
+    private readonly UnknownFieldTracker _tracker = new(TestParserFactory.CreateUnknownNodeParser());
+
+    [Fact]
+    public void Constructor_NullUnknownNodeParser_Throws()
+    {
+        var exception =
+            Assert.Throws<ArgumentNullException>(
+                () => new UnknownFieldTracker(null!));
+
+        Assert.Equal(
+            "unknownNodeParser",
+            exception.ParamName);
+    }
+
+    [Fact]
+    public void GetUnknownFields_InitiallyEmpty()
+    {
+        Assert.Empty(
+            _tracker.GetUnknownFields());
+    }
+
+    [Fact]
+    public void AddUnknownField_WithScalarKey_AddsField()
+    {
+        var cursor = TestParserFactory.CreateCursor("value");
+
+        cursor.StartDocument();
+
+        _tracker.AddUnknownField(
+            new Scalar("custom"),
+            cursor);
+
+        var field =
+            Assert.IsType<UnknownSimpleFieldNode>(
+                Assert.Single(
+                    _tracker.GetUnknownFields()));
+
+        Assert.Equal(
+            "custom",
+            field.Key);
+    }
+
+    [Fact]
+    public void AddUnknownField_WithComplexKey_AddsField()
+    {
+        var cursor =
+            TestParserFactory.CreateCursor(
+                """
+                ? [1, 2]
+                : value
+                """);
+
+        cursor.StartDocument();
+
+        _ = cursor.Read<MappingStart>();
+
+        _tracker.AddUnknownField(cursor);
+
+        var field =
+            Assert.Single(
+                _tracker.GetUnknownFields());
+
+        Assert.IsType<UnknownComplexFieldNode>(field);
+    }
+}

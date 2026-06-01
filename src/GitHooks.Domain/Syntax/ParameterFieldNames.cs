@@ -8,7 +8,7 @@ public static class ParameterFieldNames
     public const string DefaultValue = "default";
     public const string Values = "values";
 
-    public static readonly IReadOnlySet<string> All =
+    public static IReadOnlySet<string> All { get; } =
         new HashSet<string>(
         [
             Name,

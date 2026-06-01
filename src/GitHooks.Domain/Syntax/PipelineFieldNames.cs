@@ -5,7 +5,7 @@ public static class PipelineFieldNames
     public const string Parameters = "parameters";
     public const string Steps = "steps";
 
-    public static readonly IReadOnlySet<string> All =
+    public static IReadOnlySet<string> All { get; } =
         new HashSet<string>(
         [
             Parameters,

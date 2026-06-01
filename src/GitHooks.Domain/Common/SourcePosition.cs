@@ -4,7 +4,7 @@ public readonly record struct SourcePosition(
     long Line,
     long Column)
 {
-    public static SourcePosition Unknown { get; }
+    public static readonly SourcePosition Unknown
         = new(-1, -1);
 
     public bool HasKnownLine

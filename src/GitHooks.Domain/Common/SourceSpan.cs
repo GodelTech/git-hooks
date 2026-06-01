@@ -4,7 +4,7 @@ public readonly record struct SourceSpan(
     SourcePosition Start,
     SourcePosition End)
 {
-    public static SourceSpan Unknown { get; }
+    public static readonly SourceSpan Unknown
         = new(SourcePosition.Unknown, SourcePosition.Unknown);
 
     public bool IsUnknown

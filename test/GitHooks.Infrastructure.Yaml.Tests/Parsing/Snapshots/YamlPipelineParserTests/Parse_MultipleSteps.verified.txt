@@ -1,7 +1,0 @@
-﻿Pipeline
-  ScriptStep
-    Script:
-      String("echo first")
-  ScriptStep
-    Script:
-      String("echo second")

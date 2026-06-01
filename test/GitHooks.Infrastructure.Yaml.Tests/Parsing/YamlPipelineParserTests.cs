@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 
+using GitHooks.Diagnostics;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 
@@ -10,14 +11,36 @@ public sealed class YamlPipelineParserTests
     private readonly YamlPipelineParser _parser = TestParserFactory.CreateYamlPipelineParser();
 
     [Fact]
-    public async Task Parse_EmptyPipeline()
+    public void Constructor_NullPipelineParser_Throws()
     {
-        await VerifyAstAsync(
-            "{}");
+        var exception =
+            Assert.Throws<ArgumentNullException>(
+                () => new YamlPipelineParser(
+                    null!));
+
+        Assert.Equal(
+            "pipelineParser",
+            exception.ParamName);
     }
 
     [Fact]
-    public async Task Parse_SimpleScriptStep()
+    public void Parse_EmptyPipeline_ReturnsMissingStepsDiagnostic()
+    {
+        var result =
+            _parser.Parse(
+                "{}",
+                "test.yaml");
+
+        var diagnostic =
+            Assert.Single(result.Diagnostics);
+
+        Assert.Equal(
+            DiagnosticCode.InvalidYaml,
+            diagnostic.Code);
+    }
+
+    [Fact]
+    public async Task Parse_MinimalPipeline()
     {
         await VerifyAstAsync(
             """
@@ -27,18 +50,30 @@ public sealed class YamlPipelineParserTests
     }
 
     [Fact]
-    public async Task Parse_Parameter()
+    public async Task Parse_Pipeline()
     {
         await VerifyAstAsync(
             """
             parameters:
               - name: configuration
-                displayName: Build configuration
-                type: String
-                default: Debug
-                values:
-                  - Debug
-                  - Release
+                type: string
+                default: Release
+
+            steps:
+              - script: dotnet restore
+
+              - script: dotnet build
+                displayName: Build
+            """);
+    }
+
+    [Fact]
+    public async Task Parse_TemplateStep()
+    {
+        await VerifyAstAsync(
+            """
+            steps:
+              - template: build.yml
             """);
     }
 
@@ -57,72 +92,41 @@ public sealed class YamlPipelineParserTests
     }
 
     [Fact]
-    public async Task Parse_UnknownStepField()
+    public async Task Parse_UnknownComplexField()
     {
         await VerifyAstAsync(
             """
             steps:
               - script: echo hello
-                retry: 3
+
+            ? [1, 2]
+            : value
             """);
     }
 
     [Fact]
-    public async Task Parse_UnknownNestedSequence()
+    public void Parse_InvalidYaml_ReturnsDiagnostic()
     {
-        await VerifyAstAsync(
-            """
-            unknown:
-              - - - value
-            """);
-    }
+        var result =
+            _parser.Parse(
+                """
+                steps:
+                  - script: test
+                    invalid: [
+                """,
+                "test.yaml");
 
-    [Fact]
-    public async Task Parse_UnknownNestedMapping()
-    {
-        await VerifyAstAsync(
-            """
-            unknown:
-              nested:
-                child:
-                  value: test
-            """);
-    }
+        Assert.Null(result.Root);
 
-    [Fact]
-    public async Task Parse_MultipleSteps()
-    {
-        await VerifyAstAsync(
-            """
-            steps:
-              - script: echo first
+        var diagnostic = Assert.Single(result.Diagnostics);
 
-              - script: echo second
-            """);
-    }
+        Assert.Equal(
+            DiagnosticCode.InvalidYaml,
+            diagnostic.Code);
 
-    [Fact]
-    public async Task Parse_Parameter_WithUnknownField()
-    {
-        await VerifyAstAsync(
-            """
-            parameters:
-              - name: configuration
-                custom: value
-            """);
-    }
-
-    [Fact]
-    public async Task Parse_Step_WithUnknownSequence()
-    {
-        await VerifyAstAsync(
-            """
-            steps:
-              - script: echo hello
-                matrix:
-                  - linux
-                  - windows
-            """);
+        Assert.Equal(
+            DiagnosticSeverity.Error,
+            diagnostic.Severity);
     }
 
     private async Task VerifyAstAsync(
