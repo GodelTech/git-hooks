@@ -1,0 +1,6 @@
+﻿UnknownField(test)
+  UnknownMapping
+    UnknownField(nested)
+      UnknownMapping
+        UnknownField(child)
+          UnknownScalar("value")

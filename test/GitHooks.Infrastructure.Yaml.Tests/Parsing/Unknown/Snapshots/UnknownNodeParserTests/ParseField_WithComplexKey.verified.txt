@@ -1,0 +1,7 @@
+﻿UnknownComplexField
+  Key:
+    UnknownSequence
+      UnknownScalar("1")
+      UnknownScalar("2")
+  Value:
+    UnknownScalar("value")
