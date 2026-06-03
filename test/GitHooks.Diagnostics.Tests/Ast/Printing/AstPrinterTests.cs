@@ -83,11 +83,7 @@ public sealed class AstPrinterTests
                             ]))
                 ]);
 
-        var printer = new AstPrinter();
-
-        var result = printer.Print(pipeline);
-
-        await Verify(result);
+        await VerifyAstAsync(pipeline);
     }
 
     [Fact]
