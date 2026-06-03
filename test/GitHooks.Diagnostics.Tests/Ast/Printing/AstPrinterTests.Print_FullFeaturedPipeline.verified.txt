@@ -1,0 +1,38 @@
+﻿Pipeline
+  Parameter(configuration)
+    DisplayName("Build Configuration")
+    Type(String)
+    Values:
+      String("Debug")
+      String("Release")
+  ScriptStep
+    Script:
+      String("dotnet test")
+    DisplayName:
+      String("Run Tests")
+    Condition:
+      String("succeeded()")
+    TimeoutInMinutes:
+      Integer(30)
+    WorkingDirectory:
+      String("/src")
+    Env:
+      CONFIGURATION:
+        String("Release")
+  TemplateStep
+    Template:
+      String("build.yml")
+    Parameters:
+      configuration:
+        String("Release")
+  UnknownField(simple)
+    UnknownScalar("value")
+  UnknownComplexField
+    Key:
+      UnknownScalar("key")
+    Value:
+      UnknownSequence
+        UnknownScalar("item1")
+        UnknownMapping
+          UnknownField(nested)
+            UnknownScalar("value")

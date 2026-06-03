@@ -7,6 +7,20 @@ namespace GitHooks.Diagnostics.Tests.Printing;
 public sealed class DiagnosticPrinterTests
 {
     [Fact]
+    public void Print_NullDiagnosticsProvided_Throws()
+    {
+        var printer = new DiagnosticPrinter();
+
+        var exception =
+            Assert.Throws<ArgumentNullException>(
+                () => printer.Print(null!));
+
+        Assert.Equal(
+            "diagnostics",
+            exception.ParamName);
+    }
+
+    [Fact]
     public void Print_ErrorDiagnosticProvided_ReturnsFormattedDiagnostic()
     {
         var diagnostic = new Diagnostic

@@ -1,0 +1,3 @@
+﻿InterpolatedString
+  String("/src/")
+  Variable(parameters.project)

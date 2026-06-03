@@ -32,7 +32,7 @@ public sealed class SourceSpanRendererTests
     }
 
     [Fact]
-    public void Render_PartiallyKnownStartPositionProvided_ReturnsPartialPosition()
+    public void Render_PartiallyKnownColumnProvided_ReturnsPartialPosition()
     {
         var span = new SourceSpan(
             new SourcePosition(1, -1),
@@ -42,6 +42,20 @@ public sealed class SourceSpanRendererTests
 
         Assert.Equal(
             "(1:?-2:5)",
+            result);
+    }
+
+    [Fact]
+    public void Render_PartiallyKnownLineProvided_ReturnsPartialPosition()
+    {
+        var span = new SourceSpan(
+            new SourcePosition(-1, 5),
+            new SourcePosition(2, 5));
+
+        var result = SourceSpanRenderer.Render(span);
+
+        Assert.Equal(
+            "(?:5-2:5)",
             result);
     }
 
