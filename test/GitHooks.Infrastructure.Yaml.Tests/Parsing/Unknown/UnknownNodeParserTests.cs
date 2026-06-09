@@ -1,9 +1,9 @@
 using System.Runtime.CompilerServices;
 
-using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 
+using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Unknown;
@@ -126,7 +126,7 @@ public sealed class UnknownNodeParserTests
         _ = cursor.Read<Scalar>();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _parser.ParseField(cursor));
 
         Assert.StartsWith(

@@ -17,21 +17,16 @@ public sealed class DiagnosticBagTests
     {
         var bag = new DiagnosticBag();
 
-        var diagnostic =
-            new Diagnostic
-            {
-                Code = new DiagnosticCode("GH0001"),
-                Message = "Test",
-                Severity = DiagnosticSeverity.Error,
-                Span = SourceSpan.Unknown
-            };
-
-        bag.Report(diagnostic);
+        bag.Report(DiagnosticDescriptors.InvalidYaml, SourceSpan.Unknown);
 
         var result = Assert.Single(bag.Diagnostics);
 
         Assert.Same(
-            diagnostic,
-            result);
+            DiagnosticDescriptors.InvalidYaml,
+            result.Descriptor);
+
+        Assert.Equal(
+            SourceSpan.Unknown,
+            result.Span);
     }
 }

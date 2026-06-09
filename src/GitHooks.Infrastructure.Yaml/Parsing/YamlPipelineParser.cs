@@ -1,5 +1,5 @@
 using GitHooks.Diagnostics;
-using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
+using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 
 using YamlDotNet.Core;
@@ -7,29 +7,26 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing;
 
+// todo: recoverable parsing.
 internal sealed class YamlPipelineParser(
     PipelineParser pipelineParser)
 {
     private readonly PipelineParser _pipelineParser
         = pipelineParser ?? throw new ArgumentNullException(nameof(pipelineParser));
 
-    public YamlParserResult Parse(string yaml, string sourceName)
+    public YamlParserResult Parse(string yaml, SourceDocument sourceDocument)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
-        ArgumentException.ThrowIfNullOrWhiteSpace(sourceName);
+        ArgumentNullException.ThrowIfNull(sourceDocument);
 
         var diagnostics = new DiagnosticBag();
 
         var cursor = YamlParserCursor.Create(
-                yaml,
-                sourceName);
+            yaml,
+            sourceDocument);
 
         try
         {
-            cursor = YamlParserCursor.Create(
-                yaml,
-                sourceName);
-
             _ = cursor.Read<StreamStart>();
             _ = cursor.Read<DocumentStart>();
 
@@ -47,30 +44,9 @@ internal sealed class YamlPipelineParser(
         catch (YamlException exception)
         {
             diagnostics.Report(
-                new Diagnostic
-                {
-                    Code = DiagnosticCode.InvalidYaml,
-                    Message = exception.Message,
-                    Severity = DiagnosticSeverity.Error,
-                    Span = cursor.CreateSpan(exception)
-                });
-
-            return new YamlParserResult
-            {
-                Root = null,
-                Diagnostics = diagnostics.Diagnostics
-            };
-        }
-        catch (YamlPipelineParsingException exception)
-        {
-            diagnostics.Report(
-                new Diagnostic
-                {
-                    Code = DiagnosticCode.InvalidYaml,
-                    Message = exception.Message,
-                    Severity = DiagnosticSeverity.Error,
-                    Span = exception.Span
-                });
+                DiagnosticDescriptors.InvalidYaml,
+                cursor.CreateSpan(exception),
+                exception.Message);
 
             return new YamlParserResult
             {

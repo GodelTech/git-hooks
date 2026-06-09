@@ -5,6 +5,7 @@
     <Project Path="src/GitHooks.Infrastructure.Yaml/GitHooks.Infrastructure.Yaml.csproj" Id="f10530b7-0312-46ff-907c-8b4dca21d46c" />
     <Project Path="src/GitHooks.Infrastructure/GitHooks.Infrastructure.csproj" Id="f3c7d8d3-8e11-4208-b80c-0310bde43317" />
     <Project Path="src/GitHooks.Templates/GitHooks.Templates.csproj" Id="ee3c1915-89aa-4acc-810b-3a3c95339015" />
+    <Project Path="src/GitHooks.Validation/GitHooks.Validation.csproj" Id="1c4f344a-b4a8-479f-9db4-ff4cb24ed68c" />
     <Project Path="src/GitHooks.Workflow.Application/GitHooks.Workflow.Application.csproj" Id="02572336-2177-4566-9e57-a650807237a3" />
     <Project Path="src/GitHooks.Workflow.Domain/GitHooks.Workflow.Domain.csproj" Id="89bfbc67-dc5e-4ed6-bf71-1678aad19362" />
     <Project Path="src/GitHooks.Workflow.Infrastructure/GitHooks.Workflow.Infrastructure.csproj" Id="561fe152-9dd1-4f27-8be5-80eadfdbf630" />
@@ -16,6 +17,7 @@
     <Project Path="test/GitHooks.Infrastructure.Yaml.Tests/GitHooks.Infrastructure.Yaml.Tests.csproj" Id="bea66777-fbab-41d5-ba52-113f93c36064" />
     <Project Path="test/GitHooks.Testing/GitHooks.Testing.csproj" Id="511de8c3-6fcc-40e2-8a3c-0c6dd172f4c1" />
     <Project Path="test/GitHooks.Tests/GitHooks.Tests.csproj" Id="b3138dc6-0147-4d0f-b1ae-a14b1ca2e984" />
+    <Project Path="test/GitHooks.Validation.Tests/GitHooks.Validation.Tests.csproj" Id="03d1e196-ce41-44f4-96c8-d37325f76f66" />
     <Project Path="test/GitHooks.Workflow.Application.Tests/GitHooks.Workflow.Application.Tests.csproj" Id="512cef9d-5d8a-4e90-8838-e11c7b463b0b" />
     <Project Path="test/GitHooks.Workflow.Domain.Tests/GitHooks.Workflow.Domain.Tests.csproj" Id="084e88d3-9597-445f-9fbc-f5351b4fc36d" />
     <Project Path="test/GitHooks.Workflow.Infrastructure.Tests/GitHooks.Workflow.Infrastructure.Tests.csproj" Id="ceb0babf-703d-4894-87f2-340b5f788c08" />

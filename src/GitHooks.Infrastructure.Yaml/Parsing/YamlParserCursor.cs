@@ -1,5 +1,4 @@
 using GitHooks.Domain.Common;
-using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -8,35 +7,35 @@ namespace GitHooks.Infrastructure.Yaml.Parsing;
 
 internal sealed class YamlParserCursor(
     Parser parser,
-    string sourceName)
+    SourceDocument sourceDocument)
 {
     private readonly Parser _parser
         = parser ?? throw new ArgumentNullException(nameof(parser));
 
-    private readonly string _sourceName
-        = sourceName ?? throw new ArgumentNullException(nameof(sourceName));
+    private readonly SourceDocument _sourceDocument
+        = sourceDocument ?? throw new ArgumentNullException(nameof(sourceDocument));
 
-    public static YamlParserCursor Create(string yaml, string sourceName)
+    public static YamlParserCursor Create(string yaml, SourceDocument sourceDocument)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
-        ArgumentException.ThrowIfNullOrWhiteSpace(sourceName);
+        ArgumentNullException.ThrowIfNull(sourceDocument);
 
         return new(
             new Parser(
                 new StringReader(yaml)),
-            sourceName);
+            sourceDocument);
     }
 
     public T Read<T>()
         where T : ParsingEvent
     {
-        if (!_parser.TryConsume<T>(out var parsingEvent))
+        if (_parser.TryConsume<T>(out var parsingEvent))
         {
-            throw CreateParsingException(
-                $"Expected {typeof(T).Name}");
+            return parsingEvent;
         }
 
-        return parsingEvent;
+        throw CreateException(
+            $"Expected {typeof(T).Name}, got {_parser.Current?.GetType().Name ?? "EOF"}");
     }
 
     public bool Is<T>()
@@ -64,11 +63,10 @@ internal sealed class YamlParserCursor(
             exception.End);
     }
 
-#pragma warning disable CA1822 // Mark members as static
     public SourceSpan CreateSpan(Mark start, Mark end)
-#pragma warning restore CA1822 // Mark members as static
     {
         return new SourceSpan(
+            _sourceDocument,
             new SourcePosition(
                 start.Line,
                 start.Column),
@@ -87,15 +85,11 @@ internal sealed class YamlParserCursor(
     }
 
     // TODO: recoverable parsing instead of throwing exceptions
-    internal YamlPipelineParsingException CreateParsingException(string message)
+    internal YamlException CreateException(string message)
     {
-        var span = CurrentSpan();
-
-        return new YamlPipelineParsingException(
-            $"{message}, " +
-            $"got {_parser.Current?.GetType().Name ?? "EOF"} " +
-            $"in {_sourceName} " +
-            $"at {span.Start.Line}:{span.Start.Column}",
-            span);
+        return new YamlException(
+            _parser.Current?.Start ?? Mark.Empty,
+            _parser.Current?.End ?? Mark.Empty,
+            message);
     }
 }

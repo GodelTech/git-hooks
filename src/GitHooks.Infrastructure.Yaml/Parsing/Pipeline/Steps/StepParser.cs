@@ -93,7 +93,7 @@ internal sealed class StepParser(
         if (step.Script is not null &&
             step.Template is not null)
         {
-            throw cursor.CreateParsingException(
+            throw cursor.CreateException(
                 "Step cannot contain multiple step type fields");
         }
 
@@ -114,7 +114,7 @@ internal sealed class StepParser(
     {
         if (step.Script is not null)
         {
-            StepValidation.ValidateScriptStep(step, cursor);
+            StepFieldValidation.ValidateScriptStep(step, cursor);
 
             return new ScriptStepNode
             {
@@ -131,7 +131,7 @@ internal sealed class StepParser(
 
         if (step.Template is not null)
         {
-            StepValidation.ValidateTemplateStep(step, cursor);
+            StepFieldValidation.ValidateTemplateStep(step, cursor);
 
             return new TemplateStepNode
             {
@@ -142,7 +142,7 @@ internal sealed class StepParser(
             };
         }
 
-        throw cursor.CreateParsingException(
+        throw cursor.CreateException(
             "Step must contain exactly one step type field");
     }
 

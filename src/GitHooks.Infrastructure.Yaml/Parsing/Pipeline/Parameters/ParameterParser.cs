@@ -82,7 +82,7 @@ internal sealed class ParameterParser(
 
         if (name is null)
         {
-            throw cursor.CreateParsingException(
+            throw cursor.CreateException(
                 "Parameter requires 'name'");
         }
 
@@ -111,7 +111,7 @@ internal sealed class ParameterParser(
             "number" => ParameterType.Number,
             "object" => ParameterType.Object,
 
-            _ => throw cursor.CreateParsingException(
+            _ => throw cursor.CreateException(
                 $"Unsupported parameter type '{value}'")
         };
     }

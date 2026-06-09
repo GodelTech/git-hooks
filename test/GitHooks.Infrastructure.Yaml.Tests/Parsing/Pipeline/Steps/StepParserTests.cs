@@ -1,9 +1,10 @@
 using System.Runtime.CompilerServices;
 
 using GitHooks.Domain.Syntax;
-using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+
+using YamlDotNet.Core;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Steps;
 
@@ -159,7 +160,7 @@ public sealed class StepParserTests
         cursor.StartDocument();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _parser.Parse(cursor));
 
         Assert.StartsWith(
@@ -185,7 +186,7 @@ public sealed class StepParserTests
         cursor.StartDocument();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _parser.Parse(cursor));
 
         Assert.StartsWith(
@@ -209,7 +210,7 @@ public sealed class StepParserTests
         cursor.StartDocument();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _parser.Parse(cursor));
 
         Assert.StartsWith(
@@ -233,7 +234,7 @@ public sealed class StepParserTests
         cursor.StartDocument();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _parser.Parse(cursor));
 
         Assert.StartsWith(
@@ -254,7 +255,7 @@ public sealed class StepParserTests
         cursor.StartDocument();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _parser.Parse(cursor));
 
         Assert.StartsWith(
@@ -276,7 +277,7 @@ public sealed class StepParserTests
         cursor.StartDocument();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _parser.Parse(cursor));
 
         Assert.StartsWith(
@@ -297,7 +298,7 @@ public sealed class StepParserTests
         cursor.StartDocument();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _parser.Parse(cursor));
 
         Assert.StartsWith(
@@ -317,7 +318,7 @@ public sealed class StepParserTests
         cursor.StartDocument();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _parser.Parse(cursor));
 
         Assert.StartsWith(

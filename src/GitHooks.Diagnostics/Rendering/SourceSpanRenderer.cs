@@ -4,11 +4,12 @@ using GitHooks.Domain.Common;
 
 namespace GitHooks.Diagnostics.Rendering;
 
+// TODO: start using SourceDocument name in rendering
 public static class SourceSpanRenderer
 {
     public static string Render(SourceSpan span)
     {
-        return span.IsUnknown
+        return span.HasUnknownPosition
             ? "<unknown>"
             : $"({RenderPosition(span.Start)}-{RenderPosition(span.End)})";
     }

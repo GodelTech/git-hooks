@@ -25,9 +25,7 @@ public sealed class DiagnosticPrinterTests
     {
         var diagnostic = new Diagnostic
         {
-            Code = DiagnosticCode.InvalidYaml,
-            Message = "Invalid YAML syntax.",
-            Severity = DiagnosticSeverity.Error,
+            Descriptor = DiagnosticDescriptors.InvalidYaml,
             Span = SourceSpan.Unknown
         };
 
@@ -36,7 +34,7 @@ public sealed class DiagnosticPrinterTests
         var result = printer.Print([diagnostic]);
 
         Assert.Equal(
-            "Error GH0001: Invalid YAML syntax. @ <unknown>",
+            "Error GH0001: Invalid YAML: {0} @ <unknown>",
             result);
     }
 
@@ -47,18 +45,15 @@ public sealed class DiagnosticPrinterTests
         [
             new Diagnostic
             {
-                Code = DiagnosticCode.InvalidYaml,
-                Message = "Invalid YAML syntax.",
-                Severity = DiagnosticSeverity.Error,
+                Descriptor = DiagnosticDescriptors.InvalidYaml,
                 Span = SourceSpan.Unknown
             },
 
             new Diagnostic
             {
-                Code = DiagnosticCode.UnknownStepType,
-                Message = "Unknown step type.",
-                Severity = DiagnosticSeverity.Warning,
+                Descriptor = DiagnosticDescriptors.PipelineMustContainStep,
                 Span = new SourceSpan(
+                    new SourceDocument("pipeline.yaml"),
                     new SourcePosition(5, 1),
                     new SourcePosition(5, 10))
             }
@@ -70,8 +65,8 @@ public sealed class DiagnosticPrinterTests
 
         Assert.Equal(
             """
-            Error GH0001: Invalid YAML syntax. @ <unknown>
-            Warning GH0005: Unknown step type. @ (5:1-5:10)
+            Error GH0001: Invalid YAML: {0} @ <unknown>
+            Error GH1001: Pipeline must contain at least one step. @ (5:1-5:10)
             """,
             result);
     }
@@ -81,9 +76,7 @@ public sealed class DiagnosticPrinterTests
     {
         var diagnostic = new Diagnostic
         {
-            Code = DiagnosticCode.InvalidYaml,
-            Message = "Invalid YAML syntax.",
-            Severity = DiagnosticSeverity.Error,
+            Descriptor = DiagnosticDescriptors.InvalidYaml,
             Span = SourceSpan.Unknown
         };
 
@@ -96,7 +89,7 @@ public sealed class DiagnosticPrinterTests
         var result = printer.Print([diagnostic]);
 
         Assert.Equal(
-            "GH0001: Invalid YAML syntax. @ <unknown>",
+            "GH0001: Invalid YAML: {0} @ <unknown>",
             result);
     }
 
@@ -105,9 +98,7 @@ public sealed class DiagnosticPrinterTests
     {
         var diagnostic = new Diagnostic
         {
-            Code = DiagnosticCode.InvalidYaml,
-            Message = "Invalid YAML syntax.",
-            Severity = DiagnosticSeverity.Error,
+            Descriptor = DiagnosticDescriptors.InvalidYaml,
             Span = SourceSpan.Unknown
         };
 
@@ -120,7 +111,7 @@ public sealed class DiagnosticPrinterTests
         var result = printer.Print([diagnostic]);
 
         Assert.Equal(
-            "Error Invalid YAML syntax. @ <unknown>",
+            "Error Invalid YAML: {0} @ <unknown>",
             result);
     }
 
@@ -129,9 +120,7 @@ public sealed class DiagnosticPrinterTests
     {
         var diagnostic = new Diagnostic
         {
-            Code = DiagnosticCode.InvalidYaml,
-            Message = "Invalid YAML syntax.",
-            Severity = DiagnosticSeverity.Error,
+            Descriptor = DiagnosticDescriptors.InvalidYaml,
             Span = SourceSpan.Unknown
         };
 
@@ -144,7 +133,7 @@ public sealed class DiagnosticPrinterTests
         var result = printer.Print([diagnostic]);
 
         Assert.Equal(
-            "Error GH0001: Invalid YAML syntax.",
+            "Error GH0001: Invalid YAML: {0}",
             result);
     }
 

@@ -1,8 +1,8 @@
 using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Infrastructure.Yaml.Parsing;
-using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 
+using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
@@ -36,7 +36,7 @@ public sealed class MappingFieldsTests
             cursor);
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _fields.MarkSeen(
                     key,
                     cursor));

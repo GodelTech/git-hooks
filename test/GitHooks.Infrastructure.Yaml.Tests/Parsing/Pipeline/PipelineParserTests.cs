@@ -1,8 +1,9 @@
 using System.Runtime.CompilerServices;
 
-using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+
+using YamlDotNet.Core;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline;
 
@@ -118,7 +119,7 @@ public sealed class PipelineParserTests
         cursor.StartDocument();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _parser.Parse(cursor));
 
         Assert.StartsWith(
@@ -142,33 +143,11 @@ public sealed class PipelineParserTests
         cursor.StartDocument();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 () => _parser.Parse(cursor));
 
         Assert.StartsWith(
             "Duplicate 'steps' field",
-            exception.Message);
-    }
-
-    [Fact]
-    public void Parse_MissingSteps_Throws()
-    {
-        var cursor =
-            TestParserFactory.CreateCursor(
-                """
-                parameters:
-                  - name: configuration
-                    type: string
-                """);
-
-        cursor.StartDocument();
-
-        var exception =
-            Assert.Throws<YamlPipelineParsingException>(
-                () => _parser.Parse(cursor));
-
-        Assert.StartsWith(
-            "Pipeline must contain at least one step",
             exception.Message);
     }
 

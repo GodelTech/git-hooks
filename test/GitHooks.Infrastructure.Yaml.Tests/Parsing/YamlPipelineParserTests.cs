@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 
 using GitHooks.Diagnostics;
+using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 
@@ -21,22 +22,6 @@ public sealed class YamlPipelineParserTests
         Assert.Equal(
             "pipelineParser",
             exception.ParamName);
-    }
-
-    [Fact]
-    public void Parse_EmptyPipeline_ReturnsMissingStepsDiagnostic()
-    {
-        var result =
-            _parser.Parse(
-                "{}",
-                "test.yaml");
-
-        var diagnostic =
-            Assert.Single(result.Diagnostics);
-
-        Assert.Equal(
-            DiagnosticCode.InvalidYaml,
-            diagnostic.Code);
     }
 
     [Fact]
@@ -114,7 +99,7 @@ public sealed class YamlPipelineParserTests
                   - script: test
                     invalid: [
                 """,
-                "test.yaml");
+                new SourceDocument("test.yaml"));
 
         Assert.Null(result.Root);
 

@@ -8,7 +8,8 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
 
 public sealed class UnknownFieldTrackerTests
 {
-    private readonly UnknownFieldTracker _tracker = new(TestParserFactory.CreateUnknownNodeParser());
+    private readonly UnknownFieldTracker _tracker =
+        new(TestParserFactory.CreateUnknownNodeParser());
 
     [Fact]
     public void Constructor_NullUnknownNodeParser_Throws()

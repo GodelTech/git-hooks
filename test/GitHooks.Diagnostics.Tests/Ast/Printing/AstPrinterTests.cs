@@ -112,6 +112,7 @@ public sealed class AstPrinterTests
     public async Task Print_IncludeSourceSpans()
     {
         var span = new SourceSpan(
+            new SourceDocument("pipeline.yaml"),
             new SourcePosition(1, 1),
             new SourcePosition(1, 10));
 
@@ -162,6 +163,7 @@ public sealed class AstPrinterTests
     public async Task Print_PartiallyKnownSourceSpan()
     {
         var span = new SourceSpan(
+            new SourceDocument("pipeline.yaml"),
             new SourcePosition(1, -1),
             new SourcePosition(-1, -1));
 

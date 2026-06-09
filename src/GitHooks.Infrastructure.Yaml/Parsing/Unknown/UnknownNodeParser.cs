@@ -58,7 +58,7 @@ internal sealed class UnknownNodeParser
             return ParseMapping(cursor);
         }
 
-        throw cursor.CreateParsingException(
+        throw cursor.CreateException(
             "Unsupported unknown node");
     }
 

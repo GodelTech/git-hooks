@@ -13,16 +13,18 @@ internal static class TestParserFactory
 {
     public static YamlParserCursor CreateCursor(
         string yaml,
-        string sourceName = "test.yaml")
+        SourceDocument? sourceDocument = null)
     {
-        return YamlParserCursor.Create(yaml, sourceName);
+        return YamlParserCursor.Create(
+            yaml,
+            sourceDocument ?? new SourceDocument("test.yaml"));
     }
 
     public static YamlParserCursor CreateDummyCursor()
     {
         return CreateCursor(
             "{}",
-            "test.yaml");
+            new SourceDocument("test.yaml"));
     }
 
     public static YamlPipelineParser CreateYamlPipelineParser()

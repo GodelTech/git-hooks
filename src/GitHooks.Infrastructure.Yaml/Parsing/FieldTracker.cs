@@ -18,12 +18,18 @@ internal sealed class FieldTracker
 
         var fieldName = key.Value;
 
-        if (_fields.TryGetValue(fieldName, out var existing))
+        // TODO: add public IReadOnlyList<DiagnosticRelatedLocation> RelatedLocations into Diagnostic
+        // and use it to report the location of the previous field with the same name.
+        // error GH1001: Duplicate 'steps' field.
+        // --> pipeline.yml:10:1
+        // duplicate declaration
+        // note:
+        // first declaration
+        // --> pipeline.yml:2:1
+        if (_fields.TryGetValue(fieldName, out var _))
         {
-            throw cursor.CreateParsingException(
-                $"Duplicate '{fieldName}' field. " +
-                $"First declared at " +
-                $"{existing.Start.Line}:{existing.Start.Column}");
+            throw cursor.CreateException(
+                $"Duplicate '{fieldName}' field.");
         }
 
         _fields.Add(

@@ -65,12 +65,6 @@ internal sealed class PipelineParser(
 
         var end = cursor.Read<MappingEnd>();
 
-        if (steps.Count == 0)
-        {
-            throw cursor.CreateParsingException(
-                "Pipeline must contain at least one step");
-        }
-
         var span = cursor.CreateSpan(start, end);
 
         return new PipelineNode

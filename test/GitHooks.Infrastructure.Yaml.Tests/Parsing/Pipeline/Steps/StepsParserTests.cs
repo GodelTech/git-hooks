@@ -1,7 +1,8 @@
 using GitHooks.Domain.Ast.Mappings.Steps;
-using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+
+using YamlDotNet.Core;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Steps;
 
@@ -72,7 +73,7 @@ public sealed class StepsParserTests
 
         cursor.StartDocument();
 
-        var exception = Assert.Throws<YamlPipelineParsingException>(
+        var exception = Assert.Throws<YamlException>(
             () => _parser.Parse(cursor));
 
         Assert.Contains(

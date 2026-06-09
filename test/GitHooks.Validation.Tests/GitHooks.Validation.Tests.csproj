@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\GitHooks.Validation\GitHooks.Validation.csproj" />
     <ProjectReference Include="..\GitHooks.Testing\GitHooks.Testing.csproj" />
   </ItemGroup>
 

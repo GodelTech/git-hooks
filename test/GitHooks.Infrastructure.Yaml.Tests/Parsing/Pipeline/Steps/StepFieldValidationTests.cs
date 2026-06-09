@@ -1,10 +1,11 @@
 using GitHooks.Domain.Syntax;
-using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
+
+using YamlDotNet.Core;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Steps;
 
-public sealed class StepValidationTests
+public sealed class StepFieldValidationTests
 {
     [Fact]
     public void ValidateScriptStep_ValidFields_DoesNotThrow()
@@ -20,7 +21,7 @@ public sealed class StepValidationTests
 
         step.Env["KEY"] = TestParserFactory.CreateExpression();
 
-        StepValidation.ValidateScriptStep(
+        StepFieldValidation.ValidateScriptStep(
             step,
             TestParserFactory.CreateDummyCursor());
     }
@@ -38,8 +39,8 @@ public sealed class StepValidationTests
         SetField(step, field);
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
-                () => StepValidation.ValidateScriptStep(
+            Assert.Throws<YamlException>(
+                () => StepFieldValidation.ValidateScriptStep(
                     step,
                     TestParserFactory.CreateDummyCursor()));
 
@@ -60,8 +61,8 @@ public sealed class StepValidationTests
         step.Parameters["KEY"] = TestParserFactory.CreateExpression();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
-                () => StepValidation.ValidateScriptStep(
+            Assert.Throws<YamlException>(
+                () => StepFieldValidation.ValidateScriptStep(
                     step,
                     TestParserFactory.CreateDummyCursor()));
 
@@ -80,7 +81,7 @@ public sealed class StepValidationTests
 
         step.Parameters["Configuration"] = TestParserFactory.CreateExpression();
 
-        StepValidation.ValidateTemplateStep(
+        StepFieldValidation.ValidateTemplateStep(
             step,
             TestParserFactory.CreateDummyCursor());
     }
@@ -102,8 +103,8 @@ public sealed class StepValidationTests
         SetField(step, field);
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
-                () => StepValidation.ValidateTemplateStep(
+            Assert.Throws<YamlException>(
+                () => StepFieldValidation.ValidateTemplateStep(
                     step,
                     TestParserFactory.CreateDummyCursor()));
 
@@ -124,8 +125,8 @@ public sealed class StepValidationTests
         step.Env["KEY"] = TestParserFactory.CreateExpression();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
-                () => StepValidation.ValidateTemplateStep(
+            Assert.Throws<YamlException>(
+                () => StepFieldValidation.ValidateTemplateStep(
                     step,
                     TestParserFactory.CreateDummyCursor()));
 

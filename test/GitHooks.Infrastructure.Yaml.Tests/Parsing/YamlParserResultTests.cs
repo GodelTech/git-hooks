@@ -17,9 +17,12 @@ public sealed class YamlParserResultTests
                 [
                     new Diagnostic
                     {
-                        Code = DiagnosticCode.InvalidYaml,
-                        Message = "Error",
-                        Severity = DiagnosticSeverity.Error,
+                        Descriptor = new DiagnosticDescriptor
+                        {
+                            Code = DiagnosticCode.InvalidYaml,
+                            Severity = DiagnosticSeverity.Error,
+                            MessageFormat = "Error"
+                        },
                         Span = SourceSpan.Unknown
                     }
                 ]
@@ -39,9 +42,12 @@ public sealed class YamlParserResultTests
                 [
                     new Diagnostic
                     {
-                        Code = DiagnosticCode.InvalidYaml,
-                        Message = "Warning",
-                        Severity = DiagnosticSeverity.Warning,
+                        Descriptor = new DiagnosticDescriptor
+                        {
+                            Code = DiagnosticCode.InvalidYaml,
+                            Severity = DiagnosticSeverity.Warning,
+                            MessageFormat = "Warning"
+                        },
                         Span = SourceSpan.Unknown
                     }
                 ]

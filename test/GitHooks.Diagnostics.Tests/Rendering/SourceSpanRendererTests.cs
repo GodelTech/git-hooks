@@ -21,6 +21,7 @@ public sealed class SourceSpanRendererTests
     public void Render_FullyKnownSpanProvided_ReturnsFormattedSpan()
     {
         var span = new SourceSpan(
+            new SourceDocument("pipeline.yaml"),
             new SourcePosition(1, 5),
             new SourcePosition(1, 10));
 
@@ -35,6 +36,7 @@ public sealed class SourceSpanRendererTests
     public void Render_PartiallyKnownColumnProvided_ReturnsPartialPosition()
     {
         var span = new SourceSpan(
+            new SourceDocument("pipeline.yaml"),
             new SourcePosition(1, -1),
             new SourcePosition(2, 5));
 
@@ -49,6 +51,7 @@ public sealed class SourceSpanRendererTests
     public void Render_PartiallyKnownLineProvided_ReturnsPartialPosition()
     {
         var span = new SourceSpan(
+            new SourceDocument("pipeline.yaml"),
             new SourcePosition(-1, 5),
             new SourcePosition(2, 5));
 
@@ -63,6 +66,7 @@ public sealed class SourceSpanRendererTests
     public void Render_UnknownStartPositionProvided_ReturnsUnknownPosition()
     {
         var span = new SourceSpan(
+            new SourceDocument("pipeline.yaml"),
             SourcePosition.Unknown,
             new SourcePosition(2, 5));
 
@@ -77,6 +81,7 @@ public sealed class SourceSpanRendererTests
     public void Render_UnknownEndPositionProvided_ReturnsUnknownPosition()
     {
         var span = new SourceSpan(
+            new SourceDocument("pipeline.yaml"),
             new SourcePosition(1, 5),
             SourcePosition.Unknown);
 

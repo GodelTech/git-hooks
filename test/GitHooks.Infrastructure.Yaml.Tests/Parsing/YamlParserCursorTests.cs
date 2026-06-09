@@ -1,6 +1,5 @@
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
-using GitHooks.Infrastructure.Yaml.Parsing.Exceptions;
 
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -16,7 +15,7 @@ public sealed class YamlParserCursorTests
             Assert.Throws<ArgumentNullException>(
                 () => new YamlParserCursor(
                     null!,
-                    "test.yaml"));
+                    new SourceDocument("test.yaml")));
 
         Assert.Equal(
             "parser",
@@ -24,7 +23,7 @@ public sealed class YamlParserCursorTests
     }
 
     [Fact]
-    public void Constructor_NullSourceName_Throws()
+    public void Constructor_NullSourceDocument_Throws()
     {
         var exception =
             Assert.Throws<ArgumentNullException>(
@@ -33,7 +32,7 @@ public sealed class YamlParserCursorTests
                     null!));
 
         Assert.Equal(
-            "sourceName",
+            "sourceDocument",
             exception.ParamName);
     }
 
@@ -44,7 +43,7 @@ public sealed class YamlParserCursorTests
             Assert.Throws<ArgumentNullException>(
                 () => YamlParserCursor.Create(
                     null!,
-                    "test.yaml"));
+                    new SourceDocument("test.yaml")));
 
         Assert.Equal(
             "yaml",
@@ -58,7 +57,7 @@ public sealed class YamlParserCursorTests
             Assert.Throws<ArgumentException>(
                 () => YamlParserCursor.Create(
                     string.Empty,
-                    "test.yaml"));
+                    new SourceDocument("test.yaml")));
 
         Assert.Equal(
             "yaml",
@@ -66,7 +65,7 @@ public sealed class YamlParserCursorTests
     }
 
     [Fact]
-    public void Create_NullSourceName_Throws()
+    public void Create_NullSourceDocument_Throws()
     {
         var exception =
             Assert.Throws<ArgumentNullException>(
@@ -75,21 +74,7 @@ public sealed class YamlParserCursorTests
                     null!));
 
         Assert.Equal(
-            "sourceName",
-            exception.ParamName);
-    }
-
-    [Fact]
-    public void Create_EmptySourceName_Throws()
-    {
-        var exception =
-            Assert.Throws<ArgumentException>(
-                () => YamlParserCursor.Create(
-                    "{}",
-                    string.Empty));
-
-        Assert.Equal(
-            "sourceName",
+            "sourceDocument",
             exception.ParamName);
     }
 
@@ -109,7 +94,7 @@ public sealed class YamlParserCursorTests
         var cursor = TestParserFactory.CreateDummyCursor();
 
         var exception =
-            Assert.Throws<YamlPipelineParsingException>(
+            Assert.Throws<YamlException>(
                 cursor.Read<MappingStart>);
 
         Assert.StartsWith(
@@ -178,7 +163,7 @@ public sealed class YamlParserCursorTests
                 start,
                 end);
 
-        Assert.False(result.IsUnknown);
+        Assert.False(result.HasUnknownPosition);
 
         Assert.Equal(
             expectedSpan,
@@ -229,6 +214,7 @@ public sealed class YamlParserCursorTests
     public void CreateSpan_WithMarks_ReturnsSpan()
     {
         var expectedSpan = new SourceSpan(
+            new SourceDocument("test.yaml"),
             new SourcePosition(2, 3),
             new SourcePosition(5, 6));
 
@@ -256,7 +242,7 @@ public sealed class YamlParserCursorTests
         _ = cursor.Read<DocumentEnd>();
         _ = cursor.Read<StreamEnd>();
 
-        Assert.True(cursor.CurrentSpan().IsUnknown);
+        Assert.True(cursor.CurrentSpan().HasUnknownPosition);
     }
 
     [Fact]
@@ -265,11 +251,11 @@ public sealed class YamlParserCursorTests
         var cursor = TestParserFactory.CreateDummyCursor();
 
         var exception =
-            cursor.CreateParsingException(
+            cursor.CreateException(
                 "Test");
 
         Assert.Equal(
-            "Test, got EOF in test.yaml at -1:-1",
+            "Test",
             exception.Message);
     }
 

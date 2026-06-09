@@ -4,6 +4,7 @@ using GitHooks.Diagnostics.Ast.Printing;
 using GitHooks.Diagnostics.Printing;
 using GitHooks.Domain.Ast;
 using GitHooks.Domain.Ast.Mappings;
+using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Testing.Snapshots;
 
@@ -13,14 +14,14 @@ internal static class TestParserSnapshotVerifier
 {
     public static async Task VerifyAstAsync(
         string yaml,
-        Func<string, string, YamlParserResult> parseFunc,
+        Func<string, SourceDocument, YamlParserResult> parseFunc,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentNullException.ThrowIfNull(parseFunc);
 
-        var result = parseFunc(yaml, "test.yaml");
+        var result = parseFunc(yaml, new SourceDocument("test.yaml"));
 
         var output = result.Root is PipelineNode root
             ? new AstPrinter().Print(root)

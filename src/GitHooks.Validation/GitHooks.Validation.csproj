@@ -1,11 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <PackageReference Include="YamlDotNet" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\GitHooks.Diagnostics\GitHooks.Diagnostics.csproj" />
   </ItemGroup>
-
 </Project>
