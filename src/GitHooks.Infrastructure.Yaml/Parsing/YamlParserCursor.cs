@@ -34,8 +34,11 @@ internal sealed class YamlParserCursor(
             return parsingEvent;
         }
 
+        // Guaranteed by YamlDotNet ParserExtensions.TryConsume contract.
+        var current = _parser.Current!;
+
         throw CreateException(
-            $"Expected {typeof(T).Name}, got {_parser.Current?.GetType().Name ?? "EOF"}");
+            $"Expected {typeof(T).Name}, got {current.GetType().Name}");
     }
 
     public bool Is<T>()

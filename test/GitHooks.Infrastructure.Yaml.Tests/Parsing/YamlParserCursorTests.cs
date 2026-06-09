@@ -246,7 +246,7 @@ public sealed class YamlParserCursorTests
     }
 
     [Fact]
-    public void CreateParsingException_ReturnsException()
+    public void CreateException_ReturnsYamlException()
     {
         var cursor = TestParserFactory.CreateDummyCursor();
 
