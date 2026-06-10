@@ -14,7 +14,7 @@ public sealed record ScriptStepNode(
 
     public ExpressionNode? Condition { get; init; }
 
-    public int? TimeoutInMinutes { get; init; } // todo: consider using TimeSpan instead of int for better clarity and flexibility
+    public int? TimeoutInMinutes { get; init; }
 
     public InterpolatedStringNode? WorkingDirectory { get; init; }
 

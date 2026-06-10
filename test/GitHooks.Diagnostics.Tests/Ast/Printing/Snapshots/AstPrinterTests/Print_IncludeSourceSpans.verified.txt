@@ -1,1 +1,1 @@
-﻿Pipeline @ (1:1-1:10)
+﻿Pipeline @ pipeline.yaml(1:1-1:10)

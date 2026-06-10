@@ -1,34 +1,22 @@
-using System.Globalization;
-
 using GitHooks.Domain.Common;
 
 namespace GitHooks.Diagnostics.Rendering;
 
-// TODO: start using SourceDocument name in rendering
 public static class SourceSpanRenderer
 {
     public static string Render(SourceSpan span)
     {
-        return span.HasUnknownPosition
-            ? "<unknown>"
-            : $"({RenderPosition(span.Start)}-{RenderPosition(span.End)})";
-    }
-
-    private static string RenderPosition(SourcePosition position)
-    {
-        if (position.IsUnknown)
+        if (!span.HasDocument && span.HasUnknownPosition)
         {
             return "<unknown>";
         }
 
-        var line = position.HasKnownLine
-            ? position.Line.ToString(CultureInfo.InvariantCulture)
-            : "?";
+        var location = span.HasUnknownPosition
+            ? "<unknown>"
+            : $"{SourcePositionRenderer.Render(span.Start)}-{SourcePositionRenderer.Render(span.End)}";
 
-        var column = position.HasKnownColumn
-            ? position.Column.ToString(CultureInfo.InvariantCulture)
-            : "?";
-
-        return $"{line}:{column}";
+        return span.HasDocument
+            ? $"{span.Document!.Name}({location})"
+            : $"({location})";
     }
 }

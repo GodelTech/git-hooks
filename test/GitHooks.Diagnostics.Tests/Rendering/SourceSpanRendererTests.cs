@@ -28,42 +28,12 @@ public sealed class SourceSpanRendererTests
         var result = SourceSpanRenderer.Render(span);
 
         Assert.Equal(
-            "(1:5-1:10)",
+            "pipeline.yaml(1:5-1:10)",
             result);
     }
 
     [Fact]
-    public void Render_PartiallyKnownColumnProvided_ReturnsPartialPosition()
-    {
-        var span = new SourceSpan(
-            new SourceDocument("pipeline.yaml"),
-            new SourcePosition(1, -1),
-            new SourcePosition(2, 5));
-
-        var result = SourceSpanRenderer.Render(span);
-
-        Assert.Equal(
-            "(1:?-2:5)",
-            result);
-    }
-
-    [Fact]
-    public void Render_PartiallyKnownLineProvided_ReturnsPartialPosition()
-    {
-        var span = new SourceSpan(
-            new SourceDocument("pipeline.yaml"),
-            new SourcePosition(-1, 5),
-            new SourcePosition(2, 5));
-
-        var result = SourceSpanRenderer.Render(span);
-
-        Assert.Equal(
-            "(?:5-2:5)",
-            result);
-    }
-
-    [Fact]
-    public void Render_UnknownStartPositionProvided_ReturnsUnknownPosition()
+    public void Render_UnknownStartPositionProvided_ReturnsFormattedSpan()
     {
         var span = new SourceSpan(
             new SourceDocument("pipeline.yaml"),
@@ -73,12 +43,12 @@ public sealed class SourceSpanRendererTests
         var result = SourceSpanRenderer.Render(span);
 
         Assert.Equal(
-            "(<unknown>-2:5)",
+            "pipeline.yaml(<unknown>-2:5)",
             result);
     }
 
     [Fact]
-    public void Render_UnknownEndPositionProvided_ReturnsUnknownPosition()
+    public void Render_UnknownEndPositionProvided_ReturnsFormattedSpan()
     {
         var span = new SourceSpan(
             new SourceDocument("pipeline.yaml"),
@@ -88,7 +58,52 @@ public sealed class SourceSpanRendererTests
         var result = SourceSpanRenderer.Render(span);
 
         Assert.Equal(
-            "(1:5-<unknown>)",
+            "pipeline.yaml(1:5-<unknown>)",
+            result);
+    }
+
+    [Fact]
+    public void Render_KnownSpanWithoutDocument_ReturnsFormattedSpan()
+    {
+        var span = new SourceSpan(
+            null,
+            new SourcePosition(1, 5),
+            new SourcePosition(1, 10));
+
+        var result = SourceSpanRenderer.Render(span);
+
+        Assert.Equal(
+            "(1:5-1:10)",
+            result);
+    }
+
+    [Fact]
+    public void Render_UnknownStartAndEndWithoutDocument_ReturnsUnknownSpan()
+    {
+        var span = new SourceSpan(
+            null,
+            SourcePosition.Unknown,
+            SourcePosition.Unknown);
+
+        var result = SourceSpanRenderer.Render(span);
+
+        Assert.Equal(
+            "<unknown>",
+            result);
+    }
+
+    [Fact]
+    public void Render_UnknownSpanWithDocument_ReturnsDocumentAndUnknown()
+    {
+        var span = new SourceSpan(
+            new SourceDocument("pipeline.yaml"),
+            SourcePosition.Unknown,
+            SourcePosition.Unknown);
+
+        var result = SourceSpanRenderer.Render(span);
+
+        Assert.Equal(
+            "pipeline.yaml(<unknown>)",
             result);
     }
 }

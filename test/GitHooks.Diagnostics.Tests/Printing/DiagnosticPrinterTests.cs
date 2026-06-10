@@ -34,7 +34,7 @@ public sealed class DiagnosticPrinterTests
         var result = printer.Print([diagnostic]);
 
         Assert.Equal(
-            "Error GH0001: Invalid YAML: {0} @ <unknown>",
+            "<unknown>: error GH0001: Invalid YAML: {0}",
             result);
     }
 
@@ -65,8 +65,8 @@ public sealed class DiagnosticPrinterTests
 
         Assert.Equal(
             """
-            Error GH0001: Invalid YAML: {0} @ <unknown>
-            Error GH1001: Pipeline must contain at least one step. @ (5:1-5:10)
+            <unknown>: error GH0001: Invalid YAML: {0}
+            pipeline.yaml(5,1,5,10): error GH1001: Pipeline must contain at least one step.
             """,
             result);
     }
@@ -89,7 +89,7 @@ public sealed class DiagnosticPrinterTests
         var result = printer.Print([diagnostic]);
 
         Assert.Equal(
-            "GH0001: Invalid YAML: {0} @ <unknown>",
+            "<unknown>: GH0001: Invalid YAML: {0}",
             result);
     }
 
@@ -111,7 +111,7 @@ public sealed class DiagnosticPrinterTests
         var result = printer.Print([diagnostic]);
 
         Assert.Equal(
-            "Error Invalid YAML: {0} @ <unknown>",
+            "<unknown>: error Invalid YAML: {0}",
             result);
     }
 
@@ -133,7 +133,7 @@ public sealed class DiagnosticPrinterTests
         var result = printer.Print([diagnostic]);
 
         Assert.Equal(
-            "Error GH0001: Invalid YAML: {0}",
+            "error GH0001: Invalid YAML: {0}",
             result);
     }
 

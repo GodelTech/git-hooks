@@ -29,9 +29,15 @@ public sealed class DiagnosticPrinter(
     {
         var builder = new StringBuilder();
 
+        if (_options.IncludeSourceSpans)
+        {
+            _ = builder.Append(DiagnosticLocationRenderer.Render(diagnostic.Span));
+            _ = builder.Append(": ");
+        }
+
         if (_options.IncludeSeverity)
         {
-            _ = builder.Append(diagnostic.Severity);
+            _ = builder.Append(DiagnosticSeverityRenderer.Render(diagnostic.Severity));
             _ = builder.Append(' ');
         }
 
@@ -42,12 +48,6 @@ public sealed class DiagnosticPrinter(
         }
 
         _ = builder.Append(diagnostic.Message);
-
-        if (_options.IncludeSourceSpans)
-        {
-            _ = builder.Append(" @ ");
-            _ = builder.Append(SourceSpanRenderer.Render(diagnostic.Span));
-        }
 
         return builder.ToString();
     }
