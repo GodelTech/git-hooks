@@ -1,5 +1,5 @@
 using GitHooks.Diagnostics;
-using GitHooks.Testing.Builders;
+using GitHooks.Testing.Ast.Builders;
 using GitHooks.Validation.Rules.Pipeline;
 
 namespace GitHooks.Validation.Tests.Rules.Pipeline;

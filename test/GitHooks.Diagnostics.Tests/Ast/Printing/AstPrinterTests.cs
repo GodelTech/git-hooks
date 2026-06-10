@@ -4,6 +4,7 @@ using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Domain.Ast.Visitors;
 using GitHooks.Domain.Common;
 using GitHooks.Testing.Ast;
+using GitHooks.Testing.Ast.Builders;
 
 using static GitHooks.Diagnostics.Tests.Ast.Printing.AstPrinterTestHelper;
 
@@ -28,60 +29,41 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_FullFeaturedPipeline()
     {
-        var pipeline =
-            TestAst.Pipeline(
-                parameters:
-                [
-                    TestAst.Parameter(
-                        name: "configuration",
-                        displayName: "Build Configuration",
-                        values:
+        var pipeline = new PipelineNodeBuilder()
+            .WithParameter(x => x
+                .WithName("configuration")
+                .WithDisplayName("Build Configuration")
+                .WithValues(
+                    "Debug",
+                    "Release"))
+            .WithScriptStep(x => x
+                .WithScript("dotnet test")
+                .WithDisplayName("Run Tests")
+                .WithCondition("succeeded()")
+                .WithTimeoutInMinutes(30)
+                .WithWorkingDirectory("/src")
+                .WithEnvironmentVariable("CONFIGURATION", "Release"))
+            .WithTemplateStep(x => x
+                .WithTemplate("build.yml")
+                .WithParameter("configuration", "Release"))
+            .WithUnknownField(
+                TestUnknown.SimpleField(
+                    key: "simple",
+                    value: "value"))
+            .WithUnknownField(
+                TestUnknown.ComplexField(
+                    key: "key",
+                    value: TestUnknown.Sequence(
                         [
-                            "Debug",
-                            "Release"
-                        ])
-                ],
-                steps:
-                [
-                    TestAst.ScriptStep(
-                        script: "dotnet test",
-                        displayName: "Run Tests",
-                        condition: "succeeded()",
-                        timeoutInMinutes: 30,
-                        workingDirectory: "/src",
-                        env: new Dictionary<string, string>
-                        {
-                            ["CONFIGURATION"] = "Release"
-                        }),
-
-                    TestAst.TemplateStep(
-                        template: "build.yml",
-                        parameters: new Dictionary<string, string>
-                        {
-                            ["configuration"] = "Release"
-                        })
-                ],
-                unknownFields:
-                [
-                    TestAst.UnknownSimpleField(
-                        key: "simple",
-                        value: "value"),
-
-                    TestAst.UnknownComplexField(
-                        key: "key",
-                        value: TestAst.UnknownSequence(
-                            items:
-                            [
-                                TestAst.UnknownScalar("item1"),
-                                TestAst.UnknownMapping(
-                                    fields:
-                                    [
-                                        TestAst.UnknownSimpleField(
-                                            key: "nested",
-                                            value: "value")
-                                    ])
-                            ]))
-                ]);
+                            TestUnknown.Scalar("item1"),
+                            TestUnknown.Mapping(
+                                [
+                                    TestUnknown.SimpleField(
+                                        key: "nested",
+                                        value: "value")
+                                ])
+                        ])))
+            .Build();
 
         await VerifyAstAsync(pipeline);
     }
@@ -89,8 +71,9 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_StringContainsEscapedCharacters()
     {
-        var step = TestAst.ScriptStep(
-            script: "echo \"Hello\"\nexit 0");
+        var step = new ScriptStepNodeBuilder()
+            .WithScript("echo \"Hello\"\nexit 0")
+            .Build();
 
         await VerifyAstAsync(step);
     }
@@ -98,7 +81,8 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_IncludeNodeKinds()
     {
-        var pipeline = TestAst.Pipeline();
+        var pipeline = new PipelineNodeBuilder()
+            .Build();
 
         await VerifyAstAsync(
             pipeline,
@@ -116,8 +100,9 @@ public sealed class AstPrinterTests
             new SourcePosition(1, 1),
             new SourcePosition(1, 10));
 
-        var pipeline = TestAst.Pipeline(
-            span: span);
+        var pipeline = new PipelineNodeBuilder()
+            .WithSpan(span)
+            .Build();
 
         await VerifyAstAsync(
             pipeline,
@@ -130,13 +115,11 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_CustomIndentSize()
     {
-        var pipeline = TestAst.Pipeline(
-            parameters:
-            [
-                TestAst.Parameter(
-                    name: "configuration",
-                    defaultValue: "Release")
-            ]);
+        var pipeline = new PipelineNodeBuilder()
+            .WithParameter(x => x
+                .WithName("configuration")
+                .WithDefaultValue("Release"))
+            .Build();
 
         await VerifyAstAsync(
             pipeline,
@@ -149,7 +132,8 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_UnknownSourceSpan()
     {
-        var pipeline = TestAst.Pipeline();
+        var pipeline = new PipelineNodeBuilder()
+            .Build();
 
         await VerifyAstAsync(
             pipeline,
@@ -167,8 +151,9 @@ public sealed class AstPrinterTests
             new SourcePosition(1, -1),
             new SourcePosition(-1, -1));
 
-        var pipeline = TestAst.Pipeline(
-            span: span);
+        var pipeline = new PipelineNodeBuilder()
+            .WithSpan(span)
+            .Build();
 
         await VerifyAstAsync(
             pipeline,
@@ -181,7 +166,7 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_BooleanLiteral()
     {
-        var expression = TestAst.BooleanLiteral(true);
+        var expression = TestExpressions.Boolean(true);
 
         await VerifyAstAsync(expression);
     }
@@ -190,9 +175,9 @@ public sealed class AstPrinterTests
     public async Task Print_InterpolatedString()
     {
         var expression =
-            TestAst.InterpolatedString(
-                TestAst.StringLiteral("/src/"),
-                TestAst.Variable("parameters.project"));
+            TestExpressions.InterpolatedString(
+                TestExpressions.String("/src/"),
+                TestExpressions.Variable("parameters.project"));
 
         await VerifyAstAsync(expression);
     }
