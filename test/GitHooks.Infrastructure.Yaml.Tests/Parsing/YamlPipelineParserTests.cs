@@ -4,6 +4,7 @@ using GitHooks.Diagnostics;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
 
@@ -103,15 +104,9 @@ public sealed class YamlPipelineParserTests
 
         Assert.Null(result.Root);
 
-        var diagnostic = Assert.Single(result.Diagnostics);
-
-        Assert.Equal(
-            DiagnosticCode.InvalidYaml,
-            diagnostic.Code);
-
-        Assert.Equal(
-            DiagnosticSeverity.Error,
-            diagnostic.Severity);
+        DiagnosticAssert.Single(
+            result.Diagnostics,
+            DiagnosticDescriptors.InvalidYaml);
     }
 
     private async Task VerifyAstAsync(

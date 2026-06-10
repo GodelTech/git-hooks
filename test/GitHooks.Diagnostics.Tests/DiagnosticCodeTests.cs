@@ -3,22 +3,29 @@ namespace GitHooks.Diagnostics.Tests;
 public sealed class DiagnosticCodeTests
 {
     [Fact]
-    public void EqualValues_AreEqual()
+    public void Create_ReturnsFormattedCode()
     {
-        var left = new DiagnosticCode("GH0001");
-        var right = new DiagnosticCode("GH0001");
+        var result = DiagnosticCode.Create(42);
 
-        Assert.Equal(left, right);
-        Assert.True(left == right);
+        Assert.Equal(
+            "GH0042",
+            result.Value);
     }
 
     [Fact]
-    public void ToString_ReturnsValue()
+    public void Create_Zero_ReturnsFormattedCode()
     {
-        var code = new DiagnosticCode("GH9999");
+        var result = DiagnosticCode.Create(0);
 
         Assert.Equal(
-            "GH9999",
-            code.ToString());
+            "GH0000",
+            result.Value);
+    }
+
+    [Fact]
+    public void Create_NegativeValue_Throws()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => DiagnosticCode.Create(-1));
     }
 }

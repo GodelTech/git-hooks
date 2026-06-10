@@ -14,6 +14,8 @@ public sealed record Diagnostic
 
     public IReadOnlyList<object?> Arguments { get; init; } = [];
 
+    public IReadOnlyList<DiagnosticLocation> RelatedLocations { get; init; } = [];
+
     public DiagnosticCode Code
         => Descriptor.Code;
 

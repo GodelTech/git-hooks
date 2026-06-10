@@ -3,11 +3,13 @@ namespace GitHooks.Diagnostics;
 public readonly record struct DiagnosticCode(
     string Value)
 {
-    public static readonly DiagnosticCode InvalidYaml
-        = new("GH0001");
+    public static DiagnosticCode Create(
+        int value)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(value);
 
-    public static readonly DiagnosticCode PipelineMustContainStep
-        = new("GH1001");
+        return new($"GH{value:D4}");
+    }
 
     public override string ToString()
     {

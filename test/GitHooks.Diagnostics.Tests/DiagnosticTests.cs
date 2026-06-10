@@ -5,13 +5,70 @@ namespace GitHooks.Diagnostics.Tests;
 public sealed class DiagnosticTests
 {
     [Fact]
+    public void Create_WithoutArguments_ReturnsDiagnostic()
+    {
+        var result = Diagnostic.Create(
+            DiagnosticDescriptors.InvalidYaml,
+            SourceSpan.Unknown);
+
+        Assert.Equal(
+            DiagnosticDescriptors.InvalidYaml,
+            result.Descriptor);
+
+        Assert.Equal(
+            SourceSpan.Unknown,
+            result.Span);
+
+        Assert.Empty(result.Arguments);
+        Assert.Empty(result.RelatedLocations);
+    }
+
+    [Fact]
+    public void Create_WithArguments_ReturnsDiagnostic()
+    {
+        var result = Diagnostic.Create(
+            DiagnosticDescriptors.DuplicateField,
+            SourceSpan.Unknown,
+            "configuration");
+
+        Assert.Single(result.Arguments);
+
+        Assert.Equal(
+            "configuration",
+            result.Arguments[0]);
+    }
+
+    [Fact]
+    public void Message_WithoutArguments_ReturnsDescriptorMessage()
+    {
+        var diagnostic = Diagnostic.Create(
+            DiagnosticDescriptors.InvalidYaml,
+            SourceSpan.Unknown);
+
+        Assert.Equal(
+            DiagnosticDescriptors.InvalidYaml.MessageFormat,
+            diagnostic.Message);
+    }
+
+    [Fact]
+    public void Message_WithArguments_ReturnsFormattedMessage()
+    {
+        var diagnostic = Diagnostic.Create(
+            DiagnosticDescriptors.DuplicateField,
+            SourceSpan.Unknown,
+            "configuration");
+
+        Assert.Equal(
+            "Duplicate 'configuration' field.",
+            diagnostic.Message);
+    }
+
+    [Fact]
     public void Code_ReturnsDescriptorCode()
     {
-        var diagnostic = new Diagnostic
-        {
-            Descriptor = DiagnosticDescriptors.InvalidYaml,
-            Span = SourceSpan.Unknown
-        };
+        var diagnostic = Diagnostic.Create(
+            DiagnosticDescriptors.InvalidYaml,
+            SourceSpan.Unknown);
 
         Assert.Equal(
             DiagnosticDescriptors.InvalidYaml.Code,
@@ -21,11 +78,9 @@ public sealed class DiagnosticTests
     [Fact]
     public void Severity_ReturnsDescriptorSeverity()
     {
-        var diagnostic = new Diagnostic
-        {
-            Descriptor = DiagnosticDescriptors.InvalidYaml,
-            Span = SourceSpan.Unknown
-        };
+        var diagnostic = Diagnostic.Create(
+            DiagnosticDescriptors.InvalidYaml,
+            SourceSpan.Unknown);
 
         Assert.Equal(
             DiagnosticDescriptors.InvalidYaml.Severity,
@@ -33,38 +88,35 @@ public sealed class DiagnosticTests
     }
 
     [Fact]
-    public void Message_WhenDiagnosticHasNoArguments_ReturnsDescriptorMessageFormat()
+    public void RelatedLocations_DefaultsToEmptyCollection()
     {
-        var diagnostic = new Diagnostic
-        {
-            Descriptor = DiagnosticDescriptors.InvalidYaml,
-            Span = SourceSpan.Unknown
-        };
+        var diagnostic = Diagnostic.Create(
+            DiagnosticDescriptors.InvalidYaml,
+            SourceSpan.Unknown);
 
-        Assert.Equal(
-            DiagnosticDescriptors.InvalidYaml.MessageFormat,
-            diagnostic.Message);
+        Assert.Empty(
+            diagnostic.RelatedLocations);
     }
 
     [Fact]
-    public void Message_WhenDiagnosticHasArguments_FormatsMessage()
+    public void RelatedLocations_CanBeAssigned()
     {
-        var descriptor = new DiagnosticDescriptor
-        {
-            Code = DiagnosticCode.InvalidYaml,
-            Severity = DiagnosticSeverity.Error,
-            MessageFormat = "Expected '{0}' but found '{1}'."
-        };
+        var location = DiagnosticLocation.Create(
+            SourceSpan.Unknown,
+            "First declaration is here.");
 
         var diagnostic = new Diagnostic
         {
-            Descriptor = descriptor,
+            Descriptor = DiagnosticDescriptors.InvalidYaml,
             Span = SourceSpan.Unknown,
-            Arguments = ["Scalar", "Mapping"]
+            RelatedLocations = [location]
         };
 
+        var result = Assert.Single(
+            diagnostic.RelatedLocations);
+
         Assert.Equal(
-            "Expected 'Scalar' but found 'Mapping'.",
-            diagnostic.Message);
+            location,
+            result);
     }
 }

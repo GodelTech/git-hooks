@@ -19,7 +19,7 @@ public sealed class YamlParserResultTests
                     {
                         Descriptor = new DiagnosticDescriptor
                         {
-                            Code = DiagnosticCode.InvalidYaml,
+                            Code = DiagnosticCode.Create(1),
                             Severity = DiagnosticSeverity.Error,
                             MessageFormat = "Error"
                         },
@@ -44,7 +44,7 @@ public sealed class YamlParserResultTests
                     {
                         Descriptor = new DiagnosticDescriptor
                         {
-                            Code = DiagnosticCode.InvalidYaml,
+                            Code = DiagnosticCode.Create(2),
                             Severity = DiagnosticSeverity.Warning,
                             MessageFormat = "Warning"
                         },
