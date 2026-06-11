@@ -43,43 +43,67 @@ internal sealed class StepParser(
             switch (key.Value.ToLowerInvariant())
             {
                 case "script":
-                    fields.MarkSeen(key, context);
-                    step.Script = _expressionParser.Parse(context);
+                    step.Script = fields.ReadFirst(
+                        key,
+                        context,
+                        step.Script,
+                        _expressionParser.Parse);
                     break;
 
                 case "template":
-                    fields.MarkSeen(key, context);
-                    step.Template = _expressionParser.Parse(context);
+                    step.Template = fields.ReadFirst(
+                        key,
+                        context,
+                        step.Template,
+                        _expressionParser.Parse);
                     break;
 
                 case "displayname":
-                    fields.MarkSeen(key, context);
-                    step.DisplayName = _expressionParser.Parse(context);
+                    step.DisplayName = fields.ReadFirst(
+                        key,
+                        context,
+                        step.DisplayName,
+                        _expressionParser.Parse);
                     break;
 
                 case "condition":
-                    fields.MarkSeen(key, context);
-                    step.Condition = _expressionParser.Parse(context);
+                    step.Condition = fields.ReadFirst(
+                        key,
+                        context,
+                        step.Condition,
+                        _expressionParser.Parse);
                     break;
 
                 case "timeoutinminutes":
-                    fields.MarkSeen(key, context);
-                    step.TimeoutInMinutes = _expressionParser.Parse(context);
+                    step.TimeoutInMinutes = fields.ReadFirst(
+                        key,
+                        context,
+                        step.TimeoutInMinutes,
+                        _expressionParser.Parse);
                     break;
 
                 case "workingdirectory":
-                    fields.MarkSeen(key, context);
-                    step.WorkingDirectory = _expressionParser.Parse(context);
+                    step.WorkingDirectory = fields.ReadFirst(
+                        key,
+                        context,
+                        step.WorkingDirectory,
+                        _expressionParser.Parse);
                     break;
 
                 case "env":
-                    fields.MarkSeen(key, context);
-                    ParseExpressionDictionary(step.Env, context);
+                    step.Env = fields.ReadFirst(
+                        key,
+                        context,
+                        step.Env,
+                        ParseExpressionDictionary);
                     break;
 
                 case "parameters":
-                    fields.MarkSeen(key, context);
-                    ParseExpressionDictionary(step.Parameters, context);
+                    step.Parameters = fields.ReadFirst(
+                        key,
+                        context,
+                        step.Parameters,
+                        ParseExpressionDictionary);
                     break;
 
                 default:
@@ -146,23 +170,45 @@ internal sealed class StepParser(
             "Step must contain exactly one step type field");
     }
 
-    private void ParseExpressionDictionary(Dictionary<string, ExpressionNode> values, ParsingContext context)
+    private Dictionary<string, ExpressionNode> ParseExpressionDictionary(ParsingContext context)
     {
+        var values = new Dictionary<string, ExpressionNode>(
+            StringComparer.OrdinalIgnoreCase);
+
         _ = context.Cursor.Read<MappingStart>();
 
-        var fields = new FieldTracker();
+        var fields = new MappingFields(_unknownNodeParser);
 
         while (!context.Cursor.Is<MappingEnd>())
         {
+            if (!context.Cursor.Is<Scalar>())
+            {
+                // todo: where we are assign UknownFieldNode
+                fields.AddUnknownField(context);
+
+                continue;
+            }
+
             var key = context.Cursor.Read<Scalar>();
 
-            fields.MarkSeen(key, context);
+            _ = values.TryGetValue(
+                key.Value,
+                out var currentValue);
 
-            var value = _expressionParser.Parse(context);
+            var value = fields.ReadFirst(
+                key,
+                context,
+                currentValue,
+                _expressionParser.Parse);
 
-            values.Add(key.Value, value);
+            if (value is not null)
+            {
+                values[key.Value] = value;
+            }
         }
 
         _ = context.Cursor.Read<MappingEnd>();
+
+        return values;
     }
 }

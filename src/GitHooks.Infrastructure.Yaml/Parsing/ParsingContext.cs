@@ -26,14 +26,10 @@ internal sealed class ParsingContext
 
     public YamlParserCursor Cursor { get; }
 
-    public void Report(
-        DiagnosticDescriptor descriptor,
-        SourceSpan span,
-        params object?[] arguments)
+    public void Report(Diagnostic diagnostic)
     {
-        _diagnostics.Report(
-            descriptor,
-            span,
-            arguments);
+        ArgumentNullException.ThrowIfNull(diagnostic);
+
+        _diagnostics.Report(diagnostic);
     }
 }

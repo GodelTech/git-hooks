@@ -81,9 +81,10 @@ public sealed class ParsingContextTests
                 new SourceDocument("test.yaml"));
 
         context.Report(
-            DiagnosticDescriptors.InvalidYaml,
-            SourceSpan.Unknown,
-            "Test");
+            Diagnostic.Create(
+                DiagnosticDescriptors.InvalidYaml,
+                SourceSpan.Unknown,
+                "Test"));
 
         var diagnostic =
             Assert.Single(

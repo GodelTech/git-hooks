@@ -7,19 +7,22 @@ public sealed class DiagnosticBagTests
     [Fact]
     public void Diagnostics_IsEmptyByDefault()
     {
-        var bag = new DiagnosticBag();
+        var diagnostics = new DiagnosticBag();
 
-        Assert.Empty(bag.Diagnostics);
+        Assert.Empty(diagnostics.Diagnostics);
     }
 
     [Fact]
     public void Report_AddsDiagnostic()
     {
-        var bag = new DiagnosticBag();
+        var diagnostics = new DiagnosticBag();
 
-        bag.Report(DiagnosticDescriptors.InvalidYaml, SourceSpan.Unknown);
+        diagnostics.Report(
+            Diagnostic.Create(
+                DiagnosticDescriptors.InvalidYaml,
+                SourceSpan.Unknown));
 
-        var result = Assert.Single(bag.Diagnostics);
+        var result = Assert.Single(diagnostics.Diagnostics);
 
         Assert.Same(
             DiagnosticDescriptors.InvalidYaml,

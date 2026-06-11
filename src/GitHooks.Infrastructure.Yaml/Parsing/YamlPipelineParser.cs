@@ -42,9 +42,10 @@ internal sealed class YamlPipelineParser(
         catch (YamlException exception)
         {
             context.Report(
-                DiagnosticDescriptors.InvalidYaml,
-                context.Cursor.CreateSpan(exception),
-                exception.Message);
+                Diagnostic.Create(
+                    DiagnosticDescriptors.InvalidYaml,
+                    context.Cursor.CreateSpan(exception),
+                    exception.Message));
 
             return new YamlParserResult
             {

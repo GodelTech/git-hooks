@@ -1,5 +1,3 @@
-using GitHooks.Domain.Common;
-
 namespace GitHooks.Diagnostics;
 
 public sealed class DiagnosticBag
@@ -10,18 +8,10 @@ public sealed class DiagnosticBag
     public IReadOnlyList<Diagnostic> Diagnostics
         => _diagnostics;
 
-    public void Report(
-        DiagnosticDescriptor descriptor,
-        SourceSpan span,
-        params object?[] arguments)
+    public void Report(Diagnostic diagnostic)
     {
-        ArgumentNullException.ThrowIfNull(descriptor);
-        ArgumentNullException.ThrowIfNull(arguments);
+        ArgumentNullException.ThrowIfNull(diagnostic);
 
-        _diagnostics.Add(
-            Diagnostic.Create(
-                descriptor,
-                span,
-                arguments));
+        _diagnostics.Add(diagnostic);
     }
 }

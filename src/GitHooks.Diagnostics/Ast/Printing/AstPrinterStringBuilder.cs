@@ -5,9 +5,11 @@ namespace GitHooks.Diagnostics.Ast.Printing;
 internal sealed class AstPrinterStringBuilder(
     int indentSize = 2)
 {
-    private readonly string _indentText = new(' ', indentSize);
+    private readonly string _indentText
+        = new(' ', indentSize);
 
-    private readonly StringBuilder _builder = new();
+    private readonly StringBuilder _builder
+        = new();
 
     private int _indentLevel;
 
@@ -57,8 +59,7 @@ internal sealed class AstPrinterStringBuilder(
         _indentLevel--;
     }
 
-    private sealed class IndentScope(
-        AstPrinterStringBuilder builder)
+    private sealed class IndentScope(AstPrinterStringBuilder builder)
         : IDisposable
     {
         private readonly AstPrinterStringBuilder _builder = builder;

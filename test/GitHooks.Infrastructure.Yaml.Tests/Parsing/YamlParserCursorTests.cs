@@ -246,6 +246,16 @@ public sealed class YamlParserCursorTests
     }
 
     [Fact]
+    public void CurrentSpan_WhenCurrentEventExists_ReturnsKnownPosition()
+    {
+        var context = TestParserFactory.CreateDummyContext();
+
+        _ = context.Cursor.Read<StreamStart>();
+
+        Assert.False(context.Cursor.CurrentSpan().HasUnknownPosition);
+    }
+
+    [Fact]
     public void CreateException_ReturnsYamlException()
     {
         var context = TestParserFactory.CreateDummyContext();

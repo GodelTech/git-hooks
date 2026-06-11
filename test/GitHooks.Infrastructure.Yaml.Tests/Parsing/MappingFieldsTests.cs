@@ -1,8 +1,9 @@
+using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Diagnostics;
 
-using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
@@ -25,25 +26,39 @@ public sealed class MappingFieldsTests
     }
 
     [Fact]
-    public void MarkSeen_DuplicateField_Throws()
+    public void ReadFirst_DuplicateField_ReportsDiagnosticAndKeepsCurrentValue()
     {
         var context = TestParserFactory.CreateDummyContext();
 
         var key = new Scalar("steps");
 
-        _fields.MarkSeen(
+        var firstResult = _fields.ReadFirst(
             key,
-            context);
+            context,
+            "current",
+            static _ => "first");
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => _fields.MarkSeen(
-                    key,
-                    context));
+        var secondResult = _fields.ReadFirst(
+            key,
+            context,
+            firstResult,
+            static _ => "second");
 
-        Assert.StartsWith(
-            "Duplicate 'steps' field",
-            exception.Message);
+        Assert.Equal(
+            "first",
+            firstResult);
+
+        Assert.Equal(
+            "first",
+            secondResult);
+
+        var diagnostic = DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.DuplicateField);
+
+        Assert.Equal(
+            "Duplicate 'steps' field.",
+            diagnostic.Message);
     }
 
     [Fact]

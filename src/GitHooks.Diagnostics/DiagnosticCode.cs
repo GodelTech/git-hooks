@@ -3,8 +3,7 @@ namespace GitHooks.Diagnostics;
 public readonly record struct DiagnosticCode(
     string Value)
 {
-    public static DiagnosticCode Create(
-        int value)
+    public static DiagnosticCode Create(int value)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(value);
 

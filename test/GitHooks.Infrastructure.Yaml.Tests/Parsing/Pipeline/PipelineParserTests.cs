@@ -1,9 +1,9 @@
 using System.Runtime.CompilerServices;
 
+using GitHooks.Diagnostics;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
-
-using YamlDotNet.Core;
+using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline;
 
@@ -105,7 +105,7 @@ public sealed class PipelineParserTests
     }
 
     [Fact]
-    public void Parse_DuplicateParametersField_Throws()
+    public void Parse_DuplicateParametersField_ReportsDiagnostic()
     {
         var context =
             TestParserFactory.CreateContext(
@@ -118,17 +118,19 @@ public sealed class PipelineParserTests
 
         context.Cursor.StartDocument();
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => _parser.Parse(context));
+        _ = _parser.Parse(context);
 
-        Assert.StartsWith(
-            "Duplicate 'parameters' field",
-            exception.Message);
+        var diagnostic = DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.DuplicateField);
+
+        Assert.Equal(
+            "Duplicate 'parameters' field.",
+            diagnostic.Message);
     }
 
     [Fact]
-    public void Parse_DuplicateStepsField_Throws()
+    public void Parse_DuplicateStepsField_ReportsDiagnostic()
     {
         var context =
             TestParserFactory.CreateContext(
@@ -142,13 +144,15 @@ public sealed class PipelineParserTests
 
         context.Cursor.StartDocument();
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => _parser.Parse(context));
+        _ = _parser.Parse(context);
 
-        Assert.StartsWith(
-            "Duplicate 'steps' field",
-            exception.Message);
+        var diagnostic = DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.DuplicateField);
+
+        Assert.Equal(
+            "Duplicate 'steps' field.",
+            diagnostic.Message);
     }
 
     private async Task VerifyAstAsync(

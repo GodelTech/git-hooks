@@ -1,4 +1,6 @@
+using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Unknown;
+using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
 using YamlDotNet.Core.Events;
@@ -8,15 +10,52 @@ namespace GitHooks.Infrastructure.Yaml.Parsing;
 internal sealed class MappingFields(
     UnknownNodeParser unknownNodeParser)
 {
-    private readonly FieldTracker _fieldTracker
-        = new();
+    private readonly Dictionary<string, SourceSpan> _fields
+        = new(StringComparer.OrdinalIgnoreCase);
 
     private readonly UnknownFieldTracker _unknownFieldTracker
         = new(unknownNodeParser);
 
-    public void MarkSeen(Scalar key, ParsingContext context)
+    public T ReadFirst<T>(
+        Scalar key,
+        ParsingContext context,
+        T currentValue,
+        Func<ParsingContext, T> readValue)
     {
-        _fieldTracker.MarkSeen(key, context);
+        ArgumentNullException.ThrowIfNull(key);
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(readValue);
+
+        var fieldName = key.Value;
+
+        var fieldSpan = context.Cursor.CreateSpan(
+            key.Start,
+            key.End);
+
+        if (_fields.TryGetValue(fieldName, out var firstSpan))
+        {
+            context.Report(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.DuplicateField,
+                    fieldSpan,
+                    [
+                        DiagnosticLocation.Create(
+                            firstSpan,
+                            "First declaration is here.")
+                    ],
+                    fieldName));
+
+            // Consume the duplicate value to keep parser state consistent.
+            _ = readValue(context);
+
+            return currentValue;
+        }
+
+        _fields.Add(
+            fieldName,
+            fieldSpan);
+
+        return readValue(context);
     }
 
     public IReadOnlyList<UnknownFieldNode> GetUnknownFields()

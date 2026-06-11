@@ -48,13 +48,19 @@ internal sealed class PipelineParser(
             switch (key.Value.ToLowerInvariant())
             {
                 case "parameters":
-                    fields.MarkSeen(key, context);
-                    parameters = _parametersParser.Parse(context);
+                    parameters = fields.ReadFirst(
+                        key,
+                        context,
+                        parameters,
+                        _parametersParser.Parse);
                     break;
 
                 case "steps":
-                    fields.MarkSeen(key, context);
-                    steps = _stepsParser.Parse(context);
+                    steps = fields.ReadFirst(
+                        key,
+                        context,
+                        steps,
+                        _stepsParser.Parse);
                     break;
 
                 default:

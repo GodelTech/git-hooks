@@ -17,10 +17,10 @@ internal sealed class StepFields
 
     public ExpressionNode? WorkingDirectory { get; set; }
 
-    public Dictionary<string, ExpressionNode> Env { get; }
+    public Dictionary<string, ExpressionNode> Env { get; set; }
         = new(StringComparer.OrdinalIgnoreCase);
 
-    public Dictionary<string, ExpressionNode> Parameters { get; }
+    public Dictionary<string, ExpressionNode> Parameters { get; set; }
         = new(StringComparer.OrdinalIgnoreCase);
 
     public IEnumerable<string> GetPresentFields()

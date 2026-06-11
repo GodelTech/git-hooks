@@ -1,9 +1,12 @@
 using System.Runtime.CompilerServices;
 
+using GitHooks.Diagnostics;
+using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Syntax;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Diagnostics;
 
 using YamlDotNet.Core;
 
@@ -136,7 +139,7 @@ public sealed class ParameterParserTests
     [InlineData(ParameterFieldNames.DisplayName, "Build", "Test")]
     [InlineData(ParameterFieldNames.Type, "string", "number")]
     [InlineData(ParameterFieldNames.DefaultValue, "abc", "def")]
-    public void Parse_DuplicateField_Throws(
+    public void Parse_DuplicateField_ReportsDiagnostic(
         string field,
         string firstValue,
         string secondValue)
@@ -144,27 +147,61 @@ public sealed class ParameterParserTests
         var context =
             TestParserFactory.CreateContext(
                 $$"""
+                {{GetRequiredNamePrefix(field)}}
                 {{field}}: {{firstValue}}
                 {{field}}: {{secondValue}}
                 """);
 
         context.Cursor.StartDocument();
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => _parser.Parse(context));
+        var result = _parser.Parse(context);
 
-        Assert.StartsWith(
-            $"Duplicate '{field}' field",
-            exception.Message);
+        var diagnostic = DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.DuplicateField);
+
+        Assert.Equal(
+            $"Duplicate '{field}' field.",
+            diagnostic.Message);
+
+        switch (field)
+        {
+            case ParameterFieldNames.Name:
+                Assert.Equal(
+                    firstValue,
+                    result.Name);
+                break;
+
+            case ParameterFieldNames.DisplayName:
+                Assert.Equal(
+                    firstValue,
+                    result.DisplayName);
+                break;
+
+            case ParameterFieldNames.Type:
+                Assert.Equal(
+                    ParameterType.String,
+                    result.Type);
+                break;
+
+            case ParameterFieldNames.DefaultValue:
+                Assert.Equal(
+                    firstValue,
+                    GetStringLiteralValue(result.DefaultValue));
+                break;
+
+            default:
+                break;
+        }
     }
 
     [Fact]
-    public void Parse_DuplicateValuesField_Throws()
+    public void Parse_DuplicateValuesField_ReportsDiagnostic()
     {
         var context =
             TestParserFactory.CreateContext(
                 """
+                name: configuration
                 values:
                   - Debug
 
@@ -174,13 +211,21 @@ public sealed class ParameterParserTests
 
         context.Cursor.StartDocument();
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => _parser.Parse(context));
+        var result = _parser.Parse(context);
 
-        Assert.StartsWith(
-            "Duplicate 'values' field",
-            exception.Message);
+        var diagnostic = DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.DuplicateField);
+
+        Assert.Equal(
+            "Duplicate 'values' field.",
+            diagnostic.Message);
+
+        var value = Assert.Single(result.Values);
+
+        Assert.Equal(
+            "Debug",
+            GetStringLiteralValue(value));
     }
 
     [Fact]
@@ -201,6 +246,20 @@ public sealed class ParameterParserTests
         Assert.StartsWith(
             "Parameter requires 'name'",
             exception.Message);
+    }
+
+    private static string GetRequiredNamePrefix(string field)
+    {
+        return field == ParameterFieldNames.Name
+            ? string.Empty
+            : $"{ParameterFieldNames.Name}: configuration";
+    }
+
+    private static string GetStringLiteralValue(ExpressionNode? expression)
+    {
+        var literal = Assert.IsType<StringLiteralExpressionNode>(expression);
+
+        return literal.Value;
     }
 
     private async Task VerifyAstAsync(

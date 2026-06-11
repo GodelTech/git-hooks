@@ -48,28 +48,45 @@ internal sealed class ParameterParser(
             switch (key.Value.ToLowerInvariant())
             {
                 case "name":
-                    fields.MarkSeen(key, context);
-                    name = context.Cursor.Read<Scalar>().Value;
+                    name = fields.ReadFirst(
+                        key,
+                        context,
+                        name,
+                        static context => context.Cursor.Read<Scalar>().Value);
                     break;
 
                 case "displayname":
-                    fields.MarkSeen(key, context);
-                    displayName = context.Cursor.Read<Scalar>().Value;
+                    displayName = fields.ReadFirst(
+                        key,
+                        context,
+                        displayName,
+                        static context => context.Cursor.Read<Scalar>().Value);
                     break;
 
                 case "type":
-                    fields.MarkSeen(key, context);
-                    type = ParseType(context.Cursor.Read<Scalar>().Value, context);
+                    type = fields.ReadFirst(
+                        key,
+                        context,
+                        type,
+                        static context => ParseType(
+                            context.Cursor.Read<Scalar>().Value,
+                            context));
                     break;
 
                 case "default":
-                    fields.MarkSeen(key, context);
-                    defaultValue = _expressionParser.Parse(context);
+                    defaultValue = fields.ReadFirst(
+                        key,
+                        context,
+                        defaultValue,
+                        _expressionParser.Parse);
                     break;
 
                 case "values":
-                    fields.MarkSeen(key, context);
-                    values = ParseValues(context);
+                    values = fields.ReadFirst(
+                        key,
+                        context,
+                        values,
+                        ParseValues);
                     break;
 
                 default:

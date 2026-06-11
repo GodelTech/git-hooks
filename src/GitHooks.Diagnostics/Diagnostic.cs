@@ -12,9 +12,11 @@ public sealed record Diagnostic
 
     public required SourceSpan Span { get; init; }
 
-    public IReadOnlyList<object?> Arguments { get; init; } = [];
+    public IReadOnlyList<object?> Arguments { get; init; }
+        = [];
 
-    public IReadOnlyList<DiagnosticLocation> RelatedLocations { get; init; } = [];
+    public IReadOnlyList<DiagnosticLocation> RelatedLocations { get; init; }
+        = [];
 
     public DiagnosticCode Code
         => Descriptor.Code;
@@ -35,11 +37,29 @@ public sealed record Diagnostic
         SourceSpan span,
         params object?[] arguments)
     {
+        return Create(
+            descriptor,
+            span,
+            [],
+            arguments);
+    }
+
+    public static Diagnostic Create(
+        DiagnosticDescriptor descriptor,
+        SourceSpan span,
+        IReadOnlyList<DiagnosticLocation> relatedLocations,
+        params object?[] arguments)
+    {
+        ArgumentNullException.ThrowIfNull(descriptor);
+        ArgumentNullException.ThrowIfNull(relatedLocations);
+        ArgumentNullException.ThrowIfNull(arguments);
+
         return new Diagnostic
         {
             Descriptor = descriptor,
             Span = span,
-            Arguments = arguments
+            Arguments = arguments,
+            RelatedLocations = relatedLocations
         };
     }
 }
