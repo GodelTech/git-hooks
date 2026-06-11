@@ -11,18 +11,18 @@ namespace GitHooks.Infrastructure.Yaml.Tests;
 
 internal static class TestParserFactory
 {
-    public static YamlParserCursor CreateCursor(
+    public static ParsingContext CreateContext(
         string yaml,
         SourceDocument? sourceDocument = null)
     {
-        return YamlParserCursor.Create(
+        return new ParsingContext(
             yaml,
             sourceDocument ?? new SourceDocument("test.yaml"));
     }
 
-    public static YamlParserCursor CreateDummyCursor()
+    public static ParsingContext CreateDummyContext()
     {
-        return CreateCursor(
+        return new ParsingContext(
             "{}",
             new SourceDocument("test.yaml"));
     }

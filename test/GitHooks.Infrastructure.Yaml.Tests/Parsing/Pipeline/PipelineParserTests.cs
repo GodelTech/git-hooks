@@ -107,8 +107,8 @@ public sealed class PipelineParserTests
     [Fact]
     public void Parse_DuplicateParametersField_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 parameters: []
                 parameters: []
@@ -116,11 +116,11 @@ public sealed class PipelineParserTests
                   - script: dotnet test
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             "Duplicate 'parameters' field",
@@ -130,8 +130,8 @@ public sealed class PipelineParserTests
     [Fact]
     public void Parse_DuplicateStepsField_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 steps:
                   - script: dotnet test
@@ -140,11 +140,11 @@ public sealed class PipelineParserTests
                   - script: dotnet build
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             "Duplicate 'steps' field",

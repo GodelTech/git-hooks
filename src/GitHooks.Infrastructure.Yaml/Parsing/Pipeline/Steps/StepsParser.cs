@@ -10,22 +10,22 @@ internal sealed class StepsParser(
     private readonly StepParser _stepParser
         = stepParser ?? throw new ArgumentNullException(nameof(stepParser));
 
-    public IReadOnlyList<StepNode> Parse(YamlParserCursor cursor)
+    public IReadOnlyList<StepNode> Parse(ParsingContext context)
     {
-        ArgumentNullException.ThrowIfNull(cursor);
+        ArgumentNullException.ThrowIfNull(context);
 
-        _ = cursor.Read<SequenceStart>();
+        _ = context.Cursor.Read<SequenceStart>();
 
         var steps = new List<StepNode>();
 
-        while (!cursor.Is<SequenceEnd>())
+        while (!context.Cursor.Is<SequenceEnd>())
         {
-            var step = _stepParser.Parse(cursor);
+            var step = _stepParser.Parse(context);
 
             steps.Add(step);
         }
 
-        _ = cursor.Read<SequenceEnd>();
+        _ = context.Cursor.Read<SequenceEnd>();
 
         return steps;
     }

@@ -20,11 +20,11 @@ internal sealed class ParameterParser(
     private readonly UnknownNodeParser _unknownNodeParser
         = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
 
-    public ParameterNode Parse(YamlParserCursor cursor)
+    public ParameterNode Parse(ParsingContext context)
     {
-        ArgumentNullException.ThrowIfNull(cursor);
+        ArgumentNullException.ThrowIfNull(context);
 
-        var start = cursor.Read<MappingStart>();
+        var start = context.Cursor.Read<MappingStart>();
 
         var fields = new MappingFields(_unknownNodeParser);
 
@@ -34,59 +34,59 @@ internal sealed class ParameterParser(
         ExpressionNode? defaultValue = null;
         List<ExpressionNode>? values = null;
 
-        while (!cursor.Is<MappingEnd>())
+        while (!context.Cursor.Is<MappingEnd>())
         {
-            if (!cursor.Is<Scalar>())
+            if (!context.Cursor.Is<Scalar>())
             {
-                fields.AddUnknownField(cursor);
+                fields.AddUnknownField(context);
 
                 continue;
             }
 
-            var key = cursor.Read<Scalar>();
+            var key = context.Cursor.Read<Scalar>();
 
             switch (key.Value.ToLowerInvariant())
             {
                 case "name":
-                    fields.MarkSeen(key, cursor);
-                    name = cursor.Read<Scalar>().Value;
+                    fields.MarkSeen(key, context);
+                    name = context.Cursor.Read<Scalar>().Value;
                     break;
 
                 case "displayname":
-                    fields.MarkSeen(key, cursor);
-                    displayName = cursor.Read<Scalar>().Value;
+                    fields.MarkSeen(key, context);
+                    displayName = context.Cursor.Read<Scalar>().Value;
                     break;
 
                 case "type":
-                    fields.MarkSeen(key, cursor);
-                    type = ParseType(cursor.Read<Scalar>().Value, cursor);
+                    fields.MarkSeen(key, context);
+                    type = ParseType(context.Cursor.Read<Scalar>().Value, context);
                     break;
 
                 case "default":
-                    fields.MarkSeen(key, cursor);
-                    defaultValue = _expressionParser.Parse(cursor);
+                    fields.MarkSeen(key, context);
+                    defaultValue = _expressionParser.Parse(context);
                     break;
 
                 case "values":
-                    fields.MarkSeen(key, cursor);
-                    values = ParseValues(cursor);
+                    fields.MarkSeen(key, context);
+                    values = ParseValues(context);
                     break;
 
                 default:
-                    fields.AddUnknownField(key, cursor);
+                    fields.AddUnknownField(key, context);
                     break;
             }
         }
 
-        var end = cursor.Read<MappingEnd>();
+        var end = context.Cursor.Read<MappingEnd>();
 
         if (name is null)
         {
-            throw cursor.CreateException(
+            throw context.Cursor.CreateException(
                 "Parameter requires 'name'");
         }
 
-        var span = cursor.CreateSpan(start, end);
+        var span = context.Cursor.CreateSpan(start, end);
 
         return new ParameterNode
         {
@@ -102,7 +102,7 @@ internal sealed class ParameterParser(
 
     private static ParameterType ParseType(
         string value,
-        YamlParserCursor cursor)
+        ParsingContext context)
     {
         return value.ToLowerInvariant() switch
         {
@@ -111,25 +111,25 @@ internal sealed class ParameterParser(
             "number" => ParameterType.Number,
             "object" => ParameterType.Object,
 
-            _ => throw cursor.CreateException(
+            _ => throw context.Cursor.CreateException(
                 $"Unsupported parameter type '{value}'")
         };
     }
 
-    private List<ExpressionNode> ParseValues(YamlParserCursor cursor)
+    private List<ExpressionNode> ParseValues(ParsingContext context)
     {
         var values = new List<ExpressionNode>();
 
-        _ = cursor.Read<SequenceStart>();
+        _ = context.Cursor.Read<SequenceStart>();
 
-        while (!cursor.Is<SequenceEnd>())
+        while (!context.Cursor.Is<SequenceEnd>())
         {
-            var value = _expressionParser.Parse(cursor);
+            var value = _expressionParser.Parse(context);
 
             values.Add(value);
         }
 
-        _ = cursor.Read<SequenceEnd>();
+        _ = context.Cursor.Read<SequenceEnd>();
 
         return values;
     }

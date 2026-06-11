@@ -10,22 +10,22 @@ internal sealed class ParametersParser(
     private readonly ParameterParser _parameterParser
         = parameterParser ?? throw new ArgumentNullException(nameof(parameterParser));
 
-    public IReadOnlyList<ParameterNode> Parse(YamlParserCursor cursor)
+    public IReadOnlyList<ParameterNode> Parse(ParsingContext context)
     {
-        ArgumentNullException.ThrowIfNull(cursor);
+        ArgumentNullException.ThrowIfNull(context);
 
-        _ = cursor.Read<SequenceStart>();
+        _ = context.Cursor.Read<SequenceStart>();
 
         var parameters = new List<ParameterNode>();
 
-        while (!cursor.Is<SequenceEnd>())
+        while (!context.Cursor.Is<SequenceEnd>())
         {
-            var parameter = _parameterParser.Parse(cursor);
+            var parameter = _parameterParser.Parse(context);
 
             parameters.Add(parameter);
         }
 
-        _ = cursor.Read<SequenceEnd>();
+        _ = context.Cursor.Read<SequenceEnd>();
 
         return parameters;
     }

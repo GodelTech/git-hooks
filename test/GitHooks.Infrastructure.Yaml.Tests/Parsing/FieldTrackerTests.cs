@@ -17,7 +17,7 @@ public sealed class FieldTrackerTests
             Assert.Throws<ArgumentNullException>(
                 () => tracker.MarkSeen(
                     null!,
-                    TestParserFactory.CreateDummyCursor()));
+                    TestParserFactory.CreateDummyContext()));
 
         Assert.Equal(
             "key",
@@ -25,7 +25,7 @@ public sealed class FieldTrackerTests
     }
 
     [Fact]
-    public void MarkSeen_NullCursor_Throws()
+    public void MarkSeen_NullContext_Throws()
     {
         var tracker = new FieldTracker();
 
@@ -36,7 +36,7 @@ public sealed class FieldTrackerTests
                     null!));
 
         Assert.Equal(
-            "cursor",
+            "context",
             exception.ParamName);
     }
 
@@ -45,23 +45,23 @@ public sealed class FieldTrackerTests
     {
         var tracker = new FieldTracker();
 
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 "test");
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var key = new Scalar("test");
 
         tracker.MarkSeen(
             key,
-            cursor);
+            context);
 
         var exception =
             Assert.Throws<YamlException>(
                 () => tracker.MarkSeen(
                     key,
-                    cursor));
+                    context));
 
         Assert.StartsWith(
             "Duplicate 'test' field",

@@ -19,102 +19,102 @@ internal sealed class StepParser(
     private readonly UnknownNodeParser _unknownNodeParser
         = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
 
-    public StepNode Parse(YamlParserCursor cursor)
+    public StepNode Parse(ParsingContext context)
     {
-        ArgumentNullException.ThrowIfNull(cursor);
+        ArgumentNullException.ThrowIfNull(context);
 
-        var start = cursor.Read<MappingStart>();
+        var start = context.Cursor.Read<MappingStart>();
 
         var fields = new MappingFields(_unknownNodeParser);
 
         var step = new StepFields();
 
-        while (!cursor.Is<MappingEnd>())
+        while (!context.Cursor.Is<MappingEnd>())
         {
-            if (!cursor.Is<Scalar>())
+            if (!context.Cursor.Is<Scalar>())
             {
-                fields.AddUnknownField(cursor);
+                fields.AddUnknownField(context);
 
                 continue;
             }
 
-            var key = cursor.Read<Scalar>();
+            var key = context.Cursor.Read<Scalar>();
 
             switch (key.Value.ToLowerInvariant())
             {
                 case "script":
-                    fields.MarkSeen(key, cursor);
-                    step.Script = _expressionParser.Parse(cursor);
+                    fields.MarkSeen(key, context);
+                    step.Script = _expressionParser.Parse(context);
                     break;
 
                 case "template":
-                    fields.MarkSeen(key, cursor);
-                    step.Template = _expressionParser.Parse(cursor);
+                    fields.MarkSeen(key, context);
+                    step.Template = _expressionParser.Parse(context);
                     break;
 
                 case "displayname":
-                    fields.MarkSeen(key, cursor);
-                    step.DisplayName = _expressionParser.Parse(cursor);
+                    fields.MarkSeen(key, context);
+                    step.DisplayName = _expressionParser.Parse(context);
                     break;
 
                 case "condition":
-                    fields.MarkSeen(key, cursor);
-                    step.Condition = _expressionParser.Parse(cursor);
+                    fields.MarkSeen(key, context);
+                    step.Condition = _expressionParser.Parse(context);
                     break;
 
                 case "timeoutinminutes":
-                    fields.MarkSeen(key, cursor);
-                    step.TimeoutInMinutes = _expressionParser.Parse(cursor);
+                    fields.MarkSeen(key, context);
+                    step.TimeoutInMinutes = _expressionParser.Parse(context);
                     break;
 
                 case "workingdirectory":
-                    fields.MarkSeen(key, cursor);
-                    step.WorkingDirectory = _expressionParser.Parse(cursor);
+                    fields.MarkSeen(key, context);
+                    step.WorkingDirectory = _expressionParser.Parse(context);
                     break;
 
                 case "env":
-                    fields.MarkSeen(key, cursor);
-                    ParseExpressionDictionary(step.Env, cursor);
+                    fields.MarkSeen(key, context);
+                    ParseExpressionDictionary(step.Env, context);
                     break;
 
                 case "parameters":
-                    fields.MarkSeen(key, cursor);
-                    ParseExpressionDictionary(step.Parameters, cursor);
+                    fields.MarkSeen(key, context);
+                    ParseExpressionDictionary(step.Parameters, context);
                     break;
 
                 default:
-                    fields.AddUnknownField(key, cursor);
+                    fields.AddUnknownField(key, context);
                     break;
             }
         }
 
-        var end = cursor.Read<MappingEnd>();
+        var end = context.Cursor.Read<MappingEnd>();
 
         if (step.Script is not null &&
             step.Template is not null)
         {
-            throw cursor.CreateException(
+            throw context.Cursor.CreateException(
                 "Step cannot contain multiple step type fields");
         }
 
-        var span = cursor.CreateSpan(start, end);
+        var span = context.Cursor.CreateSpan(start, end);
 
         return BuildStep(
             step,
             fields.GetUnknownFields(),
             span,
-            cursor);
+            context);
     }
 
     private static StepNode BuildStep(
         StepFields step,
         IReadOnlyList<UnknownFieldNode> unknownFields,
         SourceSpan span,
-        YamlParserCursor cursor)
+        ParsingContext context)
     {
         if (step.Script is not null)
         {
-            StepFieldValidation.ValidateScriptStep(step, cursor);
+            StepFieldValidation.ValidateScriptStep(step, context);
 
             return new ScriptStepNode
             {
@@ -131,7 +131,7 @@ internal sealed class StepParser(
 
         if (step.Template is not null)
         {
-            StepFieldValidation.ValidateTemplateStep(step, cursor);
+            StepFieldValidation.ValidateTemplateStep(step, context);
 
             return new TemplateStepNode
             {
@@ -142,27 +142,27 @@ internal sealed class StepParser(
             };
         }
 
-        throw cursor.CreateException(
+        throw context.Cursor.CreateException(
             "Step must contain exactly one step type field");
     }
 
-    private void ParseExpressionDictionary(Dictionary<string, ExpressionNode> values, YamlParserCursor cursor)
+    private void ParseExpressionDictionary(Dictionary<string, ExpressionNode> values, ParsingContext context)
     {
-        _ = cursor.Read<MappingStart>();
+        _ = context.Cursor.Read<MappingStart>();
 
         var fields = new FieldTracker();
 
-        while (!cursor.Is<MappingEnd>())
+        while (!context.Cursor.Is<MappingEnd>())
         {
-            var key = cursor.Read<Scalar>();
+            var key = context.Cursor.Read<Scalar>();
 
-            fields.MarkSeen(key, cursor);
+            fields.MarkSeen(key, context);
 
-            var value = _expressionParser.Parse(cursor);
+            var value = _expressionParser.Parse(context);
 
             values.Add(key.Value, value);
         }
 
-        _ = cursor.Read<MappingEnd>();
+        _ = context.Cursor.Read<MappingEnd>();
     }
 }

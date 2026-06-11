@@ -11,10 +11,10 @@ internal sealed class FieldTracker
 
     public void MarkSeen(
         Scalar key,
-        YamlParserCursor cursor)
+        ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(key);
-        ArgumentNullException.ThrowIfNull(cursor);
+        ArgumentNullException.ThrowIfNull(context);
 
         var fieldName = key.Value;
 
@@ -28,12 +28,12 @@ internal sealed class FieldTracker
         // --> pipeline.yml:2:1
         if (_fields.TryGetValue(fieldName, out var _))
         {
-            throw cursor.CreateException(
+            throw context.Cursor.CreateException(
                 $"Duplicate '{fieldName}' field.");
         }
 
         _fields.Add(
             fieldName,
-            cursor.CurrentSpan());
+            context.Cursor.CurrentSpan());
     }
 }

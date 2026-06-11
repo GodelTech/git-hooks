@@ -23,49 +23,49 @@ internal sealed class PipelineParser(
     private readonly UnknownNodeParser _unknownNodeParser
         = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
 
-    public PipelineNode Parse(YamlParserCursor cursor)
+    public PipelineNode Parse(ParsingContext context)
     {
-        ArgumentNullException.ThrowIfNull(cursor);
+        ArgumentNullException.ThrowIfNull(context);
 
-        var start = cursor.Read<MappingStart>();
+        var start = context.Cursor.Read<MappingStart>();
 
         var fields = new MappingFields(_unknownNodeParser);
 
         IReadOnlyList<ParameterNode> parameters = [];
         IReadOnlyList<StepNode> steps = [];
 
-        while (!cursor.Is<MappingEnd>())
+        while (!context.Cursor.Is<MappingEnd>())
         {
-            if (!cursor.Is<Scalar>())
+            if (!context.Cursor.Is<Scalar>())
             {
-                fields.AddUnknownField(cursor);
+                fields.AddUnknownField(context);
 
                 continue;
             }
 
-            var key = cursor.Read<Scalar>();
+            var key = context.Cursor.Read<Scalar>();
 
             switch (key.Value.ToLowerInvariant())
             {
                 case "parameters":
-                    fields.MarkSeen(key, cursor);
-                    parameters = _parametersParser.Parse(cursor);
+                    fields.MarkSeen(key, context);
+                    parameters = _parametersParser.Parse(context);
                     break;
 
                 case "steps":
-                    fields.MarkSeen(key, cursor);
-                    steps = _stepsParser.Parse(cursor);
+                    fields.MarkSeen(key, context);
+                    steps = _stepsParser.Parse(context);
                     break;
 
                 default:
-                    fields.AddUnknownField(key, cursor);
+                    fields.AddUnknownField(key, context);
                     break;
             }
         }
 
-        var end = cursor.Read<MappingEnd>();
+        var end = context.Cursor.Read<MappingEnd>();
 
-        var span = cursor.CreateSpan(start, end);
+        var span = context.Cursor.CreateSpan(start, end);
 
         return new PipelineNode
         {

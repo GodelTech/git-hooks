@@ -81,9 +81,9 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Read_ExpectedEvent_ReturnsEvent()
     {
-        var cursor = TestParserFactory.CreateDummyCursor();
+        var context = TestParserFactory.CreateDummyContext();
 
-        var result = cursor.Read<StreamStart>();
+        var result = context.Cursor.Read<StreamStart>();
 
         Assert.NotNull(result);
     }
@@ -91,11 +91,11 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Read_UnexpectedEvent_Throws()
     {
-        var cursor = TestParserFactory.CreateDummyCursor();
+        var context = TestParserFactory.CreateDummyContext();
 
         var exception =
             Assert.Throws<YamlException>(
-                cursor.Read<MappingStart>);
+                context.Cursor.Read<MappingStart>);
 
         Assert.StartsWith(
             "Expected MappingStart",
@@ -105,27 +105,27 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Is_CurrentEventMatches_ReturnsTrue()
     {
-        var cursor = TestParserFactory.CreateDummyCursor();
+        var context = TestParserFactory.CreateDummyContext();
 
-        Assert.True(cursor.Is<StreamStart>());
+        Assert.True(context.Cursor.Is<StreamStart>());
     }
 
     [Fact]
     public void Is_CurrentEventDoesNotMatch_ReturnsFalse()
     {
-        var cursor = TestParserFactory.CreateDummyCursor();
+        var context = TestParserFactory.CreateDummyContext();
 
-        Assert.False(cursor.Is<MappingStart>());
+        Assert.False(context.Cursor.Is<MappingStart>());
     }
 
     [Fact]
     public void CreateSpan_WithNullStart_Throws()
     {
-        var (cursor, _, end) = CreateMappingCursor();
+        var (context, _, end) = CreateMappingContext();
 
         var exception =
             Assert.Throws<ArgumentNullException>(
-                () => cursor.CreateSpan(
+                () => context.Cursor.CreateSpan(
                     null!, end));
 
         Assert.Equal(
@@ -136,11 +136,11 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CreateSpan_WithNullEnd_Throws()
     {
-        var (cursor, start, _) = CreateMappingCursor();
+        var (context, start, _) = CreateMappingContext();
 
         var exception =
             Assert.Throws<ArgumentNullException>(
-                () => cursor.CreateSpan(
+                () => context.Cursor.CreateSpan(
                     start, null!));
 
         Assert.Equal(
@@ -151,15 +151,15 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CreateSpan_WithEvents_ReturnsSpan()
     {
-        var (cursor, start, end) = CreateMappingCursor();
+        var (context, start, end) = CreateMappingContext();
 
         var expectedSpan =
-            cursor.CreateSpan(
+            context.Cursor.CreateSpan(
                 start.Start,
                 end.End);
 
         var result =
-            cursor.CreateSpan(
+            context.Cursor.CreateSpan(
                 start,
                 end);
 
@@ -173,11 +173,11 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CreateSpan_WithNullYamlException_Throws()
     {
-        var cursor = TestParserFactory.CreateDummyCursor();
+        var context = TestParserFactory.CreateDummyContext();
 
         var exception =
             Assert.Throws<ArgumentNullException>(
-                () => cursor.CreateSpan(
+                () => context.Cursor.CreateSpan(
                     null!));
 
         Assert.Equal(
@@ -188,7 +188,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CreateSpan_WithYamlException_ReturnsSpan()
     {
-        var cursor = TestParserFactory.CreateDummyCursor();
+        var context = TestParserFactory.CreateDummyContext();
 
         var exception =
             new YamlException(
@@ -197,12 +197,12 @@ public sealed class YamlParserCursorTests
                 "Test");
 
         var expected =
-            cursor.CreateSpan(
+            context.Cursor.CreateSpan(
                 exception.Start,
                 exception.End);
 
         var result =
-            cursor.CreateSpan(
+            context.Cursor.CreateSpan(
                 exception);
 
         Assert.Equal(
@@ -218,10 +218,10 @@ public sealed class YamlParserCursorTests
             new SourcePosition(2, 3),
             new SourcePosition(5, 6));
 
-        var cursor = TestParserFactory.CreateDummyCursor();
+        var context = TestParserFactory.CreateDummyContext();
 
         var result =
-            cursor.CreateSpan(
+            context.Cursor.CreateSpan(
                 new Mark(1, 2, 3),
                 new Mark(4, 5, 6));
 
@@ -233,25 +233,25 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CurrentSpan_AtEnd_ReturnsUnknown()
     {
-        var cursor = TestParserFactory.CreateDummyCursor();
+        var context = TestParserFactory.CreateDummyContext();
 
-        _ = cursor.Read<StreamStart>();
-        _ = cursor.Read<DocumentStart>();
-        _ = cursor.Read<MappingStart>();
-        _ = cursor.Read<MappingEnd>();
-        _ = cursor.Read<DocumentEnd>();
-        _ = cursor.Read<StreamEnd>();
+        _ = context.Cursor.Read<StreamStart>();
+        _ = context.Cursor.Read<DocumentStart>();
+        _ = context.Cursor.Read<MappingStart>();
+        _ = context.Cursor.Read<MappingEnd>();
+        _ = context.Cursor.Read<DocumentEnd>();
+        _ = context.Cursor.Read<StreamEnd>();
 
-        Assert.True(cursor.CurrentSpan().HasUnknownPosition);
+        Assert.True(context.Cursor.CurrentSpan().HasUnknownPosition);
     }
 
     [Fact]
     public void CreateException_ReturnsYamlException()
     {
-        var cursor = TestParserFactory.CreateDummyCursor();
+        var context = TestParserFactory.CreateDummyContext();
 
         var exception =
-            cursor.CreateException(
+            context.Cursor.CreateException(
                 "Test");
 
         Assert.Equal(
@@ -259,24 +259,24 @@ public sealed class YamlParserCursorTests
             exception.Message);
     }
 
-    private static (YamlParserCursor Cursor, MappingStart Start, MappingEnd End) CreateMappingCursor()
+    private static (ParsingContext Context, MappingStart Start, MappingEnd End) CreateMappingContext()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 key: value
                 """);
 
-        _ = cursor.Read<StreamStart>();
-        _ = cursor.Read<DocumentStart>();
+        _ = context.Cursor.Read<StreamStart>();
+        _ = context.Cursor.Read<DocumentStart>();
 
-        var start = cursor.Read<MappingStart>();
+        var start = context.Cursor.Read<MappingStart>();
 
-        _ = cursor.Read<Scalar>();
-        _ = cursor.Read<Scalar>();
+        _ = context.Cursor.Read<Scalar>();
+        _ = context.Cursor.Read<Scalar>();
 
-        var end = cursor.Read<MappingEnd>();
+        var end = context.Cursor.Read<MappingEnd>();
 
-        return (cursor, start, end);
+        return (context, start, end);
     }
 }

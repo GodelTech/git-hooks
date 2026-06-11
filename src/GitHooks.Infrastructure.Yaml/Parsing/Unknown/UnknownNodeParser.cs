@@ -7,12 +7,12 @@ namespace GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
 internal sealed class UnknownNodeParser
 {
-    public UnknownFieldNode ParseField(YamlParserCursor cursor)
+    public UnknownFieldNode ParseField(ParsingContext context)
     {
-        ArgumentNullException.ThrowIfNull(cursor);
+        ArgumentNullException.ThrowIfNull(context);
 
-        var key = ParseNode(cursor);
-        var value = ParseNode(cursor);
+        var key = ParseNode(context);
+        var value = ParseNode(context);
 
         return new UnknownComplexFieldNode
         {
@@ -24,112 +24,112 @@ internal sealed class UnknownNodeParser
         };
     }
 
-    public UnknownSimpleFieldNode ParseField(Scalar key, YamlParserCursor cursor)
+    public UnknownSimpleFieldNode ParseField(Scalar key, ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(key);
-        ArgumentNullException.ThrowIfNull(cursor);
+        ArgumentNullException.ThrowIfNull(context);
 
-        var value = ParseNode(cursor);
+        var value = ParseNode(context);
 
         return new UnknownSimpleFieldNode
         {
             Key = key.Value,
             Value = value,
             Span = SourceSpan.Combine(
-                cursor.CreateSpan(key, key),
+                context.Cursor.CreateSpan(key, key),
                 value.Span)
         };
     }
 
-    private UnknownNode ParseNode(YamlParserCursor cursor)
+    private UnknownNode ParseNode(ParsingContext context)
     {
-        if (cursor.Is<Scalar>())
+        if (context.Cursor.Is<Scalar>())
         {
-            return ParseScalar(cursor);
+            return ParseScalar(context);
         }
 
-        if (cursor.Is<SequenceStart>())
+        if (context.Cursor.Is<SequenceStart>())
         {
-            return ParseSequence(cursor);
+            return ParseSequence(context);
         }
 
-        if (cursor.Is<MappingStart>())
+        if (context.Cursor.Is<MappingStart>())
         {
-            return ParseMapping(cursor);
+            return ParseMapping(context);
         }
 
-        throw cursor.CreateException(
+        throw context.Cursor.CreateException(
             "Unsupported unknown node");
     }
 
 #pragma warning disable CA1822 // Mark members as static
-    private UnknownScalarNode ParseScalar(YamlParserCursor cursor)
+    private UnknownScalarNode ParseScalar(ParsingContext context)
 #pragma warning restore CA1822 // Mark members as static
     {
-        var scalar = cursor.Read<Scalar>();
+        var scalar = context.Cursor.Read<Scalar>();
 
         return new UnknownScalarNode
         {
             Value = scalar.Value,
-            Span = cursor.CreateSpan(
+            Span = context.Cursor.CreateSpan(
                 scalar,
                 scalar)
         };
     }
 
-    private UnknownSequenceNode ParseSequence(YamlParserCursor cursor)
+    private UnknownSequenceNode ParseSequence(ParsingContext context)
     {
-        var start = cursor.Read<SequenceStart>();
+        var start = context.Cursor.Read<SequenceStart>();
 
         var items = new List<UnknownNode>();
 
-        while (!cursor.Is<SequenceEnd>())
+        while (!context.Cursor.Is<SequenceEnd>())
         {
-            items.Add(ParseNode(cursor));
+            items.Add(ParseNode(context));
         }
 
-        var end = cursor.Read<SequenceEnd>();
+        var end = context.Cursor.Read<SequenceEnd>();
 
         return new UnknownSequenceNode
         {
             Items = items,
-            Span = cursor.CreateSpan(
+            Span = context.Cursor.CreateSpan(
                 start,
                 end)
         };
     }
 
-    private UnknownMappingNode ParseMapping(YamlParserCursor cursor)
+    private UnknownMappingNode ParseMapping(ParsingContext context)
     {
-        var start = cursor.Read<MappingStart>();
+        var start = context.Cursor.Read<MappingStart>();
 
         var fields = new List<UnknownFieldNode>();
 
-        while (!cursor.Is<MappingEnd>())
+        while (!context.Cursor.Is<MappingEnd>())
         {
-            if (cursor.Is<Scalar>())
+            if (context.Cursor.Is<Scalar>())
             {
-                var key = cursor.Read<Scalar>();
+                var key = context.Cursor.Read<Scalar>();
 
                 fields.Add(
                     ParseField(
                         key,
-                        cursor));
+                        context));
             }
             else
             {
                 fields.Add(
                     ParseField(
-                        cursor));
+                        context));
             }
         }
 
-        var end = cursor.Read<MappingEnd>();
+        var end = context.Cursor.Read<MappingEnd>();
 
         return new UnknownMappingNode
         {
             Fields = fields,
-            Span = cursor.CreateSpan(
+            Span = context.Cursor.CreateSpan(
                 start,
                 end)
         };

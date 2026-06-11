@@ -20,25 +20,25 @@ internal sealed class UnknownFieldTracker(
     }
 
     public void AddUnknownField(
-        YamlParserCursor cursor)
+        ParsingContext context)
     {
-        ArgumentNullException.ThrowIfNull(cursor);
+        ArgumentNullException.ThrowIfNull(context);
 
         _unknownFields.Add(
             _unknownNodeParser.ParseField(
-                cursor));
+                context));
     }
 
     public void AddUnknownField(
         Scalar key,
-        YamlParserCursor cursor)
+        ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(key);
-        ArgumentNullException.ThrowIfNull(cursor);
+        ArgumentNullException.ThrowIfNull(context);
 
         _unknownFields.Add(
             _unknownNodeParser.ParseField(
                 key,
-                cursor));
+                context));
     }
 }

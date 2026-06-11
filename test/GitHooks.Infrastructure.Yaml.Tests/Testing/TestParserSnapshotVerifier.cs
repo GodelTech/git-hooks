@@ -35,7 +35,7 @@ internal static class TestParserSnapshotVerifier
 
     public static async Task VerifyAstAsync(
         string yaml,
-        Func<YamlParserCursor, AstNode> parseFunc,
+        Func<ParsingContext, AstNode> parseFunc,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
@@ -50,26 +50,26 @@ internal static class TestParserSnapshotVerifier
 
     public static async Task VerifyAstAsync(
         string yaml,
-        Func<YamlParserCursor, AstNode> parseFunc,
-        Action<YamlParserCursor>? beforeParse = null,
-        Action<YamlParserCursor>? afterParse = null,
+        Func<ParsingContext, AstNode> parseFunc,
+        Action<ParsingContext>? beforeParse = null,
+        Action<ParsingContext>? afterParse = null,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentNullException.ThrowIfNull(parseFunc);
 
-        var cursor = TestParserFactory.CreateCursor(yaml);
+        var context = TestParserFactory.CreateContext(yaml);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
-        beforeParse?.Invoke(cursor);
+        beforeParse?.Invoke(context);
 
-        var result = parseFunc(cursor);
+        var result = parseFunc(context);
 
-        afterParse?.Invoke(cursor);
+        afterParse?.Invoke(context);
 
-        cursor.EndDocument();
+        context.Cursor.EndDocument();
 
         var output = new AstPrinter().Print(result);
 

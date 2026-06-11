@@ -13,7 +13,7 @@ public sealed class UnknownNodeParserTests
     private readonly UnknownNodeParser _parser = TestParserFactory.CreateUnknownNodeParser();
 
     [Fact]
-    public void ParseField_WithNullCursor_Throws()
+    public void ParseField_WithNullContext_Throws()
     {
         var exception =
             Assert.Throws<ArgumentNullException>(
@@ -21,7 +21,7 @@ public sealed class UnknownNodeParserTests
                     null!));
 
         Assert.Equal(
-            "cursor",
+            "context",
             exception.ParamName);
     }
 
@@ -32,7 +32,7 @@ public sealed class UnknownNodeParserTests
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseField(
                     null!,
-                    TestParserFactory.CreateDummyCursor()));
+                    TestParserFactory.CreateDummyContext()));
 
         Assert.Equal(
             "key",
@@ -40,7 +40,7 @@ public sealed class UnknownNodeParserTests
     }
 
     [Fact]
-    public void ParseField_WithKeyAndNullCursor_Throws()
+    public void ParseField_WithKeyAndNullContext_Throws()
     {
         var key = new Scalar("test");
 
@@ -51,7 +51,7 @@ public sealed class UnknownNodeParserTests
                     null!));
 
         Assert.Equal(
-            "cursor",
+            "context",
             exception.ParamName);
     }
 
@@ -115,19 +115,19 @@ public sealed class UnknownNodeParserTests
     [Fact]
     public void ParseField_WithUnsupportedNode_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 test
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
-        _ = cursor.Read<Scalar>();
+        _ = context.Cursor.Read<Scalar>();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.ParseField(cursor));
+                () => _parser.ParseField(context));
 
         Assert.StartsWith(
             "Unsupported unknown node",
@@ -156,8 +156,8 @@ public sealed class UnknownNodeParserTests
         await TestParserSnapshotVerifier.VerifyAstAsync(
             yaml,
             _parser.ParseField,
-            beforeParse: cursor => _ = cursor.Read<MappingStart>(),
-            afterParse: cursor => _ = cursor.Read<MappingEnd>(),
+            beforeParse: context => _ = context.Cursor.Read<MappingStart>(),
+            afterParse: context => _ = context.Cursor.Read<MappingEnd>(),
             memberName,
             sourceFilePath);
     }

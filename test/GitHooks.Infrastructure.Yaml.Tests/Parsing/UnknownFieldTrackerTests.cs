@@ -33,13 +33,13 @@ public sealed class UnknownFieldTrackerTests
     [Fact]
     public void AddUnknownField_WithScalarKey_AddsField()
     {
-        var cursor = TestParserFactory.CreateCursor("value");
+        var context = TestParserFactory.CreateContext("value");
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         _tracker.AddUnknownField(
             new Scalar("custom"),
-            cursor);
+            context);
 
         var field =
             Assert.IsType<UnknownSimpleFieldNode>(
@@ -54,18 +54,18 @@ public sealed class UnknownFieldTrackerTests
     [Fact]
     public void AddUnknownField_WithComplexKey_AddsField()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 ? [1, 2]
                 : value
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
-        _ = cursor.Read<MappingStart>();
+        _ = context.Cursor.Read<MappingStart>();
 
-        _tracker.AddUnknownField(cursor);
+        _tracker.AddUnknownField(context);
 
         var field =
             Assert.Single(

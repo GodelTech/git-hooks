@@ -27,19 +27,19 @@ public sealed class MappingFieldsTests
     [Fact]
     public void MarkSeen_DuplicateField_Throws()
     {
-        var cursor = TestParserFactory.CreateDummyCursor();
+        var context = TestParserFactory.CreateDummyContext();
 
         var key = new Scalar("steps");
 
         _fields.MarkSeen(
             key,
-            cursor);
+            context);
 
         var exception =
             Assert.Throws<YamlException>(
                 () => _fields.MarkSeen(
                     key,
-                    cursor));
+                    context));
 
         Assert.StartsWith(
             "Duplicate 'steps' field",
@@ -56,15 +56,15 @@ public sealed class MappingFieldsTests
     [Fact]
     public void AddUnknownField_AddsField()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 "value");
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         _fields.AddUnknownField(
             new Scalar("custom"),
-            cursor);
+            context);
 
         var fields = _fields.GetUnknownFields();
 
@@ -84,20 +84,20 @@ public sealed class MappingFieldsTests
             new MappingFields(
                 TestParserFactory.CreateUnknownNodeParser());
 
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 ? [1, 2]
                 : value
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
-        _ = cursor.Read<MappingStart>();
+        _ = context.Cursor.Read<MappingStart>();
 
-        fields.AddUnknownField(cursor);
+        fields.AddUnknownField(context);
 
-        _ = cursor.Read<MappingEnd>();
+        _ = context.Cursor.Read<MappingEnd>();
 
         var field =
             Assert.Single(

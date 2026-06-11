@@ -92,18 +92,18 @@ public sealed class ParameterParserTests
         string value,
         ParameterType expected)
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 $$"""
                 name: configuration
                 type: {{value}}
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
-        var result = _parser.Parse(cursor);
+        var result = _parser.Parse(context);
 
-        cursor.EndDocument();
+        context.Cursor.EndDocument();
 
         Assert.Equal(
             expected,
@@ -113,18 +113,18 @@ public sealed class ParameterParserTests
     [Fact]
     public void Parse_UnsupportedType_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 name: configuration
                 type: invalid
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             "Unsupported parameter type 'invalid'",
@@ -141,18 +141,18 @@ public sealed class ParameterParserTests
         string firstValue,
         string secondValue)
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 $$"""
                 {{field}}: {{firstValue}}
                 {{field}}: {{secondValue}}
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             $"Duplicate '{field}' field",
@@ -162,8 +162,8 @@ public sealed class ParameterParserTests
     [Fact]
     public void Parse_DuplicateValuesField_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 values:
                   - Debug
@@ -172,11 +172,11 @@ public sealed class ParameterParserTests
                   - Release
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             "Duplicate 'values' field",
@@ -186,17 +186,17 @@ public sealed class ParameterParserTests
     [Fact]
     public void Parse_MissingName_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 type: string
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             "Parameter requires 'name'",

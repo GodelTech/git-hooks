@@ -19,39 +19,37 @@ internal sealed class YamlPipelineParser(
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentNullException.ThrowIfNull(sourceDocument);
 
-        var diagnostics = new DiagnosticBag();
-
-        var cursor = YamlParserCursor.Create(
+        var context = new ParsingContext(
             yaml,
             sourceDocument);
 
         try
         {
-            _ = cursor.Read<StreamStart>();
-            _ = cursor.Read<DocumentStart>();
+            _ = context.Cursor.Read<StreamStart>();
+            _ = context.Cursor.Read<DocumentStart>();
 
-            var pipeline = _pipelineParser.Parse(cursor);
+            var pipeline = _pipelineParser.Parse(context);
 
-            _ = cursor.Read<DocumentEnd>();
-            _ = cursor.Read<StreamEnd>();
+            _ = context.Cursor.Read<DocumentEnd>();
+            _ = context.Cursor.Read<StreamEnd>();
 
             return new YamlParserResult
             {
                 Root = pipeline,
-                Diagnostics = diagnostics.Diagnostics
+                Diagnostics = context.Diagnostics
             };
         }
         catch (YamlException exception)
         {
-            diagnostics.Report(
+            context.Report(
                 DiagnosticDescriptors.InvalidYaml,
-                cursor.CreateSpan(exception),
+                context.Cursor.CreateSpan(exception),
                 exception.Message);
 
             return new YamlParserResult
             {
                 Root = null,
-                Diagnostics = diagnostics.Diagnostics
+                Diagnostics = context.Diagnostics
             };
         }
     }

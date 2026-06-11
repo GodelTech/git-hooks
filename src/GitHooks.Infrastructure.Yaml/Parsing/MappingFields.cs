@@ -14,9 +14,9 @@ internal sealed class MappingFields(
     private readonly UnknownFieldTracker _unknownFieldTracker
         = new(unknownNodeParser);
 
-    public void MarkSeen(Scalar key, YamlParserCursor cursor)
+    public void MarkSeen(Scalar key, ParsingContext context)
     {
-        _fieldTracker.MarkSeen(key, cursor);
+        _fieldTracker.MarkSeen(key, context);
     }
 
     public IReadOnlyList<UnknownFieldNode> GetUnknownFields()
@@ -24,13 +24,13 @@ internal sealed class MappingFields(
         return _unknownFieldTracker.GetUnknownFields();
     }
 
-    public void AddUnknownField(YamlParserCursor cursor)
+    public void AddUnknownField(ParsingContext context)
     {
-        _unknownFieldTracker.AddUnknownField(cursor);
+        _unknownFieldTracker.AddUnknownField(context);
     }
 
-    public void AddUnknownField(Scalar key, YamlParserCursor cursor)
+    public void AddUnknownField(Scalar key, ParsingContext context)
     {
-        _unknownFieldTracker.AddUnknownField(key, cursor);
+        _unknownFieldTracker.AddUnknownField(key, context);
     }
 }

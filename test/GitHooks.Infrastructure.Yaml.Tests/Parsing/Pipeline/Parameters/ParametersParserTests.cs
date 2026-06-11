@@ -23,15 +23,15 @@ public sealed class ParametersParserTests
     [Fact]
     public void Parse_EmptySequence_ReturnsEmptyCollection()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 "[]");
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
-        var result = _parser.Parse(cursor);
+        var result = _parser.Parse(context);
 
-        cursor.EndDocument();
+        context.Cursor.EndDocument();
 
         Assert.Empty(result);
     }
@@ -39,8 +39,8 @@ public sealed class ParametersParserTests
     [Fact]
     public void Parse_MultipleParameters_ReturnsParameters()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 - name: configuration
                   type: string
@@ -49,11 +49,11 @@ public sealed class ParametersParserTests
                   type: string
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
-        var result = _parser.Parse(cursor);
+        var result = _parser.Parse(context);
 
-        cursor.EndDocument();
+        context.Cursor.EndDocument();
 
         Assert.Equal(
             2,
@@ -71,17 +71,17 @@ public sealed class ParametersParserTests
     [Fact]
     public void Parse_NotSequence_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 name: configuration
                 type: string
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception = Assert.Throws<YamlException>(
-            () => _parser.Parse(cursor));
+            () => _parser.Parse(context));
 
         Assert.Contains(
             "Expected SequenceStart",

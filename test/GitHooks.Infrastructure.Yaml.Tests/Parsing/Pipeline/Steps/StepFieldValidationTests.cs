@@ -23,7 +23,7 @@ public sealed class StepFieldValidationTests
 
         StepFieldValidation.ValidateScriptStep(
             step,
-            TestParserFactory.CreateDummyCursor());
+            TestParserFactory.CreateDummyContext());
     }
 
     [Theory]
@@ -42,7 +42,7 @@ public sealed class StepFieldValidationTests
             Assert.Throws<YamlException>(
                 () => StepFieldValidation.ValidateScriptStep(
                     step,
-                    TestParserFactory.CreateDummyCursor()));
+                    TestParserFactory.CreateDummyContext()));
 
         Assert.StartsWith(
             $"Script step contains invalid field(s): {field}",
@@ -64,7 +64,7 @@ public sealed class StepFieldValidationTests
             Assert.Throws<YamlException>(
                 () => StepFieldValidation.ValidateScriptStep(
                     step,
-                    TestParserFactory.CreateDummyCursor()));
+                    TestParserFactory.CreateDummyContext()));
 
         Assert.StartsWith(
             "Script step contains invalid field(s): template, parameters",
@@ -83,7 +83,7 @@ public sealed class StepFieldValidationTests
 
         StepFieldValidation.ValidateTemplateStep(
             step,
-            TestParserFactory.CreateDummyCursor());
+            TestParserFactory.CreateDummyContext());
     }
 
     [Theory]
@@ -106,7 +106,7 @@ public sealed class StepFieldValidationTests
             Assert.Throws<YamlException>(
                 () => StepFieldValidation.ValidateTemplateStep(
                     step,
-                    TestParserFactory.CreateDummyCursor()));
+                    TestParserFactory.CreateDummyContext()));
 
         Assert.StartsWith(
             $"Template step contains invalid field(s): {field}",
@@ -128,7 +128,7 @@ public sealed class StepFieldValidationTests
             Assert.Throws<YamlException>(
                 () => StepFieldValidation.ValidateTemplateStep(
                     step,
-                    TestParserFactory.CreateDummyCursor()));
+                    TestParserFactory.CreateDummyContext()));
 
         Assert.StartsWith(
             "Template step contains invalid field(s): displayName, env",

@@ -6,30 +6,30 @@ internal static class StepFieldValidation
 {
     public static void ValidateScriptStep(
         StepFields step,
-        YamlParserCursor cursor)
+        ParsingContext context)
     {
         ValidateAllowedFields(
             "Script",
             step,
-            cursor,
+            context,
             StepFieldNames.ScriptStepFields);
     }
 
     public static void ValidateTemplateStep(
         StepFields step,
-        YamlParserCursor cursor)
+        ParsingContext context)
     {
         ValidateAllowedFields(
             "Template",
             step,
-            cursor,
+            context,
             StepFieldNames.TemplateStepFields);
     }
 
     private static void ValidateAllowedFields(
         string stepType,
         StepFields step,
-        YamlParserCursor cursor,
+        ParsingContext context,
         IReadOnlySet<string> allowedFields)
     {
         var violations = step
@@ -39,7 +39,7 @@ internal static class StepFieldValidation
 
         if (violations.Length > 0)
         {
-            throw cursor.CreateException(
+            throw context.Cursor.CreateException(
                 $"{stepType} step contains invalid field(s): {string.Join(", ", violations)}");
         }
     }

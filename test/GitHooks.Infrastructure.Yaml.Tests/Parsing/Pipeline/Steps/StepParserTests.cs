@@ -150,18 +150,18 @@ public sealed class StepParserTests
         string firstValue,
         string secondValue)
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 $$"""
                 {{field}}: {{firstValue}}
                 {{field}}: {{secondValue}}
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             $"Duplicate '{field}' field",
@@ -173,8 +173,8 @@ public sealed class StepParserTests
     [InlineData(StepFieldNames.Parameters)]
     public void Parse_DuplicateDictionaryField_Throws(string field)
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 $$"""
                 {{field}}:
                   name: configuration
@@ -183,11 +183,11 @@ public sealed class StepParserTests
                   name: framework
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             $"Duplicate '{field}' field",
@@ -197,8 +197,8 @@ public sealed class StepParserTests
     [Fact]
     public void Parse_DuplicateEnvKey_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 script: dotnet test
 
@@ -207,11 +207,11 @@ public sealed class StepParserTests
                   CONFIGURATION: Release
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             "Duplicate 'CONFIGURATION' field",
@@ -221,8 +221,8 @@ public sealed class StepParserTests
     [Fact]
     public void Parse_DuplicateParameterKey_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 template: build.yml
 
@@ -231,11 +231,11 @@ public sealed class StepParserTests
                   configuration: Release
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             "Duplicate 'configuration' field",
@@ -245,18 +245,18 @@ public sealed class StepParserTests
     [Fact]
     public void Parse_ScriptAndTemplate_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 script: dotnet test
                 template: build.yml
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             "Step cannot contain multiple step type fields",
@@ -266,19 +266,19 @@ public sealed class StepParserTests
     [Fact]
     public void Parse_ScriptStepWithParameters_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 script: dotnet test
                 parameters:
                   configuration: Release
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             "Script step contains invalid field(s): parameters",
@@ -288,18 +288,18 @@ public sealed class StepParserTests
     [Fact]
     public void Parse_TemplateStepWithDisplayName_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 template: build.yml
                 displayName: Build
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             "Template step contains invalid field(s): displayName",
@@ -309,17 +309,17 @@ public sealed class StepParserTests
     [Fact]
     public void Parse_MissingStepType_Throws()
     {
-        var cursor =
-            TestParserFactory.CreateCursor(
+        var context =
+            TestParserFactory.CreateContext(
                 """
                 displayName: Test
                 """);
 
-        cursor.StartDocument();
+        context.Cursor.StartDocument();
 
         var exception =
             Assert.Throws<YamlException>(
-                () => _parser.Parse(cursor));
+                () => _parser.Parse(context));
 
         Assert.StartsWith(
             "Step must contain exactly one step type field",

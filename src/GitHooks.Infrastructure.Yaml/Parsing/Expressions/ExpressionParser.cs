@@ -12,13 +12,13 @@ internal sealed class ExpressionParser(
     private readonly InterpolatedStringParser _interpolatedStringParser
         = interpolatedStringParser ?? throw new ArgumentNullException(nameof(interpolatedStringParser));
 
-    public ExpressionNode Parse(YamlParserCursor cursor)
+    public ExpressionNode Parse(ParsingContext context)
     {
-        ArgumentNullException.ThrowIfNull(cursor);
+        ArgumentNullException.ThrowIfNull(context);
 
-        var scalar = cursor.Read<Scalar>();
+        var scalar = context.Cursor.Read<Scalar>();
 
-        var span = cursor.CreateSpan(scalar.Start, scalar.End);
+        var span = context.Cursor.CreateSpan(scalar.Start, scalar.End);
 
         if (InterpolatedStringParser.ContainsInterpolation(scalar.Value))
         {
