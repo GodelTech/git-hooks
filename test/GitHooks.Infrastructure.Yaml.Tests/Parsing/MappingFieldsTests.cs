@@ -52,13 +52,10 @@ public sealed class MappingFieldsTests
             "first",
             secondResult);
 
-        var diagnostic = DiagnosticAssert.Single(
+        DiagnosticAssert.Single(
             context.Diagnostics,
-            DiagnosticDescriptors.DuplicateField);
-
-        Assert.Equal(
-            "Duplicate 'steps' field.",
-            diagnostic.Message);
+            DiagnosticDescriptors.DuplicateField,
+            "steps");
     }
 
     [Fact]

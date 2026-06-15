@@ -1,27 +1,26 @@
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Syntax;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
 
 internal sealed class StepFields
 {
-    public ExpressionNode? Script { get; set; }
+    public StringKeyFieldNode<ExpressionNode>? Script { get; set; }
 
-    public ExpressionNode? Template { get; set; }
+    public StringKeyFieldNode<ExpressionNode>? Template { get; set; }
 
-    public ExpressionNode? DisplayName { get; set; }
+    public StringKeyFieldNode<ExpressionNode>? DisplayName { get; set; }
 
-    public ExpressionNode? Condition { get; set; }
+    public StringKeyFieldNode<ExpressionNode>? Condition { get; set; }
 
-    public ExpressionNode? TimeoutInMinutes { get; set; }
+    public StringKeyFieldNode<ExpressionNode>? TimeoutInMinutes { get; set; }
 
-    public ExpressionNode? WorkingDirectory { get; set; }
+    public StringKeyFieldNode<ExpressionNode>? WorkingDirectory { get; set; }
 
-    public Dictionary<string, ExpressionNode> Env { get; set; }
-        = new(StringComparer.OrdinalIgnoreCase);
+    public MappingFieldNode<StringKeyFieldNode<ExpressionNode>>? Env { get; set; }
 
-    public Dictionary<string, ExpressionNode> Parameters { get; set; }
-        = new(StringComparer.OrdinalIgnoreCase);
+    public MappingFieldNode<StringKeyFieldNode<ExpressionNode>>? Parameters { get; set; }
 
     public IEnumerable<string> GetPresentFields()
     {
@@ -55,12 +54,12 @@ internal sealed class StepFields
             yield return StepFieldNames.WorkingDirectory;
         }
 
-        if (Env.Count is > 0)
+        if (Env is not null)
         {
             yield return StepFieldNames.Env;
         }
 
-        if (Parameters.Count is > 0)
+        if (Parameters is not null)
         {
             yield return StepFieldNames.Parameters;
         }

@@ -66,7 +66,7 @@ public sealed class DiagnosticPrinterTests
         Assert.Equal(
             """
             <unknown>: error GH0001: Invalid YAML: {0}
-            pipeline.yaml(5,1,5,10): error GH1001: Pipeline must contain at least one step.
+            pipeline.yaml(5,1,5,10): error GH2001: Pipeline must contain at least one step.
             """,
             result);
     }

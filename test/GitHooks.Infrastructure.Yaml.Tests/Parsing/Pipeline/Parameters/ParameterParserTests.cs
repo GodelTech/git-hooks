@@ -8,8 +8,6 @@ using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 using GitHooks.Testing.Diagnostics;
 
-using YamlDotNet.Core;
-
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Parameters;
 
 public sealed class ParameterParserTests
@@ -114,7 +112,7 @@ public sealed class ParameterParserTests
     }
 
     [Fact]
-    public void Parse_UnsupportedType_Throws()
+    public void Parse_UnsupportedType_ReportsDiagnostic()
     {
         var context =
             TestParserFactory.CreateContext(
@@ -125,19 +123,26 @@ public sealed class ParameterParserTests
 
         context.Cursor.StartDocument();
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => _parser.Parse(context));
+        var parameter = _parser.Parse(context);
 
-        Assert.StartsWith(
-            "Unsupported parameter type 'invalid'",
-            exception.Message);
+        DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.UnsupportedParameterType,
+            "invalid");
+
+        Assert.Equal(
+            "configuration",
+            parameter.Name);
+
+        Assert.Equal(
+            ParameterType.String,
+            parameter.Type);
     }
 
     [Theory]
     [InlineData(ParameterFieldNames.Name, "test", "duplicate")]
     [InlineData(ParameterFieldNames.DisplayName, "Build", "Test")]
-    [InlineData(ParameterFieldNames.Type, "string", "number")]
+    [InlineData(ParameterFieldNames.Type, "number", "string")]
     [InlineData(ParameterFieldNames.DefaultValue, "abc", "def")]
     public void Parse_DuplicateField_ReportsDiagnostic(
         string field,
@@ -156,43 +161,15 @@ public sealed class ParameterParserTests
 
         var result = _parser.Parse(context);
 
-        var diagnostic = DiagnosticAssert.Single(
+        DiagnosticAssert.Single(
             context.Diagnostics,
-            DiagnosticDescriptors.DuplicateField);
+            DiagnosticDescriptors.DuplicateField,
+            field);
 
-        Assert.Equal(
-            $"Duplicate '{field}' field.",
-            diagnostic.Message);
-
-        switch (field)
-        {
-            case ParameterFieldNames.Name:
-                Assert.Equal(
-                    firstValue,
-                    result.Name);
-                break;
-
-            case ParameterFieldNames.DisplayName:
-                Assert.Equal(
-                    firstValue,
-                    result.DisplayName);
-                break;
-
-            case ParameterFieldNames.Type:
-                Assert.Equal(
-                    ParameterType.String,
-                    result.Type);
-                break;
-
-            case ParameterFieldNames.DefaultValue:
-                Assert.Equal(
-                    firstValue,
-                    GetStringLiteralValue(result.DefaultValue));
-                break;
-
-            default:
-                break;
-        }
+        AssertFirstFieldValue(
+            result,
+            field,
+            firstValue);
     }
 
     [Fact]
@@ -213,13 +190,10 @@ public sealed class ParameterParserTests
 
         var result = _parser.Parse(context);
 
-        var diagnostic = DiagnosticAssert.Single(
+        DiagnosticAssert.Single(
             context.Diagnostics,
-            DiagnosticDescriptors.DuplicateField);
-
-        Assert.Equal(
-            "Duplicate 'values' field.",
-            diagnostic.Message);
+            DiagnosticDescriptors.DuplicateField,
+            "values");
 
         var value = Assert.Single(result.Values);
 
@@ -229,7 +203,7 @@ public sealed class ParameterParserTests
     }
 
     [Fact]
-    public void Parse_MissingName_Throws()
+    public void Parse_MissingName_ReportsDiagnostic()
     {
         var context =
             TestParserFactory.CreateContext(
@@ -239,18 +213,22 @@ public sealed class ParameterParserTests
 
         context.Cursor.StartDocument();
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => _parser.Parse(context));
+        var parameter = _parser.Parse(context);
 
-        Assert.StartsWith(
-            "Parameter requires 'name'",
-            exception.Message);
+        DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.ParameterNameRequired);
+
+        Assert.Empty(parameter.Name);
+
+        Assert.Equal(
+            ParameterType.String,
+            parameter.Type);
     }
 
     private static string GetRequiredNamePrefix(string field)
     {
-        return field == ParameterFieldNames.Name
+        return field is ParameterFieldNames.Name
             ? string.Empty
             : $"{ParameterFieldNames.Name}: configuration";
     }
@@ -260,6 +238,43 @@ public sealed class ParameterParserTests
         var literal = Assert.IsType<StringLiteralExpressionNode>(expression);
 
         return literal.Value;
+    }
+
+    private static void AssertFirstFieldValue(
+        ParameterNode parameter,
+        string field,
+        string expected)
+    {
+        switch (field)
+        {
+            case ParameterFieldNames.Name:
+                Assert.Equal(
+                    expected,
+                    parameter.Name);
+                break;
+
+            case ParameterFieldNames.DisplayName:
+                Assert.Equal(
+                    expected,
+                    parameter.DisplayName);
+                break;
+
+            case ParameterFieldNames.Type:
+                Assert.Equal(
+                    ParameterType.Number,
+                    parameter.Type);
+                break;
+
+            case ParameterFieldNames.DefaultValue:
+                Assert.Equal(
+                    expected,
+                    GetStringLiteralValue(parameter.DefaultValue));
+                break;
+
+            default:
+                Assert.Fail($"Unexpected field '{field}'.");
+                break;
+        }
     }
 
     private async Task VerifyAstAsync(

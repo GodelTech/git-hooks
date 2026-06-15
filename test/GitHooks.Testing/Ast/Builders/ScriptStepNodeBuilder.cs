@@ -1,4 +1,5 @@
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Common;
 
@@ -7,32 +8,17 @@ namespace GitHooks.Testing.Ast.Builders;
 public sealed class ScriptStepNodeBuilder
     : MappingNodeBuilder<ScriptStepNodeBuilder>
 {
-    private readonly Dictionary<string, ExpressionNode> _env
-        = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<StringKeyFieldNode<ExpressionNode>> _env = [];
 
-    private ExpressionNode? _script;
-    private ExpressionNode? _displayName;
-    private ExpressionNode? _condition;
-    private ExpressionNode? _timeoutInMinutes;
-    private ExpressionNode? _workingDirectory;
+    private StringKeyFieldNode<ExpressionNode>? _script;
+    private StringKeyFieldNode<ExpressionNode>? _displayName;
+    private StringKeyFieldNode<ExpressionNode>? _condition;
+    private StringKeyFieldNode<ExpressionNode>? _timeoutInMinutes;
+    private StringKeyFieldNode<ExpressionNode>? _workingDirectory;
 
     public ScriptStepNodeBuilder()
     {
-        _script = new StringLiteralExpressionNode
-        {
-            Value = "dotnet test",
-            Span = SourceSpan.Unknown
-        };
-    }
-
-    public ScriptStepNodeBuilder WithScript(
-        ExpressionNode script)
-    {
-        ArgumentNullException.ThrowIfNull(script);
-
-        _script = script;
-
-        return this;
+        WithScript("dotnet test");
     }
 
     public ScriptStepNodeBuilder WithScript(
@@ -40,18 +26,9 @@ public sealed class ScriptStepNodeBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(script);
 
-        WithScript(
-            TestExpressions.String(script));
-
-        return this;
-    }
-
-    public ScriptStepNodeBuilder WithDisplayName(
-        ExpressionNode displayName)
-    {
-        ArgumentNullException.ThrowIfNull(displayName);
-
-        _displayName = displayName;
+        _script = TestFields.StringKey(
+            "script",
+            script);
 
         return this;
     }
@@ -60,18 +37,9 @@ public sealed class ScriptStepNodeBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
 
-        WithDisplayName(
-            TestExpressions.String(displayName));
-
-        return this;
-    }
-
-    public ScriptStepNodeBuilder WithCondition(
-        ExpressionNode condition)
-    {
-        ArgumentNullException.ThrowIfNull(condition);
-
-        _condition = condition;
+        _displayName = TestFields.StringKey(
+            "displayName",
+            displayName);
 
         return this;
     }
@@ -80,36 +48,18 @@ public sealed class ScriptStepNodeBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(condition);
 
-        WithCondition(
-            TestExpressions.String(condition));
-
-        return this;
-    }
-
-    public ScriptStepNodeBuilder WithTimeoutInMinutes(
-        ExpressionNode timeoutInMinutes)
-    {
-        ArgumentNullException.ThrowIfNull(timeoutInMinutes);
-
-        _timeoutInMinutes = timeoutInMinutes;
+        _condition = TestFields.StringKey(
+            "condition",
+            condition);
 
         return this;
     }
 
     public ScriptStepNodeBuilder WithTimeoutInMinutes(int timeoutInMinutes)
     {
-        WithTimeoutInMinutes(
+        _timeoutInMinutes = TestFields.StringKey(
+            "timeoutInMinutes",
             TestExpressions.Integer(timeoutInMinutes));
-
-        return this;
-    }
-
-    public ScriptStepNodeBuilder WithWorkingDirectory(
-        ExpressionNode workingDirectory)
-    {
-        ArgumentNullException.ThrowIfNull(workingDirectory);
-
-        _workingDirectory = workingDirectory;
 
         return this;
     }
@@ -118,8 +68,9 @@ public sealed class ScriptStepNodeBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(workingDirectory);
 
-        WithWorkingDirectory(
-            TestExpressions.String(workingDirectory));
+        _workingDirectory = TestFields.StringKey(
+            "workingDirectory",
+            workingDirectory);
 
         return this;
     }
@@ -131,7 +82,13 @@ public sealed class ScriptStepNodeBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(value);
 
-        _env.Add(name, value);
+        _env.Add(
+            new StringKeyFieldNode<ExpressionNode>
+            {
+                Key = name,
+                Value = value,
+                Span = SourceSpan.Unknown
+            });
 
         return this;
     }
@@ -164,7 +121,14 @@ public sealed class ScriptStepNodeBuilder
             Condition = _condition,
             TimeoutInMinutes = _timeoutInMinutes,
             WorkingDirectory = _workingDirectory,
-            Env = new Dictionary<string, ExpressionNode>(_env),
+            Env = _env.Count == 0
+                ? null
+                : new MappingFieldNode<StringKeyFieldNode<ExpressionNode>>
+                {
+                    Key = "env",
+                    Fields = [.. _env],
+                    Span = SourceSpan.Unknown
+                },
             UnknownFields = [.. UnknownFields],
             Span = Span
         };

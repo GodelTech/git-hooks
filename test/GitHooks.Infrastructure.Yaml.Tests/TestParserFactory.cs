@@ -1,4 +1,3 @@
-using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
@@ -35,6 +34,10 @@ internal static class TestParserFactory
         // expressions
         var expressionParser = CreateExpressionParser();
 
+        var expressionMappingParser = CreateExpressionMappingParser(
+            expressionParser,
+            unknownNodeParser);
+
         // parameters
         var parameterParser = CreateParameterParser(
             expressionParser,
@@ -46,6 +49,7 @@ internal static class TestParserFactory
         // steps
         var stepParser = CreateStepParser(
             expressionParser,
+            expressionMappingParser,
             unknownNodeParser);
 
         var stepsParser = CreateStepsParser(
@@ -97,11 +101,16 @@ internal static class TestParserFactory
 
     public static StepParser CreateStepParser(
         ExpressionParser? expressionParser = null,
+        ExpressionMappingParser? expressionMappingParser = null,
         UnknownNodeParser? unknownNodeParser = null)
     {
+        expressionParser ??= CreateExpressionParser();
+        unknownNodeParser ??= CreateUnknownNodeParser();
+
         return new StepParser(
-            expressionParser ?? CreateExpressionParser(),
-            unknownNodeParser ?? CreateUnknownNodeParser());
+            expressionParser,
+            expressionMappingParser ?? CreateExpressionMappingParser(expressionParser, unknownNodeParser),
+            unknownNodeParser);
     }
 
     public static ExpressionParser CreateExpressionParser()
@@ -113,6 +122,15 @@ internal static class TestParserFactory
 
         return new ExpressionParser(
             interpolatedStringParser);
+    }
+
+    public static ExpressionMappingParser CreateExpressionMappingParser(
+        ExpressionParser? expressionParser = null,
+        UnknownNodeParser? unknownNodeParser = null)
+    {
+        return new ExpressionMappingParser(
+            expressionParser ?? CreateExpressionParser(),
+            unknownNodeParser ?? CreateUnknownNodeParser());
     }
 
     public static VariableExpressionParser CreateVariableExpressionParser()
@@ -130,14 +148,5 @@ internal static class TestParserFactory
     public static UnknownNodeParser CreateUnknownNodeParser()
     {
         return new UnknownNodeParser();
-    }
-
-    public static ExpressionNode CreateExpression()
-    {
-        return new StringLiteralExpressionNode
-        {
-            Value = "test",
-            Span = SourceSpan.Unknown
-        };
     }
 }

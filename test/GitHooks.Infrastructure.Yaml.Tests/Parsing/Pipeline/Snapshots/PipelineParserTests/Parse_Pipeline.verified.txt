@@ -2,5 +2,5 @@
   Parameter(configuration)
     Type(String)
   ScriptStep
-    Script:
+    Field(script)
       String("dotnet test")

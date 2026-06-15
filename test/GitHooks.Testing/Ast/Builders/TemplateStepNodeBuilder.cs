@@ -1,4 +1,5 @@
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Common;
 
@@ -7,28 +8,13 @@ namespace GitHooks.Testing.Ast.Builders;
 public sealed class TemplateStepNodeBuilder
     : MappingNodeBuilder<TemplateStepNodeBuilder>
 {
-    private readonly Dictionary<string, ExpressionNode> _parameters
-        = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<StringKeyFieldNode<ExpressionNode>> _parameters = [];
 
-    private ExpressionNode? _template;
+    private StringKeyFieldNode<ExpressionNode>? _template;
 
     public TemplateStepNodeBuilder()
     {
-        _template = new StringLiteralExpressionNode
-        {
-            Value = "build.yml",
-            Span = SourceSpan.Unknown
-        };
-    }
-
-    public TemplateStepNodeBuilder WithTemplate(
-        ExpressionNode template)
-    {
-        ArgumentNullException.ThrowIfNull(template);
-
-        _template = template;
-
-        return this;
+        WithTemplate("build.yml");
     }
 
     public TemplateStepNodeBuilder WithTemplate(
@@ -36,10 +22,9 @@ public sealed class TemplateStepNodeBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(template);
 
-        ArgumentNullException.ThrowIfNull(template);
-
-        WithTemplate(
-            TestExpressions.String(template));
+        _template = TestFields.StringKey(
+            "template",
+            template);
 
         return this;
     }
@@ -51,7 +36,13 @@ public sealed class TemplateStepNodeBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(value);
 
-        _parameters.Add(name, value);
+        _parameters.Add(
+            new StringKeyFieldNode<ExpressionNode>
+            {
+                Key = name,
+                Value = value,
+                Span = SourceSpan.Unknown
+            });
 
         return this;
     }
@@ -70,21 +61,6 @@ public sealed class TemplateStepNodeBuilder
         return this;
     }
 
-    public TemplateStepNodeBuilder WithParameters(
-        IReadOnlyDictionary<string, ExpressionNode> parameters)
-    {
-        ArgumentNullException.ThrowIfNull(parameters);
-
-        foreach (var pair in parameters)
-        {
-            WithParameter(
-                pair.Key,
-                pair.Value);
-        }
-
-        return this;
-    }
-
     public TemplateStepNode Build()
     {
         if (_template is null)
@@ -95,7 +71,14 @@ public sealed class TemplateStepNodeBuilder
         return new TemplateStepNode
         {
             Template = _template,
-            Parameters = new Dictionary<string, ExpressionNode>(_parameters),
+            Parameters = _parameters.Count == 0
+                ? null
+                : new MappingFieldNode<StringKeyFieldNode<ExpressionNode>>
+                {
+                    Key = "parameters",
+                    Fields = [.. _parameters],
+                    Span = SourceSpan.Unknown
+                },
             UnknownFields = [.. UnknownFields],
             Span = Span
         };

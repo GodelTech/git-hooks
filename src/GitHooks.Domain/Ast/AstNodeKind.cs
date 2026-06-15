@@ -8,10 +8,11 @@ public enum AstNodeKind
 
     ScriptStep,
     TemplateStep,
+    InvalidStep,
 
-    StringLiteralExpression,
-    IntegerLiteralExpression,
     BooleanLiteralExpression,
+    IntegerLiteralExpression,
+    StringLiteralExpression,
     VariableExpression,
     InterpolatedStringExpression,
 
@@ -19,5 +20,13 @@ public enum AstNodeKind
     UnknownComplexField,
     UnknownScalar,
     UnknownSequence,
-    UnknownMapping
+    UnknownMapping,
+
+    StringKeyField,
+    ComplexKeyField,
+    MappingField,
+
+    Scalar,
+    Sequence,
+    Mapping
 }

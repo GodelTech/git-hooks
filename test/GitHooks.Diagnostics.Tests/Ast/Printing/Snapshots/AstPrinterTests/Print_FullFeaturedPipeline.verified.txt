@@ -6,24 +6,24 @@
       String("Debug")
       String("Release")
   ScriptStep
-    Script:
+    Field(script)
       String("dotnet test")
-    DisplayName:
+    Field(displayName)
       String("Run Tests")
-    Condition:
+    Field(condition)
       String("succeeded()")
-    TimeoutInMinutes:
+    Field(timeoutInMinutes)
       Integer(30)
-    WorkingDirectory:
+    Field(workingDirectory)
       String("/src")
-    Env:
-      CONFIGURATION:
+    MappingField(env)
+      Field(CONFIGURATION)
         String("Release")
   TemplateStep
-    Template:
+    Field(template)
       String("build.yml")
-    Parameters:
-      configuration:
+    MappingField(parameters)
+      Field(configuration)
         String("Release")
   UnknownField(simple)
     UnknownScalar("value")

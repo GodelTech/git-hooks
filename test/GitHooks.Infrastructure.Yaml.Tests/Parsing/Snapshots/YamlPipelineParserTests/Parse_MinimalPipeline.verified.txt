@@ -1,4 +1,4 @@
 ﻿Pipeline
   ScriptStep
-    Script:
+    Field(script)
       String("echo hello")

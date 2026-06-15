@@ -1,6 +1,7 @@
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
+using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
 
@@ -86,20 +87,9 @@ public sealed class ParsingContextTests
                 SourceSpan.Unknown,
                 "Test"));
 
-        var diagnostic =
-            Assert.Single(
-                context.Diagnostics);
-
-        Assert.Equal(
+        DiagnosticAssert.Single(
+            context.Diagnostics,
             DiagnosticDescriptors.InvalidYaml,
-            diagnostic.Descriptor);
-
-        Assert.Equal(
-            SourceSpan.Unknown,
-            diagnostic.Span);
-
-        Assert.Equal(
-            "Test",
-            diagnostic.Arguments[0]);
+            "Test");
     }
 }

@@ -1,5 +1,5 @@
 ﻿TemplateStep
-  Template:
+  Field(template)
     String("build.yml")
   UnknownField(custom)
     UnknownMapping

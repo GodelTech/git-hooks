@@ -4,10 +4,10 @@
     DefaultValue:
       String("Release")
   ScriptStep
-    Script:
+    Field(script)
       String("dotnet restore")
   ScriptStep
-    Script:
+    Field(script)
       String("dotnet build")
-    DisplayName:
+    Field(displayName)
       String("Build")

@@ -1,18 +1,15 @@
-using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Mappings.Steps;
 
-public sealed record TemplateStepNode
+public sealed record InvalidStepNode
     : StepNode
 {
     public override AstNodeKind Kind
-        => AstNodeKind.TemplateStep;
+        => AstNodeKind.InvalidStep;
 
-    public required StringKeyFieldNode<ExpressionNode> Template { get; init; }
-
-    public MappingFieldNode<StringKeyFieldNode<ExpressionNode>>? Parameters { get; init; }
+    public required IReadOnlyList<FieldNode> Fields { get; init; }
 
     public override void Accept(IAstCommandVisitor visitor)
     {

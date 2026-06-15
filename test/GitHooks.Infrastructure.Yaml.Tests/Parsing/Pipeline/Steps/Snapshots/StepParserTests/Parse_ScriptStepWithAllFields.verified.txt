@@ -1,16 +1,16 @@
 ﻿ScriptStep
-  Script:
+  Field(script)
     String("dotnet test")
-  DisplayName:
+  Field(displayName)
     String("Run tests")
-  Condition:
+  Field(condition)
     String("succeeded()")
-  TimeoutInMinutes:
+  Field(timeoutInMinutes)
     Integer(10)
-  WorkingDirectory:
+  Field(workingDirectory)
     String("/src/tests")
-  Env:
-    CONFIGURATION:
+  MappingField(env)
+    Field(CONFIGURATION)
       String("Release")
-    FRAMEWORK:
+    Field(FRAMEWORK)
       String("net9.0")

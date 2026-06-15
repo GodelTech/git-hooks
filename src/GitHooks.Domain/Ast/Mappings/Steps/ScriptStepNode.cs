@@ -1,4 +1,5 @@
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Mappings.Steps;
@@ -9,18 +10,17 @@ public sealed record ScriptStepNode
     public override AstNodeKind Kind
         => AstNodeKind.ScriptStep;
 
-    public required ExpressionNode Script { get; init; }
+    public required StringKeyFieldNode<ExpressionNode> Script { get; init; }
 
-    public ExpressionNode? DisplayName { get; init; }
+    public StringKeyFieldNode<ExpressionNode>? DisplayName { get; init; }
 
-    public ExpressionNode? Condition { get; init; }
+    public StringKeyFieldNode<ExpressionNode>? Condition { get; init; }
 
-    public ExpressionNode? TimeoutInMinutes { get; init; }
+    public StringKeyFieldNode<ExpressionNode>? TimeoutInMinutes { get; init; }
 
-    public ExpressionNode? WorkingDirectory { get; init; }
+    public StringKeyFieldNode<ExpressionNode>? WorkingDirectory { get; init; }
 
-    public IReadOnlyDictionary<string, ExpressionNode> Env { get; init; }
-        = new Dictionary<string, ExpressionNode>();
+    public MappingFieldNode<StringKeyFieldNode<ExpressionNode>>? Env { get; init; }
 
     public override void Accept(IAstCommandVisitor visitor)
     {

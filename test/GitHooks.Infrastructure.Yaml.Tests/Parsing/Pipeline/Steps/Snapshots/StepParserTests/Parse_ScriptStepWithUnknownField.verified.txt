@@ -1,5 +1,5 @@
 ﻿ScriptStep
-  Script:
+  Field(script)
     String("dotnet test")
   UnknownField(custom)
     UnknownMapping

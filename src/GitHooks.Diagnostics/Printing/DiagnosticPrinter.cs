@@ -4,6 +4,7 @@ using GitHooks.Diagnostics.Rendering;
 
 namespace GitHooks.Diagnostics.Printing;
 
+// todo: show RelatedLocations
 public sealed class DiagnosticPrinter(
     DiagnosticPrinterOptions? options = null)
 {

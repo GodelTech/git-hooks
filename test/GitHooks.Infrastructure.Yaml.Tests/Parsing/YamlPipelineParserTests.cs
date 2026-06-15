@@ -106,7 +106,8 @@ public sealed class YamlPipelineParserTests
 
         DiagnosticAssert.Single(
             result.Diagnostics,
-            DiagnosticDescriptors.InvalidYaml);
+            DiagnosticDescriptors.InvalidYaml,
+            "While parsing a node, did not find expected node content.");
     }
 
     private async Task VerifyAstAsync(

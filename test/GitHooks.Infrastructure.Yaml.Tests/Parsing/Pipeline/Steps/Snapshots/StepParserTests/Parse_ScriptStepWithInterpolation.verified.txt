@@ -1,7 +1,7 @@
 ﻿ScriptStep
-  Script:
+  Field(script)
     String("dotnet test")
-  WorkingDirectory:
+  Field(workingDirectory)
     InterpolatedString
       String("/src/")
       Variable(parameters.project)

@@ -1,10 +1,12 @@
 using GitHooks.Diagnostics.Rendering;
 using GitHooks.Domain.Ast;
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Ast.Unknown;
+using GitHooks.Domain.Ast.Values;
 using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Diagnostics.Ast.Printing;
@@ -77,13 +79,13 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            AppendExpression("Script", node.Script);
-            AppendExpression("DisplayName", node.DisplayName);
-            AppendExpression("Condition", node.Condition);
-            AppendExpression("TimeoutInMinutes", node.TimeoutInMinutes);
-            AppendExpression("WorkingDirectory", node.WorkingDirectory);
+            VisitNode(node.Script);
+            VisitNode(node.DisplayName);
+            VisitNode(node.Condition);
+            VisitNode(node.TimeoutInMinutes);
+            VisitNode(node.WorkingDirectory);
 
-            AppendExpressionDictionary("Env", node.Env);
+            VisitNode(node.Env);
 
             VisitNodes(node.UnknownFields);
         }
@@ -99,9 +101,25 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            AppendExpression("Template", node.Template);
+            VisitNode(node.Template);
 
-            AppendExpressionDictionary("Parameters", node.Parameters);
+            VisitNode(node.Parameters);
+
+            VisitNodes(node.UnknownFields);
+        }
+    }
+
+    public void Visit(InvalidStepNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            "InvalidStep",
+            node);
+
+        using (_builder.Indent())
+        {
+            VisitNodes(node.Fields);
 
             VisitNodes(node.UnknownFields);
         }
@@ -192,6 +210,103 @@ public sealed class AstPrinter
         }
     }
 
+    public void Visit<TValue>(StringKeyFieldNode<TValue> node)
+        where TValue : AstNode
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            $"Field({node.Key})",
+            node);
+
+        using (_builder.Indent())
+        {
+            VisitNode(node.Value);
+        }
+    }
+
+    public void Visit<TValue>(ComplexKeyFieldNode<TValue> node)
+        where TValue : AstNode
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            "ComplexField",
+            node);
+
+        using (_builder.Indent())
+        {
+            _builder.AppendLine("Key:");
+
+            using (_builder.Indent())
+            {
+                VisitNode(node.Key);
+            }
+
+            _builder.AppendLine("Value:");
+
+            using (_builder.Indent())
+            {
+                VisitNode(node.Value);
+            }
+        }
+    }
+
+    public void Visit<TField>(MappingFieldNode<TField> node)
+        where TField : FieldNode
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            $"MappingField({node.Key})",
+            node);
+
+        using (_builder.Indent())
+        {
+            foreach (var field in node.Fields)
+            {
+                VisitNode(field);
+            }
+        }
+    }
+
+    public void Visit(ScalarNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            $"Scalar({StringRenderer.RenderQuoted(node.Value)})",
+            node);
+    }
+
+    public void Visit(SequenceNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            "Sequence",
+            node);
+
+        using (_builder.Indent())
+        {
+            VisitNodes(node.Items);
+        }
+    }
+
+    public void Visit(MappingNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            "Mapping",
+            node);
+
+        using (_builder.Indent())
+        {
+            VisitNodes(node.Fields);
+        }
+    }
+
     private void AppendNodeHeader(string text, AstNode node)
     {
         var output = text;
@@ -258,31 +373,13 @@ public sealed class AstPrinter
         }
     }
 
-    private void AppendExpressionDictionary(string fieldName, IReadOnlyDictionary<string, ExpressionNode> expressions)
+    private void VisitNode(AstNode? node)
     {
-        if (expressions.Count is 0)
+        if (node is null)
         {
             return;
         }
 
-        _builder.AppendLine($"{fieldName}:");
-
-        using (_builder.Indent())
-        {
-            foreach (var (key, expression) in expressions)
-            {
-                _builder.AppendLine($"{key}:");
-
-                using (_builder.Indent())
-                {
-                    expression.Accept(this);
-                }
-            }
-        }
-    }
-
-    private void VisitNode(AstNode node)
-    {
         node.Accept(this);
     }
 

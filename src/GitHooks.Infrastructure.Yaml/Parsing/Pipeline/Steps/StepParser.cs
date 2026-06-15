@@ -1,4 +1,6 @@
+using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Domain.Common;
@@ -11,10 +13,14 @@ namespace GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
 
 internal sealed class StepParser(
     ExpressionParser expressionParser,
+    ExpressionMappingParser expressionMappingParser,
     UnknownNodeParser unknownNodeParser)
 {
     private readonly ExpressionParser _expressionParser
         = expressionParser ?? throw new ArgumentNullException(nameof(expressionParser));
+
+    private readonly ExpressionMappingParser _expressionMappingParser
+        = expressionMappingParser ?? throw new ArgumentNullException(nameof(expressionMappingParser));
 
     private readonly UnknownNodeParser _unknownNodeParser
         = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
@@ -47,7 +53,7 @@ internal sealed class StepParser(
                         key,
                         context,
                         step.Script,
-                        _expressionParser.Parse);
+                        context => ReadExpressionField(key, context));
                     break;
 
                 case "template":
@@ -55,7 +61,7 @@ internal sealed class StepParser(
                         key,
                         context,
                         step.Template,
-                        _expressionParser.Parse);
+                        context => ReadExpressionField(key, context));
                     break;
 
                 case "displayname":
@@ -63,7 +69,7 @@ internal sealed class StepParser(
                         key,
                         context,
                         step.DisplayName,
-                        _expressionParser.Parse);
+                        context => ReadExpressionField(key, context));
                     break;
 
                 case "condition":
@@ -71,7 +77,7 @@ internal sealed class StepParser(
                         key,
                         context,
                         step.Condition,
-                        _expressionParser.Parse);
+                        context => ReadExpressionField(key, context));
                     break;
 
                 case "timeoutinminutes":
@@ -79,7 +85,7 @@ internal sealed class StepParser(
                         key,
                         context,
                         step.TimeoutInMinutes,
-                        _expressionParser.Parse);
+                        context => ReadExpressionField(key, context));
                     break;
 
                 case "workingdirectory":
@@ -87,7 +93,7 @@ internal sealed class StepParser(
                         key,
                         context,
                         step.WorkingDirectory,
-                        _expressionParser.Parse);
+                        context => ReadExpressionField(key, context));
                     break;
 
                 case "env":
@@ -95,7 +101,7 @@ internal sealed class StepParser(
                         key,
                         context,
                         step.Env,
-                        ParseExpressionDictionary);
+                        context => _expressionMappingParser.Parse(key, context));
                     break;
 
                 case "parameters":
@@ -103,7 +109,7 @@ internal sealed class StepParser(
                         key,
                         context,
                         step.Parameters,
-                        ParseExpressionDictionary);
+                        context => _expressionMappingParser.Parse(key, context));
                     break;
 
                 default:
@@ -113,13 +119,6 @@ internal sealed class StepParser(
         }
 
         var end = context.Cursor.Read<MappingEnd>();
-
-        if (step.Script is not null &&
-            step.Template is not null)
-        {
-            throw context.Cursor.CreateException(
-                "Step cannot contain multiple step type fields");
-        }
 
         var span = context.Cursor.CreateSpan(start, end);
 
@@ -136,9 +135,18 @@ internal sealed class StepParser(
         SourceSpan span,
         ParsingContext context)
     {
+        if (step.Script is not null &&
+            step.Template is not null)
+        {
+            context.Report(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.MultipleStepTypes,
+                    span));
+        }
+
         if (step.Script is not null)
         {
-            StepFieldValidation.ValidateScriptStep(step, context);
+            StepFieldValidation.ValidateScriptStep(step, span, context);
 
             return new ScriptStepNode
             {
@@ -155,7 +163,7 @@ internal sealed class StepParser(
 
         if (step.Template is not null)
         {
-            StepFieldValidation.ValidateTemplateStep(step, context);
+            StepFieldValidation.ValidateTemplateStep(step, span, context);
 
             return new TemplateStepNode
             {
@@ -170,45 +178,19 @@ internal sealed class StepParser(
             "Step must contain exactly one step type field");
     }
 
-    private Dictionary<string, ExpressionNode> ParseExpressionDictionary(ParsingContext context)
+    private StringKeyFieldNode<ExpressionNode> ReadExpressionField(
+        Scalar key,
+        ParsingContext context)
     {
-        var values = new Dictionary<string, ExpressionNode>(
-            StringComparer.OrdinalIgnoreCase);
+        var value = _expressionParser.Parse(context);
 
-        _ = context.Cursor.Read<MappingStart>();
-
-        var fields = new MappingFields(_unknownNodeParser);
-
-        while (!context.Cursor.Is<MappingEnd>())
+        return new StringKeyFieldNode<ExpressionNode>
         {
-            if (!context.Cursor.Is<Scalar>())
-            {
-                // todo: where we are assign UknownFieldNode
-                fields.AddUnknownField(context);
-
-                continue;
-            }
-
-            var key = context.Cursor.Read<Scalar>();
-
-            _ = values.TryGetValue(
-                key.Value,
-                out var currentValue);
-
-            var value = fields.ReadFirst(
-                key,
-                context,
-                currentValue,
-                _expressionParser.Parse);
-
-            if (value is not null)
-            {
-                values[key.Value] = value;
-            }
-        }
-
-        _ = context.Cursor.Read<MappingEnd>();
-
-        return values;
+            Key = key.Value,
+            Value = value,
+            Span = context.Cursor.CreateSpan(
+                key.Start,
+                value.Span)
+        };
     }
 }

@@ -78,6 +78,16 @@ internal sealed class YamlParserCursor(
                 end.Column));
     }
 
+    public SourceSpan CreateSpan(Mark start, SourceSpan end)
+    {
+        return new SourceSpan(
+            _sourceDocument,
+            new SourcePosition(
+                start.Line,
+                start.Column),
+            end.End);
+    }
+
     public SourceSpan CurrentSpan()
     {
         var mark = _parser.Current?.Start;

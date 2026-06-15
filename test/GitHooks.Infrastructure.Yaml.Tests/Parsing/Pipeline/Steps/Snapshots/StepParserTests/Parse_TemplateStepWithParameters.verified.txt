@@ -1,8 +1,8 @@
 ﻿TemplateStep
-  Template:
+  Field(template)
     String("build.yml")
-  Parameters:
-    configuration:
+  MappingField(parameters)
+    Field(configuration)
       String("Release")
-    framework:
+    Field(framework)
       String("net9.0")

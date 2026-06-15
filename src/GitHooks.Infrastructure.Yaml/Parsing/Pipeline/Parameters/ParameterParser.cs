@@ -1,3 +1,4 @@
+using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
@@ -97,13 +98,17 @@ internal sealed class ParameterParser(
 
         var end = context.Cursor.Read<MappingEnd>();
 
+        var span = context.Cursor.CreateSpan(start, end);
+
         if (name is null)
         {
-            throw context.Cursor.CreateException(
-                "Parameter requires 'name'");
-        }
+            context.Report(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.ParameterNameRequired,
+                    span));
 
-        var span = context.Cursor.CreateSpan(start, end);
+            name = string.Empty;
+        }
 
         return new ParameterNode
         {
@@ -121,16 +126,29 @@ internal sealed class ParameterParser(
         string value,
         ParsingContext context)
     {
-        return value.ToLowerInvariant() switch
+        switch (value.ToLowerInvariant())
         {
-            "string" => ParameterType.String,
-            "boolean" => ParameterType.Boolean,
-            "number" => ParameterType.Number,
-            "object" => ParameterType.Object,
+            case "string":
+                return ParameterType.String;
 
-            _ => throw context.Cursor.CreateException(
-                $"Unsupported parameter type '{value}'")
-        };
+            case "boolean":
+                return ParameterType.Boolean;
+
+            case "number":
+                return ParameterType.Number;
+
+            case "object":
+                return ParameterType.Object;
+
+            default:
+                context.Report(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.UnsupportedParameterType,
+                        context.Cursor.CurrentSpan(),
+                        value));
+
+                return ParameterType.String;
+        }
     }
 
     private List<ExpressionNode> ParseValues(ParsingContext context)

@@ -1,7 +1,9 @@
+using GitHooks.Diagnostics;
+using GitHooks.Domain.Common;
 using GitHooks.Domain.Syntax;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
-
-using YamlDotNet.Core;
+using GitHooks.Testing.Ast;
+using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Steps;
 
@@ -12,63 +14,85 @@ public sealed class StepFieldValidationTests
     {
         var step = new StepFields
         {
-            Script = TestParserFactory.CreateExpression(),
-            DisplayName = TestParserFactory.CreateExpression(),
-            Condition = TestParserFactory.CreateExpression(),
-            TimeoutInMinutes = TestParserFactory.CreateExpression(),
-            WorkingDirectory = TestParserFactory.CreateExpression()
+            Script = TestFields.StringKey("script"),
+            DisplayName = TestFields.StringKey("displayNode"),
+            Condition = TestFields.StringKey("condition"),
+            TimeoutInMinutes = TestFields.StringKey("timeoutInMinutes"),
+            WorkingDirectory = TestFields.StringKey("workingDirectory"),
+            Env = TestFields.CreateMapping(
+                "env",
+                TestFields.StringKey("KEY"))
         };
-
-        step.Env["KEY"] = TestParserFactory.CreateExpression();
 
         StepFieldValidation.ValidateScriptStep(
             step,
+            SourceSpan.Unknown,
             TestParserFactory.CreateDummyContext());
     }
 
     [Theory]
     [InlineData(StepFieldNames.Template)]
     [InlineData(StepFieldNames.Parameters)]
-    public void ValidateScriptStep_InvalidField_Throws(string field)
+    public void ValidateScriptStep_InvalidField_ReportsDiagnostic(string field)
     {
+        var context = TestParserFactory.CreateDummyContext();
+
         var step = new StepFields
         {
-            Script = TestParserFactory.CreateExpression()
+            Script = TestFields.StringKey("script")
         };
 
         SetField(step, field);
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => StepFieldValidation.ValidateScriptStep(
-                    step,
-                    TestParserFactory.CreateDummyContext()));
+        StepFieldValidation.ValidateScriptStep(
+            step,
+            SourceSpan.Unknown,
+            context);
 
-        Assert.StartsWith(
-            $"Script step contains invalid field(s): {field}",
-            exception.Message);
+        DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.InvalidStepField,
+            field,
+            "script");
     }
 
     [Fact]
-    public void ValidateScriptStep_MultipleInvalidFields_Throws()
+    public void ValidateScriptStep_MultipleInvalidFields_ReportsDiagnostic()
     {
+        var context = TestParserFactory.CreateDummyContext();
+
         var step = new StepFields
         {
-            Script = TestParserFactory.CreateExpression(),
-            Template = TestParserFactory.CreateExpression()
+            Script = TestFields.StringKey("script"),
+            Template = TestFields.StringKey("template"),
+            Parameters = TestFields.CreateMapping(
+                "parameters",
+                TestFields.StringKey("Configuration"))
         };
 
-        step.Parameters["KEY"] = TestParserFactory.CreateExpression();
+        StepFieldValidation.ValidateScriptStep(
+            step,
+            SourceSpan.Unknown,
+            context);
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => StepFieldValidation.ValidateScriptStep(
-                    step,
-                    TestParserFactory.CreateDummyContext()));
-
-        Assert.StartsWith(
-            "Script step contains invalid field(s): template, parameters",
-            exception.Message);
+        Assert.Collection(
+            context.Diagnostics,
+            diagnostic =>
+            {
+                DiagnosticAssert.Matches(
+                    diagnostic,
+                    DiagnosticDescriptors.InvalidStepField,
+                    "template",
+                    "script");
+            },
+            diagnostic =>
+            {
+                DiagnosticAssert.Matches(
+                    diagnostic,
+                    DiagnosticDescriptors.InvalidStepField,
+                    "parameters",
+                    "script");
+            });
     }
 
     [Fact]
@@ -76,13 +100,15 @@ public sealed class StepFieldValidationTests
     {
         var step = new StepFields
         {
-            Template = TestParserFactory.CreateExpression()
+            Template = TestFields.StringKey("template"),
+            Parameters = TestFields.CreateMapping(
+                "parameters",
+                TestFields.StringKey("Configuration"))
         };
-
-        step.Parameters["Configuration"] = TestParserFactory.CreateExpression();
 
         StepFieldValidation.ValidateTemplateStep(
             step,
+            SourceSpan.Unknown,
             TestParserFactory.CreateDummyContext());
     }
 
@@ -93,46 +119,66 @@ public sealed class StepFieldValidationTests
     [InlineData(StepFieldNames.TimeoutInMinutes)]
     [InlineData(StepFieldNames.WorkingDirectory)]
     [InlineData(StepFieldNames.Env)]
-    public void ValidateTemplateStep_InvalidField_Throws(string field)
+    public void ValidateTemplateStep_InvalidField_ReportsDiagnostic(string field)
     {
+        var context = TestParserFactory.CreateDummyContext();
+
         var step = new StepFields
         {
-            Template = TestParserFactory.CreateExpression(),
+            Template = TestFields.StringKey("template")
         };
 
         SetField(step, field);
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => StepFieldValidation.ValidateTemplateStep(
-                    step,
-                    TestParserFactory.CreateDummyContext()));
+        StepFieldValidation.ValidateTemplateStep(
+            step,
+            SourceSpan.Unknown,
+            context);
 
-        Assert.StartsWith(
-            $"Template step contains invalid field(s): {field}",
-            exception.Message);
+        DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.InvalidStepField,
+            field,
+            "template");
     }
 
     [Fact]
-    public void ValidateTemplateStep_MultipleInvalidFields_Throws()
+    public void ValidateTemplateStep_MultipleInvalidFields_ReportsDiagnostic()
     {
+        var context = TestParserFactory.CreateDummyContext();
+
         var step = new StepFields
         {
-            Template = TestParserFactory.CreateExpression(),
-            DisplayName = TestParserFactory.CreateExpression(),
+            Template = TestFields.StringKey("template"),
+            DisplayName = TestFields.StringKey("displayName"),
+            Env = TestFields.CreateMapping(
+                "env",
+                TestFields.StringKey("KEY"))
         };
 
-        step.Env["KEY"] = TestParserFactory.CreateExpression();
+        StepFieldValidation.ValidateTemplateStep(
+            step,
+            SourceSpan.Unknown,
+            context);
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => StepFieldValidation.ValidateTemplateStep(
-                    step,
-                    TestParserFactory.CreateDummyContext()));
-
-        Assert.StartsWith(
-            "Template step contains invalid field(s): displayName, env",
-            exception.Message);
+        Assert.Collection(
+            context.Diagnostics,
+            diagnostic =>
+            {
+                DiagnosticAssert.Matches(
+                    diagnostic,
+                    DiagnosticDescriptors.InvalidStepField,
+                    "displayName",
+                    "template");
+            },
+            diagnostic =>
+            {
+                DiagnosticAssert.Matches(
+                    diagnostic,
+                    DiagnosticDescriptors.InvalidStepField,
+                    "env",
+                    "template");
+            });
     }
 
     private static void SetField(
@@ -141,36 +187,40 @@ public sealed class StepFieldValidationTests
     {
         switch (field)
         {
+            case StepFieldNames.Script:
+                step.Script = TestFields.StringKey("script");
+                break;
+
             case StepFieldNames.Template:
-                step.Template = TestParserFactory.CreateExpression();
+                step.Template = TestFields.StringKey("template");
                 break;
 
             case StepFieldNames.DisplayName:
-                step.DisplayName = TestParserFactory.CreateExpression();
+                step.DisplayName = TestFields.StringKey("displayName");
                 break;
 
             case StepFieldNames.Condition:
-                step.Condition = TestParserFactory.CreateExpression();
+                step.Condition = TestFields.StringKey("condition");
                 break;
 
             case StepFieldNames.TimeoutInMinutes:
-                step.TimeoutInMinutes = TestParserFactory.CreateExpression();
+                step.TimeoutInMinutes = TestFields.StringKey("timeoutInMinutes");
                 break;
 
             case StepFieldNames.WorkingDirectory:
-                step.WorkingDirectory = TestParserFactory.CreateExpression();
+                step.WorkingDirectory = TestFields.StringKey("workingDirectory");
                 break;
 
             case StepFieldNames.Env:
-                step.Env["KEY"] = TestParserFactory.CreateExpression();
+                step.Env = TestFields.CreateMapping(
+                    "env",
+                    TestFields.StringKey("KEY"));
                 break;
 
             case StepFieldNames.Parameters:
-                step.Parameters["KEY"] = TestParserFactory.CreateExpression();
-                break;
-
-            case StepFieldNames.Script:
-                step.Script = TestParserFactory.CreateExpression();
+                step.Parameters = TestFields.CreateMapping(
+                    "parameters",
+                    TestFields.StringKey("Configuration"));
                 break;
 
             default:

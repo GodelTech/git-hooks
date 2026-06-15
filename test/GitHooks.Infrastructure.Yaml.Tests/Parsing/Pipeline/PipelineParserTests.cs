@@ -120,13 +120,10 @@ public sealed class PipelineParserTests
 
         _ = _parser.Parse(context);
 
-        var diagnostic = DiagnosticAssert.Single(
+        DiagnosticAssert.Single(
             context.Diagnostics,
-            DiagnosticDescriptors.DuplicateField);
-
-        Assert.Equal(
-            "Duplicate 'parameters' field.",
-            diagnostic.Message);
+            DiagnosticDescriptors.DuplicateField,
+            "parameters");
     }
 
     [Fact]
@@ -146,13 +143,10 @@ public sealed class PipelineParserTests
 
         _ = _parser.Parse(context);
 
-        var diagnostic = DiagnosticAssert.Single(
+        DiagnosticAssert.Single(
             context.Diagnostics,
-            DiagnosticDescriptors.DuplicateField);
-
-        Assert.Equal(
-            "Duplicate 'steps' field.",
-            diagnostic.Message);
+            DiagnosticDescriptors.DuplicateField,
+            "steps");
     }
 
     private async Task VerifyAstAsync(

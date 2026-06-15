@@ -1,9 +1,11 @@
 using GitHooks.Domain.Ast;
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Ast.Unknown;
+using GitHooks.Domain.Ast.Values;
 using GitHooks.Domain.Common;
 
 namespace GitHooks.Domain.Tests.Ast;
@@ -16,6 +18,7 @@ internal static class TestAstFactory
         (CreateParameterNode(), AstNodeKind.Parameter, nameof(ParameterNode)),
         (CreateScriptStepNode(), AstNodeKind.ScriptStep, nameof(ScriptStepNode)),
         (CreateTemplateStepNode(), AstNodeKind.TemplateStep, nameof(TemplateStepNode)),
+        (CreateInvalidStepNode(), AstNodeKind.InvalidStep, nameof(InvalidStepNode)),
         (CreateBooleanNode(), AstNodeKind.BooleanLiteralExpression, nameof(BooleanLiteralExpressionNode)),
         (CreateIntegerNode(), AstNodeKind.IntegerLiteralExpression, nameof(IntegerLiteralExpressionNode)),
         (CreateStringNode(), AstNodeKind.StringLiteralExpression, nameof(StringLiteralExpressionNode)),
@@ -25,16 +28,22 @@ internal static class TestAstFactory
         (CreateUnknownComplexFieldNode(), AstNodeKind.UnknownComplexField, nameof(UnknownNode)),
         (CreateUnknownScalarNode(), AstNodeKind.UnknownScalar, nameof(UnknownNode)),
         (CreateUnknownSequenceNode(), AstNodeKind.UnknownSequence, nameof(UnknownNode)),
-        (CreateUnknownMappingNode(), AstNodeKind.UnknownMapping, nameof(UnknownNode))
+        (CreateUnknownMappingNode(), AstNodeKind.UnknownMapping, nameof(UnknownNode)),
+        (CreateStringKeyFieldNode(), AstNodeKind.StringKeyField, nameof(StringKeyFieldNode<>)),
+        (CreateComplexKeyFieldNode(), AstNodeKind.ComplexKeyField, nameof(ComplexKeyFieldNode<>)),
+        (CreateMappingFieldNode(), AstNodeKind.MappingField, nameof(MappingFieldNode<>)),
+        (CreateScalarNode(), AstNodeKind.Scalar, nameof(ScalarNode)),
+        (CreateSequenceNode(), AstNodeKind.Sequence, nameof(SequenceNode)),
+        (CreateMappingNode(), AstNodeKind.Mapping, nameof(MappingNode))
     ];
 
     public static ParameterNode CreateParameterNode()
     {
         return new ParameterNode
         {
-            Span = SourceSpan.Unknown,
+            Name = "configuration",
             UnknownFields = [],
-            Name = "configuration"
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -42,9 +51,9 @@ internal static class TestAstFactory
     {
         return new ScriptStepNode
         {
-            Span = SourceSpan.Unknown,
+            Script = CreateStringKeyFieldNode(),
             UnknownFields = [],
-            Script = CreateStringNode()
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -52,9 +61,19 @@ internal static class TestAstFactory
     {
         return new TemplateStepNode
         {
-            Span = SourceSpan.Unknown,
+            Template = CreateStringKeyFieldNode(),
             UnknownFields = [],
-            Template = CreateStringNode()
+            Span = SourceSpan.Unknown
+        };
+    }
+
+    public static InvalidStepNode CreateInvalidStepNode()
+    {
+        return new InvalidStepNode
+        {
+            Fields = [],
+            UnknownFields = [],
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -62,10 +81,10 @@ internal static class TestAstFactory
     {
         return new PipelineNode
         {
-            Span = SourceSpan.Unknown,
-            UnknownFields = [],
             Parameters = [],
-            Steps = []
+            Steps = [],
+            UnknownFields = [],
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -73,8 +92,8 @@ internal static class TestAstFactory
     {
         return new BooleanLiteralExpressionNode
         {
-            Span = SourceSpan.Unknown,
-            Value = true
+            Value = true,
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -82,8 +101,8 @@ internal static class TestAstFactory
     {
         return new IntegerLiteralExpressionNode
         {
-            Span = SourceSpan.Unknown,
-            Value = 10
+            Value = 10,
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -91,8 +110,8 @@ internal static class TestAstFactory
     {
         return new StringLiteralExpressionNode
         {
-            Span = SourceSpan.Unknown,
-            Value = "value"
+            Value = "value",
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -100,8 +119,8 @@ internal static class TestAstFactory
     {
         return new VariableExpressionNode
         {
-            Span = SourceSpan.Unknown,
-            Path = "parameters.configuration"
+            Path = "parameters.configuration",
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -109,17 +128,8 @@ internal static class TestAstFactory
     {
         return new InterpolatedStringExpressionNode
         {
-            Span = SourceSpan.Unknown,
-            Parts = [CreateStringNode(), CreateVariableNode()]
-        };
-    }
-
-    private static UnknownScalarNode CreateUnknownScalarNode()
-    {
-        return new UnknownScalarNode
-        {
-            Span = SourceSpan.Unknown,
-            Value = "raw"
+            Parts = [CreateStringNode(), CreateVariableNode()],
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -127,9 +137,9 @@ internal static class TestAstFactory
     {
         return new UnknownSimpleFieldNode
         {
-            Span = SourceSpan.Unknown,
             Key = "custom",
-            Value = CreateUnknownScalarNode()
+            Value = CreateUnknownScalarNode(),
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -137,9 +147,18 @@ internal static class TestAstFactory
     {
         return new UnknownComplexFieldNode
         {
-            Span = SourceSpan.Unknown,
             Key = CreateUnknownScalarNode(),
-            Value = CreateUnknownScalarNode()
+            Value = CreateUnknownScalarNode(),
+            Span = SourceSpan.Unknown
+        };
+    }
+
+    private static UnknownScalarNode CreateUnknownScalarNode()
+    {
+        return new UnknownScalarNode
+        {
+            Value = "raw",
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -147,8 +166,8 @@ internal static class TestAstFactory
     {
         return new UnknownSequenceNode
         {
-            Span = SourceSpan.Unknown,
-            Items = [CreateUnknownScalarNode()]
+            Items = [CreateUnknownScalarNode()],
+            Span = SourceSpan.Unknown
         };
     }
 
@@ -156,8 +175,65 @@ internal static class TestAstFactory
     {
         return new UnknownMappingNode
         {
-            Span = SourceSpan.Unknown,
-            Fields = [CreateUnknownSimpleFieldNode()]
+            Fields = [CreateUnknownSimpleFieldNode()],
+            Span = SourceSpan.Unknown
+        };
+    }
+
+    private static StringKeyFieldNode<ExpressionNode> CreateStringKeyFieldNode()
+    {
+        return new StringKeyFieldNode<ExpressionNode>
+        {
+            Key = "field",
+            Value = CreateStringNode(),
+            Span = SourceSpan.Unknown
+        };
+    }
+
+    private static ComplexKeyFieldNode<ExpressionNode> CreateComplexKeyFieldNode()
+    {
+        return new ComplexKeyFieldNode<ExpressionNode>
+        {
+            Key = CreateScalarNode(),
+            Value = CreateStringNode(),
+            Span = SourceSpan.Unknown
+        };
+    }
+
+    private static MappingFieldNode<StringKeyFieldNode<ExpressionNode>> CreateMappingFieldNode()
+    {
+        return new MappingFieldNode<StringKeyFieldNode<ExpressionNode>>
+        {
+            Key = "field",
+            Fields = [],
+            Span = SourceSpan.Unknown
+        };
+    }
+
+    private static ScalarNode CreateScalarNode()
+    {
+        return new ScalarNode
+        {
+            Value = "raw",
+            Span = SourceSpan.Unknown
+        };
+    }
+
+    private static SequenceNode CreateSequenceNode()
+    {
+        return new SequenceNode
+        {
+            Items = [CreateScalarNode()],
+            Span = SourceSpan.Unknown
+        };
+    }
+
+    private static MappingNode CreateMappingNode()
+    {
+        return new MappingNode
+        {
+            Fields = [CreateStringKeyFieldNode()],
+            Span = SourceSpan.Unknown
         };
     }
 }

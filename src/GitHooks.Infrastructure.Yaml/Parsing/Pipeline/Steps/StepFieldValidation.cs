@@ -1,3 +1,5 @@
+using GitHooks.Diagnostics;
+using GitHooks.Domain.Common;
 using GitHooks.Domain.Syntax;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
@@ -6,22 +8,26 @@ internal static class StepFieldValidation
 {
     public static void ValidateScriptStep(
         StepFields step,
+        SourceSpan span,
         ParsingContext context)
     {
         ValidateAllowedFields(
-            "Script",
+            "script",
             step,
+            span,
             context,
             StepFieldNames.ScriptStepFields);
     }
 
     public static void ValidateTemplateStep(
         StepFields step,
+        SourceSpan span,
         ParsingContext context)
     {
         ValidateAllowedFields(
-            "Template",
+            "template",
             step,
+            span,
             context,
             StepFieldNames.TemplateStepFields);
     }
@@ -29,6 +35,7 @@ internal static class StepFieldValidation
     private static void ValidateAllowedFields(
         string stepType,
         StepFields step,
+        SourceSpan span,
         ParsingContext context,
         IReadOnlySet<string> allowedFields)
     {
@@ -37,10 +44,14 @@ internal static class StepFieldValidation
             .Where(field => !allowedFields.Contains(field))
             .ToArray();
 
-        if (violations.Length > 0)
+        foreach (var field in violations)
         {
-            throw context.Cursor.CreateException(
-                $"{stepType} step contains invalid field(s): {string.Join(", ", violations)}");
+            context.Report(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.InvalidStepField,
+                    span,
+                    field,
+                    stepType));
         }
     }
 }

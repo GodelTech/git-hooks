@@ -1,6 +1,6 @@
 ﻿TemplateStep
-  Template:
+  Field(template)
     String("build.yml")
-  Parameters:
-    configuration:
+  MappingField(parameters)
+    Field(configuration)
       Variable(parameters.configuration)

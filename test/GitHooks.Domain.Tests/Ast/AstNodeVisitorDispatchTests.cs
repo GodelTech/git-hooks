@@ -1,8 +1,11 @@
+using GitHooks.Domain.Ast;
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Ast.Unknown;
+using GitHooks.Domain.Ast.Values;
 using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Tests.Ast;
@@ -59,6 +62,11 @@ public sealed class AstNodeVisitorDispatchTests
             LastVisited = nameof(TemplateStepNode);
         }
 
+        public void Visit(InvalidStepNode node)
+        {
+            LastVisited = nameof(InvalidStepNode);
+        }
+
         public void Visit(BooleanLiteralExpressionNode node)
         {
             LastVisited = nameof(BooleanLiteralExpressionNode);
@@ -88,6 +96,39 @@ public sealed class AstNodeVisitorDispatchTests
         {
             LastVisited = nameof(UnknownNode);
         }
+
+        public void Visit<TValue>(StringKeyFieldNode<TValue> node)
+            where TValue : AstNode
+        {
+            LastVisited = nameof(StringKeyFieldNode<>);
+        }
+
+        public void Visit<TValue>(ComplexKeyFieldNode<TValue> node)
+            where TValue : AstNode
+        {
+            LastVisited = nameof(ComplexKeyFieldNode<>);
+        }
+
+        public void Visit<TField>(MappingFieldNode<TField> node)
+            where TField : FieldNode
+        {
+            LastVisited = nameof(MappingFieldNode<>);
+        }
+
+        public void Visit(ScalarNode node)
+        {
+            LastVisited = nameof(ScalarNode);
+        }
+
+        public void Visit(SequenceNode node)
+        {
+            LastVisited = nameof(SequenceNode);
+        }
+
+        public void Visit(MappingNode node)
+        {
+            LastVisited = nameof(MappingNode);
+        }
     }
 
     private sealed class TrackingQueryVisitor : IAstQueryVisitor<string>
@@ -110,6 +151,11 @@ public sealed class AstNodeVisitorDispatchTests
         public string Visit(TemplateStepNode node)
         {
             return nameof(TemplateStepNode);
+        }
+
+        public string Visit(InvalidStepNode node)
+        {
+            return nameof(InvalidStepNode);
         }
 
         public string Visit(BooleanLiteralExpressionNode node)
@@ -140,6 +186,39 @@ public sealed class AstNodeVisitorDispatchTests
         public string VisitUnknownNode(UnknownNode node)
         {
             return nameof(UnknownNode);
+        }
+
+        public string Visit<TValue>(StringKeyFieldNode<TValue> node)
+            where TValue : AstNode
+        {
+            return nameof(StringKeyFieldNode<>);
+        }
+
+        public string Visit<TValue>(ComplexKeyFieldNode<TValue> node)
+            where TValue : AstNode
+        {
+            return nameof(ComplexKeyFieldNode<>);
+        }
+
+        public string Visit<TField>(MappingFieldNode<TField> node)
+            where TField : FieldNode
+        {
+            return nameof(MappingFieldNode<>);
+        }
+
+        public string Visit(ScalarNode node)
+        {
+            return nameof(ScalarNode);
+        }
+
+        public string Visit(SequenceNode node)
+        {
+            return nameof(SequenceNode);
+        }
+
+        public string Visit(MappingNode node)
+        {
+            return nameof(MappingNode);
         }
     }
 }
