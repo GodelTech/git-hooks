@@ -141,7 +141,7 @@ public sealed class UnknownNodeParserTests
     {
         var key = new Scalar("test");
 
-        await TestParserSnapshotVerifier.VerifyAstAsync(
+        await ParserSnapshotVerifier.VerifyAstAsync(
             yaml,
             cursor => _parser.ParseField(key, cursor),
             memberName,
@@ -153,7 +153,7 @@ public sealed class UnknownNodeParserTests
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
-        await TestParserSnapshotVerifier.VerifyAstAsync(
+        await ParserSnapshotVerifier.VerifyAstAsync(
             yaml,
             _parser.ParseField,
             beforeParse: context => _ = context.Cursor.Read<MappingStart>(),

@@ -142,6 +142,13 @@ internal sealed class StepParser(
                 Diagnostic.Create(
                     DiagnosticDescriptors.MultipleStepTypes,
                     span));
+
+            return new InvalidStepNode
+            {
+                Fields = [.. step.GetFields()],
+                UnknownFields = unknownFields,
+                Span = span
+            };
         }
 
         if (step.Script is not null)

@@ -1,16 +1,14 @@
 using System.Runtime.CompilerServices;
 
-using GitHooks.Diagnostics.Ast.Printing;
-using GitHooks.Diagnostics.Printing;
 using GitHooks.Domain.Ast;
-using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
-using GitHooks.Testing.Snapshots;
+using GitHooks.Testing.Diagnostics;
+using GitHooks.Testing.Diagnostics.Ast;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Testing;
 
-internal static class TestParserSnapshotVerifier
+internal static class ParserSnapshotVerifier
 {
     public static async Task VerifyAstAsync(
         string yaml,
@@ -23,12 +21,20 @@ internal static class TestParserSnapshotVerifier
 
         var result = parseFunc(yaml, new SourceDocument("test.yaml"));
 
-        var output = result.Root is PipelineNode root
-            ? new AstPrinter().Print(root)
-            : new DiagnosticPrinter().Print(result.Diagnostics);
+        if (result.Root is null)
+        {
+            await DiagnosticSnapshotVerifier.VerifyAsync(
+                result.Diagnostics,
+                memberName,
+                sourceFilePath);
 
-        await SnapshotVerifier.VerifyAsync(
-            output,
+            return;
+        }
+
+        Assert.Empty(result.Diagnostics);
+
+        await VerifyAstAsync(
+            result.Root,
             memberName,
             sourceFilePath);
     }
@@ -71,10 +77,21 @@ internal static class TestParserSnapshotVerifier
 
         context.Cursor.EndDocument();
 
-        var output = new AstPrinter().Print(result);
+        Assert.Empty(context.Diagnostics);
 
-        await SnapshotVerifier.VerifyAsync(
-            output,
+        await VerifyAstAsync(
+            result,
+            memberName,
+            sourceFilePath);
+    }
+
+    public static async Task VerifyAstAsync(
+        AstNode node,
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string sourceFilePath = "")
+    {
+        await AstSnapshotVerifier.VerifyAsync(
+            node,
             memberName,
             sourceFilePath);
     }

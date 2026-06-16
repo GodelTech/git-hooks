@@ -52,6 +52,8 @@ internal static class StepFieldValidation
                     span,
                     field,
                     stepType));
+
+            // todo: solve how to store invalid fields
         }
     }
 }

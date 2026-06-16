@@ -1,6 +1,8 @@
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 using GitHooks.Diagnostics;
+using GitHooks.Domain.Ast;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Syntax;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
@@ -213,18 +215,17 @@ public sealed class StepParserTests
 
         context.Cursor.StartDocument();
 
-        _parser.Parse(context);
+        var result = _parser.Parse(context);
 
         DiagnosticAssert.Single(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
             field);
 
-        // todo: solve duplicate field value assertion
-        // AssertFirstFieldValue(
-        //    result,
-        //    field,
-        //    firstValue);
+        AssertFirstFieldValue(
+            result,
+            field,
+            firstValue);
     }
 
     [Fact]
@@ -296,7 +297,7 @@ public sealed class StepParserTests
     }
 
     [Fact]
-    public void Parse_ScriptAndTemplate_Throws()
+    public async Task Parse_ScriptAndTemplate_ReportsDiagnostic()
     {
         var context =
             TestParserFactory.CreateContext(
@@ -307,13 +308,15 @@ public sealed class StepParserTests
 
         context.Cursor.StartDocument();
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => _parser.Parse(context));
+        var result = _parser.Parse(context);
 
-        Assert.StartsWith(
-            "Step cannot contain multiple step type fields",
-            exception.Message);
+        DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.MultipleStepTypes);
+
+        var invalidStep = Assert.IsType<InvalidStepNode>(result);
+
+        await VerifyAstAsync(invalidStep);
     }
 
     [Fact]
@@ -400,12 +403,78 @@ public sealed class StepParserTests
             : $"{StepFieldNames.Script}: dotnet test";
     }
 
+    private static void AssertFirstFieldValue(
+        StepNode step,
+        string field,
+        string expected)
+    {
+        switch (field)
+        {
+            case StepFieldNames.Script:
+                AstAssert.HasStringField(
+                    Assert.IsType<ScriptStepNode>(step).Script,
+                    StepFieldNames.Script,
+                    expected);
+                break;
+
+            case StepFieldNames.Template:
+                AstAssert.HasStringField(
+                    Assert.IsType<TemplateStepNode>(step).Template,
+                    StepFieldNames.Template,
+                    expected);
+                break;
+
+            case StepFieldNames.DisplayName:
+                AstAssert.HasStringField(
+                    Assert.IsType<ScriptStepNode>(step).DisplayName!,
+                    StepFieldNames.DisplayName,
+                    expected);
+                break;
+
+            case StepFieldNames.Condition:
+                AstAssert.HasStringField(
+                    Assert.IsType<ScriptStepNode>(step).Condition!,
+                    StepFieldNames.Condition,
+                    expected);
+                break;
+
+            case StepFieldNames.TimeoutInMinutes:
+                AstAssert.HasIntegerField(
+                    Assert.IsType<ScriptStepNode>(step).TimeoutInMinutes!,
+                    StepFieldNames.TimeoutInMinutes,
+                    int.Parse(expected, CultureInfo.InvariantCulture));
+                break;
+
+            case StepFieldNames.WorkingDirectory:
+                AstAssert.HasStringField(
+                    Assert.IsType<ScriptStepNode>(step).WorkingDirectory!,
+                    StepFieldNames.WorkingDirectory,
+                    expected);
+                break;
+
+            default:
+                Assert.Fail($"Unexpected field '{field}'.");
+                break;
+        }
+    }
+
+    private static async Task VerifyAstAsync(
+        AstNode node,
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string sourceFilePath = "")
+    {
+        await ParserSnapshotVerifier.VerifyAstAsync(
+            node,
+            memberName,
+            sourceFilePath);
+    }
+
     private async Task VerifyAstAsync(
         string yaml,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
-        await TestParserSnapshotVerifier.VerifyAstAsync(
+        await ParserSnapshotVerifier.VerifyAstAsync(
             yaml,
             _parser.Parse,
             memberName,

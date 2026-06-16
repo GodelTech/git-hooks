@@ -92,7 +92,7 @@ public sealed class ExpressionParserTests
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
-        await TestParserSnapshotVerifier.VerifyAstAsync(
+        await ParserSnapshotVerifier.VerifyAstAsync(
             yaml,
             _parser.Parse,
             memberName,

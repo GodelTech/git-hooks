@@ -3,7 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\GitHooks.Infrastructure.Yaml\GitHooks.Infrastructure.Yaml.csproj" />
     <ProjectReference Include="..\GitHooks.Testing.Diagnostics\GitHooks.Testing.Diagnostics.csproj" />
-    <ProjectReference Include="..\GitHooks.Testing\GitHooks.Testing.csproj" />
   </ItemGroup>
 
 </Project>

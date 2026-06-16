@@ -1,0 +1,5 @@
+﻿InvalidStep
+  Field(script)
+    String("dotnet test")
+  Field(template)
+    String("build.yml")

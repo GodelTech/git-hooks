@@ -154,7 +154,7 @@ public sealed class PipelineParserTests
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
-        await TestParserSnapshotVerifier.VerifyAstAsync(
+        await ParserSnapshotVerifier.VerifyAstAsync(
             yaml,
             _parser.Parse,
             memberName,

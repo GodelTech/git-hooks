@@ -22,6 +22,50 @@ internal sealed class StepFields
 
     public MappingFieldNode<StringKeyFieldNode<ExpressionNode>>? Parameters { get; set; }
 
+    public IEnumerable<FieldNode> GetFields()
+    {
+        if (Script is not null)
+        {
+            yield return Script;
+        }
+
+        if (Template is not null)
+        {
+            yield return Template;
+        }
+
+        if (DisplayName is not null)
+        {
+            yield return DisplayName;
+        }
+
+        if (Condition is not null)
+        {
+            yield return Condition;
+        }
+
+        if (TimeoutInMinutes is not null)
+        {
+            yield return TimeoutInMinutes;
+        }
+
+        if (WorkingDirectory is not null)
+        {
+            yield return WorkingDirectory;
+        }
+
+        if (Env is not null)
+        {
+            yield return Env;
+        }
+
+        if (Parameters is not null)
+        {
+            yield return Parameters;
+        }
+    }
+
+    // todo: solve this as it almost duplicates the GetFields method
     public IEnumerable<string> GetPresentFields()
     {
         if (Script is not null)
