@@ -1,7 +1,7 @@
-﻿UnknownComplexField
+﻿ComplexField
   Key:
-    UnknownSequence
-      UnknownScalar("1")
-      UnknownScalar("2")
+    Sequence
+      Scalar("1")
+      Scalar("2")
   Value:
-    UnknownScalar("value")
+    Scalar("value")

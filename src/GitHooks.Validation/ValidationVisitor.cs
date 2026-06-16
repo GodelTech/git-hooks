@@ -5,7 +5,6 @@ using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
-using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Domain.Ast.Values;
 using GitHooks.Domain.Ast.Visitors;
 
@@ -57,36 +56,7 @@ internal sealed class ValidationVisitor(
         throw new NotImplementedException();
     }
 
-    public void Visit(BooleanLiteralExpressionNode node)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Visit(IntegerLiteralExpressionNode node)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Visit(StringLiteralExpressionNode node)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Visit(VariableExpressionNode node)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Visit(InterpolatedStringExpressionNode node)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void VisitUnknownNode(UnknownNode node)
-    {
-        throw new NotImplementedException();
-    }
-
+    // Fields
     public void Visit<TValue>(StringKeyFieldNode<TValue> node)
         where TValue : AstNode
     {
@@ -105,6 +75,7 @@ internal sealed class ValidationVisitor(
         throw new NotImplementedException();
     }
 
+    // Values
     public void Visit(ScalarNode node)
     {
         throw new NotImplementedException();
@@ -116,6 +87,32 @@ internal sealed class ValidationVisitor(
     }
 
     public void Visit(MappingNode node)
+    {
+        throw new NotImplementedException();
+    }
+
+    // Expressions
+    public void Visit(BooleanLiteralExpressionNode node)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(IntegerLiteralExpressionNode node)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(StringLiteralExpressionNode node)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(InterpolatedStringExpressionNode node)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(VariableExpressionNode node)
     {
         throw new NotImplementedException();
     }

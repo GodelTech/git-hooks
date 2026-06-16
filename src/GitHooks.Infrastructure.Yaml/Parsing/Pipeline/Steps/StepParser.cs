@@ -2,7 +2,6 @@ using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings.Steps;
-using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
 using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
@@ -131,7 +130,7 @@ internal sealed class StepParser(
 
     private static StepNode BuildStep(
         StepFields step,
-        IReadOnlyList<UnknownFieldNode> unknownFields,
+        IReadOnlyList<FieldNode> unknownFields,
         SourceSpan span,
         ParsingContext context)
     {

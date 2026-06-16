@@ -1,7 +1,4 @@
 using GitHooks.Diagnostics.Ast.Printing;
-using GitHooks.Domain.Ast;
-using GitHooks.Domain.Ast.Unknown;
-using GitHooks.Domain.Ast.Visitors;
 using GitHooks.Domain.Common;
 using GitHooks.Testing.Ast;
 using GitHooks.Testing.Ast.Builders;
@@ -46,19 +43,16 @@ public sealed class AstPrinterTests
             .WithTemplateStep(x => x
                 .WithTemplate("build.yml")
                 .WithParameter("configuration", "Release"))
+            .WithUnknownField("simple", "value")
             .WithUnknownField(
-                TestUnknown.SimpleField(
-                    key: "simple",
-                    value: "value"))
-            .WithUnknownField(
-                TestUnknown.ComplexField(
+                TestFields.ComplexKey(
                     key: "key",
-                    value: TestUnknown.Sequence(
+                    value: TestValues.Sequence(
                         [
-                            TestUnknown.Scalar("item1"),
-                            TestUnknown.Mapping(
+                            TestValues.Scalar("item1"),
+                            TestValues.Mapping(
                                 [
-                                    TestUnknown.SimpleField(
+                                    TestFields.StringKey(
                                         key: "nested",
                                         value: "value")
                                 ])
@@ -180,41 +174,5 @@ public sealed class AstPrinterTests
                 TestExpressions.Variable("parameters.project"));
 
         await VerifyAstAsync(expression);
-    }
-
-    [Fact]
-    public void VisitUnknownNode_UnsupportedNode_Throws()
-    {
-        var printer = new AstPrinter();
-
-        var node = new FakeUnknownNode
-        {
-            Span = SourceSpan.Unknown
-        };
-
-        var exception =
-            Assert.Throws<InvalidOperationException>(
-                () => printer.VisitUnknownNode(node));
-
-        Assert.Equal(
-            "Unsupported unknown node 'FakeUnknownNode'.",
-            exception.Message);
-    }
-
-    private sealed record FakeUnknownNode
-        : UnknownNode
-    {
-        public override AstNodeKind Kind
-            => AstNodeKind.UnknownScalar;
-
-        public override void Accept(IAstCommandVisitor visitor)
-        {
-            visitor.VisitUnknownNode(this);
-        }
-
-        public override TResult Accept<TResult>(IAstQueryVisitor<TResult> visitor)
-        {
-            return visitor.VisitUnknownNode(this);
-        }
     }
 }

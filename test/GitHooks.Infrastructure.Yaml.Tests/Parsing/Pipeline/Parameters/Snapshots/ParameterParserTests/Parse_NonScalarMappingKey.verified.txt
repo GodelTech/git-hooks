@@ -1,9 +1,10 @@
 ﻿Parameter(configuration)
   Type(String)
-  UnknownComplexField
-    Key:
-      UnknownSequence
-        UnknownScalar("1")
-        UnknownScalar("2")
-    Value:
-      UnknownScalar("value")
+  UnknownFields:
+    ComplexField
+      Key:
+        Sequence
+          Scalar("1")
+          Scalar("2")
+      Value:
+        Scalar("value")

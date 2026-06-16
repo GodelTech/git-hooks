@@ -25,14 +25,15 @@
     MappingField(parameters)
       Field(configuration)
         String("Release")
-  UnknownField(simple)
-    UnknownScalar("value")
-  UnknownComplexField
-    Key:
-      UnknownScalar("key")
-    Value:
-      UnknownSequence
-        UnknownScalar("item1")
-        UnknownMapping
-          UnknownField(nested)
-            UnknownScalar("value")
+  UnknownFields:
+    Field(simple)
+      String("value")
+    ComplexField
+      Key:
+        Scalar("key")
+      Value:
+        Sequence
+          Scalar("item1")
+          Mapping
+            Field(nested)
+              String("value")

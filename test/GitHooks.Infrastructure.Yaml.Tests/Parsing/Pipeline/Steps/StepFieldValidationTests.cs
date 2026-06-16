@@ -19,7 +19,7 @@ public sealed class StepFieldValidationTests
             Condition = TestFields.StringKey("condition"),
             TimeoutInMinutes = TestFields.StringKey("timeoutInMinutes"),
             WorkingDirectory = TestFields.StringKey("workingDirectory"),
-            Env = TestFields.CreateMapping(
+            Env = TestFields.Mapping(
                 "env",
                 TestFields.StringKey("KEY"))
         };
@@ -65,7 +65,7 @@ public sealed class StepFieldValidationTests
         {
             Script = TestFields.StringKey("script"),
             Template = TestFields.StringKey("template"),
-            Parameters = TestFields.CreateMapping(
+            Parameters = TestFields.Mapping(
                 "parameters",
                 TestFields.StringKey("Configuration"))
         };
@@ -101,7 +101,7 @@ public sealed class StepFieldValidationTests
         var step = new StepFields
         {
             Template = TestFields.StringKey("template"),
-            Parameters = TestFields.CreateMapping(
+            Parameters = TestFields.Mapping(
                 "parameters",
                 TestFields.StringKey("Configuration"))
         };
@@ -151,7 +151,7 @@ public sealed class StepFieldValidationTests
         {
             Template = TestFields.StringKey("template"),
             DisplayName = TestFields.StringKey("displayName"),
-            Env = TestFields.CreateMapping(
+            Env = TestFields.Mapping(
                 "env",
                 TestFields.StringKey("KEY"))
         };
@@ -212,13 +212,13 @@ public sealed class StepFieldValidationTests
                 break;
 
             case StepFieldNames.Env:
-                step.Env = TestFields.CreateMapping(
+                step.Env = TestFields.Mapping(
                     "env",
                     TestFields.StringKey("KEY"));
                 break;
 
             case StepFieldNames.Parameters:
-                step.Parameters = TestFields.CreateMapping(
+                step.Parameters = TestFields.Mapping(
                     "parameters",
                     TestFields.StringKey("Configuration"));
                 break;

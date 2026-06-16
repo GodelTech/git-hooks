@@ -4,7 +4,6 @@ using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
-using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Domain.Ast.Values;
 using GitHooks.Domain.Ast.Visitors;
 
@@ -67,36 +66,7 @@ public sealed class AstNodeVisitorDispatchTests
             LastVisited = nameof(InvalidStepNode);
         }
 
-        public void Visit(BooleanLiteralExpressionNode node)
-        {
-            LastVisited = nameof(BooleanLiteralExpressionNode);
-        }
-
-        public void Visit(IntegerLiteralExpressionNode node)
-        {
-            LastVisited = nameof(IntegerLiteralExpressionNode);
-        }
-
-        public void Visit(StringLiteralExpressionNode node)
-        {
-            LastVisited = nameof(StringLiteralExpressionNode);
-        }
-
-        public void Visit(VariableExpressionNode node)
-        {
-            LastVisited = nameof(VariableExpressionNode);
-        }
-
-        public void Visit(InterpolatedStringExpressionNode node)
-        {
-            LastVisited = nameof(InterpolatedStringExpressionNode);
-        }
-
-        public void VisitUnknownNode(UnknownNode node)
-        {
-            LastVisited = nameof(UnknownNode);
-        }
-
+        // Fields
         public void Visit<TValue>(StringKeyFieldNode<TValue> node)
             where TValue : AstNode
         {
@@ -115,6 +85,7 @@ public sealed class AstNodeVisitorDispatchTests
             LastVisited = nameof(MappingFieldNode<>);
         }
 
+        // Values
         public void Visit(ScalarNode node)
         {
             LastVisited = nameof(ScalarNode);
@@ -128,6 +99,32 @@ public sealed class AstNodeVisitorDispatchTests
         public void Visit(MappingNode node)
         {
             LastVisited = nameof(MappingNode);
+        }
+
+        // Expressions
+        public void Visit(BooleanLiteralExpressionNode node)
+        {
+            LastVisited = nameof(BooleanLiteralExpressionNode);
+        }
+
+        public void Visit(IntegerLiteralExpressionNode node)
+        {
+            LastVisited = nameof(IntegerLiteralExpressionNode);
+        }
+
+        public void Visit(StringLiteralExpressionNode node)
+        {
+            LastVisited = nameof(StringLiteralExpressionNode);
+        }
+
+        public void Visit(InterpolatedStringExpressionNode node)
+        {
+            LastVisited = nameof(InterpolatedStringExpressionNode);
+        }
+
+        public void Visit(VariableExpressionNode node)
+        {
+            LastVisited = nameof(VariableExpressionNode);
         }
     }
 
@@ -158,36 +155,7 @@ public sealed class AstNodeVisitorDispatchTests
             return nameof(InvalidStepNode);
         }
 
-        public string Visit(BooleanLiteralExpressionNode node)
-        {
-            return nameof(BooleanLiteralExpressionNode);
-        }
-
-        public string Visit(IntegerLiteralExpressionNode node)
-        {
-            return nameof(IntegerLiteralExpressionNode);
-        }
-
-        public string Visit(StringLiteralExpressionNode node)
-        {
-            return nameof(StringLiteralExpressionNode);
-        }
-
-        public string Visit(VariableExpressionNode node)
-        {
-            return nameof(VariableExpressionNode);
-        }
-
-        public string Visit(InterpolatedStringExpressionNode node)
-        {
-            return nameof(InterpolatedStringExpressionNode);
-        }
-
-        public string VisitUnknownNode(UnknownNode node)
-        {
-            return nameof(UnknownNode);
-        }
-
+        // Fields
         public string Visit<TValue>(StringKeyFieldNode<TValue> node)
             where TValue : AstNode
         {
@@ -206,6 +174,7 @@ public sealed class AstNodeVisitorDispatchTests
             return nameof(MappingFieldNode<>);
         }
 
+        // Values
         public string Visit(ScalarNode node)
         {
             return nameof(ScalarNode);
@@ -219,6 +188,32 @@ public sealed class AstNodeVisitorDispatchTests
         public string Visit(MappingNode node)
         {
             return nameof(MappingNode);
+        }
+
+        // Expressions
+        public string Visit(BooleanLiteralExpressionNode node)
+        {
+            return nameof(BooleanLiteralExpressionNode);
+        }
+
+        public string Visit(IntegerLiteralExpressionNode node)
+        {
+            return nameof(IntegerLiteralExpressionNode);
+        }
+
+        public string Visit(StringLiteralExpressionNode node)
+        {
+            return nameof(StringLiteralExpressionNode);
+        }
+
+        public string Visit(InterpolatedStringExpressionNode node)
+        {
+            return nameof(InterpolatedStringExpressionNode);
+        }
+
+        public string Visit(VariableExpressionNode node)
+        {
+            return nameof(VariableExpressionNode);
         }
     }
 }

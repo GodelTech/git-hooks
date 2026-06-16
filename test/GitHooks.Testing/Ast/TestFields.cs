@@ -1,3 +1,4 @@
+using GitHooks.Domain.Ast;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Common;
@@ -27,7 +28,19 @@ public static class TestFields
             TestExpressions.String(value));
     }
 
-    public static MappingFieldNode<StringKeyFieldNode<ExpressionNode>> CreateMapping(
+    public static ComplexKeyFieldNode<AstNode> ComplexKey(
+        string key,
+        AstNode value)
+    {
+        return new ComplexKeyFieldNode<AstNode>
+        {
+            Key = TestValues.Scalar(key),
+            Value = value,
+            Span = SourceSpan.Unknown
+        };
+    }
+
+    public static MappingFieldNode<StringKeyFieldNode<ExpressionNode>> Mapping(
         string key,
         StringKeyFieldNode<ExpressionNode> field)
     {

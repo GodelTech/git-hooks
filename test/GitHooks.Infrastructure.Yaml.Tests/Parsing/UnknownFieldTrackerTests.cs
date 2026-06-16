@@ -1,4 +1,5 @@
-using GitHooks.Domain.Ast.Unknown;
+using GitHooks.Domain.Ast.Fields;
+using GitHooks.Domain.Ast.Values;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 
@@ -42,7 +43,7 @@ public sealed class UnknownFieldTrackerTests
             context);
 
         var field =
-            Assert.IsType<UnknownSimpleFieldNode>(
+            Assert.IsType<StringKeyFieldNode<ValueNode>>(
                 Assert.Single(
                     _tracker.GetUnknownFields()));
 
@@ -71,6 +72,6 @@ public sealed class UnknownFieldTrackerTests
             Assert.Single(
                 _tracker.GetUnknownFields());
 
-        Assert.IsType<UnknownComplexFieldNode>(field);
+        Assert.IsType<ComplexKeyFieldNode<ValueNode>>(field);
     }
 }

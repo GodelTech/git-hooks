@@ -1,4 +1,4 @@
-using GitHooks.Domain.Ast.Unknown;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
 using YamlDotNet.Core.Events;
@@ -11,10 +11,10 @@ internal sealed class UnknownFieldTracker(
     private readonly UnknownNodeParser _unknownNodeParser
         = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
 
-    private readonly List<UnknownFieldNode> _unknownFields
+    private readonly List<FieldNode> _unknownFields
         = [];
 
-    public IReadOnlyList<UnknownFieldNode> GetUnknownFields()
+    public IReadOnlyList<FieldNode> GetUnknownFields()
     {
         return _unknownFields;
     }

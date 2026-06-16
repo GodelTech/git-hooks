@@ -3,7 +3,6 @@ using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
-using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Domain.Ast.Values;
 
 namespace GitHooks.Domain.Ast.Visitors;
@@ -20,20 +19,6 @@ public interface IAstCommandVisitor
 
     public void Visit(InvalidStepNode node);
 
-    // TODO: split into IExpressionVisitor (decide later)
-    public void Visit(BooleanLiteralExpressionNode node);
-
-    public void Visit(IntegerLiteralExpressionNode node);
-
-    public void Visit(StringLiteralExpressionNode node);
-
-    public void Visit(VariableExpressionNode node);
-
-    public void Visit(InterpolatedStringExpressionNode node);
-
-    // Unknown
-    public void VisitUnknownNode(UnknownNode node);
-
     // Fields
     public void Visit<TValue>(StringKeyFieldNode<TValue> node)
         where TValue : AstNode;
@@ -44,9 +29,22 @@ public interface IAstCommandVisitor
     public void Visit<TField>(MappingFieldNode<TField> node)
         where TField : FieldNode;
 
+    // Values
     public void Visit(ScalarNode node);
 
     public void Visit(SequenceNode node);
 
     public void Visit(MappingNode node);
+
+    // TODO: split into IExpressionVisitor (decide later)
+    // Expressions
+    public void Visit(BooleanLiteralExpressionNode node);
+
+    public void Visit(IntegerLiteralExpressionNode node);
+
+    public void Visit(StringLiteralExpressionNode node);
+
+    public void Visit(InterpolatedStringExpressionNode node);
+
+    public void Visit(VariableExpressionNode node);
 }

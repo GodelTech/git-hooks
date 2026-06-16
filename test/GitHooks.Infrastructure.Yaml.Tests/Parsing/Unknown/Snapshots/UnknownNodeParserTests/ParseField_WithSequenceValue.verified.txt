@@ -1,4 +1,4 @@
-﻿UnknownField(test)
-  UnknownSequence
-    UnknownScalar("one")
-    UnknownScalar("two")
+﻿Field(test)
+  Sequence
+    Scalar("one")
+    Scalar("two")

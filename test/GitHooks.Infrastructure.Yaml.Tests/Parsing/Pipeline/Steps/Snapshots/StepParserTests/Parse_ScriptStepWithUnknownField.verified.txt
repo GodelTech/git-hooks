@@ -1,8 +1,9 @@
 ﻿ScriptStep
   Field(script)
     String("dotnet test")
-  UnknownField(custom)
-    UnknownMapping
-      UnknownField(nested)
-        UnknownSequence
-          UnknownScalar("value")
+  UnknownFields:
+    Field(custom)
+      Mapping
+        Field(nested)
+          Sequence
+            Scalar("value")

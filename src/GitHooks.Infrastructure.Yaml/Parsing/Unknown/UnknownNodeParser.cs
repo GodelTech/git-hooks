@@ -1,20 +1,22 @@
-using GitHooks.Domain.Ast.Unknown;
+using GitHooks.Domain.Ast.Fields;
+using GitHooks.Domain.Ast.Values;
 using GitHooks.Domain.Common;
 
 using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
+// todo: split into FieldParser and ValueParser
 internal sealed class UnknownNodeParser
 {
-    public UnknownFieldNode ParseField(ParsingContext context)
+    public ComplexKeyFieldNode<ValueNode> ParseField(ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
         var key = ParseNode(context);
         var value = ParseNode(context);
 
-        return new UnknownComplexFieldNode
+        return new ComplexKeyFieldNode<ValueNode>
         {
             Key = key,
             Value = value,
@@ -24,14 +26,14 @@ internal sealed class UnknownNodeParser
         };
     }
 
-    public UnknownSimpleFieldNode ParseField(Scalar key, ParsingContext context)
+    public StringKeyFieldNode<ValueNode> ParseField(Scalar key, ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(context);
 
         var value = ParseNode(context);
 
-        return new UnknownSimpleFieldNode
+        return new StringKeyFieldNode<ValueNode>
         {
             Key = key.Value,
             Value = value,
@@ -41,7 +43,7 @@ internal sealed class UnknownNodeParser
         };
     }
 
-    private UnknownNode ParseNode(ParsingContext context)
+    private ValueNode ParseNode(ParsingContext context)
     {
         if (context.Cursor.Is<Scalar>())
         {
@@ -63,12 +65,12 @@ internal sealed class UnknownNodeParser
     }
 
 #pragma warning disable CA1822 // Mark members as static
-    private UnknownScalarNode ParseScalar(ParsingContext context)
+    private ScalarNode ParseScalar(ParsingContext context)
 #pragma warning restore CA1822 // Mark members as static
     {
         var scalar = context.Cursor.Read<Scalar>();
 
-        return new UnknownScalarNode
+        return new ScalarNode
         {
             Value = scalar.Value,
             Span = context.Cursor.CreateSpan(
@@ -77,11 +79,11 @@ internal sealed class UnknownNodeParser
         };
     }
 
-    private UnknownSequenceNode ParseSequence(ParsingContext context)
+    private SequenceNode ParseSequence(ParsingContext context)
     {
         var start = context.Cursor.Read<SequenceStart>();
 
-        var items = new List<UnknownNode>();
+        var items = new List<ValueNode>();
 
         while (!context.Cursor.Is<SequenceEnd>())
         {
@@ -90,7 +92,7 @@ internal sealed class UnknownNodeParser
 
         var end = context.Cursor.Read<SequenceEnd>();
 
-        return new UnknownSequenceNode
+        return new SequenceNode
         {
             Items = items,
             Span = context.Cursor.CreateSpan(
@@ -99,11 +101,11 @@ internal sealed class UnknownNodeParser
         };
     }
 
-    private UnknownMappingNode ParseMapping(ParsingContext context)
+    private MappingNode ParseMapping(ParsingContext context)
     {
         var start = context.Cursor.Read<MappingStart>();
 
-        var fields = new List<UnknownFieldNode>();
+        var fields = new List<FieldNode>();
 
         while (!context.Cursor.Is<MappingEnd>())
         {
@@ -126,7 +128,7 @@ internal sealed class UnknownNodeParser
 
         var end = context.Cursor.Read<MappingEnd>();
 
-        return new UnknownMappingNode
+        return new MappingNode
         {
             Fields = fields,
             Span = context.Cursor.CreateSpan(

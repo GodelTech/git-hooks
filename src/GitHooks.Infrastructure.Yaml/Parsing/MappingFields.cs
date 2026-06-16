@@ -1,5 +1,5 @@
 using GitHooks.Diagnostics;
-using GitHooks.Domain.Ast.Unknown;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
@@ -58,7 +58,7 @@ internal sealed class MappingFields(
         return readValue(context);
     }
 
-    public IReadOnlyList<UnknownFieldNode> GetUnknownFields()
+    public IReadOnlyList<FieldNode> GetUnknownFields()
     {
         return _unknownFieldTracker.GetUnknownFields();
     }

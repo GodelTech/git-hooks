@@ -1,5 +1,6 @@
 using GitHooks.Diagnostics;
-using GitHooks.Domain.Ast.Unknown;
+using GitHooks.Domain.Ast.Fields;
+using GitHooks.Domain.Ast.Values;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 using GitHooks.Testing.Diagnostics;
@@ -82,7 +83,7 @@ public sealed class MappingFieldsTests
 
         var field = Assert.Single(fields);
 
-        var simpleField = Assert.IsType<UnknownSimpleFieldNode>(field);
+        var simpleField = Assert.IsType<StringKeyFieldNode<ValueNode>>(field);
 
         Assert.Equal(
             "custom",
@@ -115,6 +116,6 @@ public sealed class MappingFieldsTests
             Assert.Single(
                 fields.GetUnknownFields());
 
-        Assert.IsType<UnknownComplexFieldNode>(field);
+        Assert.IsType<ComplexKeyFieldNode<ValueNode>>(field);
     }
 }

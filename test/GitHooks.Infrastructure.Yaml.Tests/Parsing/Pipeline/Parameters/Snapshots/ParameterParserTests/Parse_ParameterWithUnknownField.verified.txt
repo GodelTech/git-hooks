@@ -1,7 +1,8 @@
 ﻿Parameter(configuration)
   Type(String)
-  UnknownField(custom)
-    UnknownMapping
-      UnknownField(nested)
-        UnknownSequence
-          UnknownScalar("value")
+  UnknownFields:
+    Field(custom)
+      Mapping
+        Field(nested)
+          Sequence
+            Scalar("value")

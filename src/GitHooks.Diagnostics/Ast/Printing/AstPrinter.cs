@@ -5,7 +5,6 @@ using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
-using GitHooks.Domain.Ast.Unknown;
 using GitHooks.Domain.Ast.Values;
 using GitHooks.Domain.Ast.Visitors;
 
@@ -45,8 +44,10 @@ public sealed class AstPrinter
         using (_builder.Indent())
         {
             VisitNodes(node.Parameters);
+
             VisitNodes(node.Steps);
-            VisitNodes(node.UnknownFields);
+
+            AppendUnknownFields(node);
         }
     }
 
@@ -65,7 +66,7 @@ public sealed class AstPrinter
             AppendExpression("DefaultValue", node.DefaultValue);
             AppendExpressionCollection("Values", node.Values);
 
-            VisitNodes(node.UnknownFields);
+            AppendUnknownFields(node);
         }
     }
 
@@ -87,7 +88,7 @@ public sealed class AstPrinter
 
             VisitNode(node.Env);
 
-            VisitNodes(node.UnknownFields);
+            AppendUnknownFields(node);
         }
     }
 
@@ -105,7 +106,7 @@ public sealed class AstPrinter
 
             VisitNode(node.Parameters);
 
-            VisitNodes(node.UnknownFields);
+            AppendUnknownFields(node);
         }
     }
 
@@ -121,95 +122,11 @@ public sealed class AstPrinter
         {
             VisitNodes(node.Fields);
 
-            VisitNodes(node.UnknownFields);
+            AppendUnknownFields(node);
         }
     }
 
-    public void Visit(BooleanLiteralExpressionNode node)
-    {
-        ArgumentNullException.ThrowIfNull(node);
-
-        AppendNodeHeader(
-            $"Boolean({node.Value})",
-            node);
-    }
-
-    public void Visit(IntegerLiteralExpressionNode node)
-    {
-        ArgumentNullException.ThrowIfNull(node);
-
-        AppendNodeHeader(
-            $"Integer({node.Value})",
-            node);
-    }
-
-    public void Visit(StringLiteralExpressionNode node)
-    {
-        ArgumentNullException.ThrowIfNull(node);
-
-        AppendNodeHeader(
-            $"String({StringRenderer.RenderQuoted(node.Value)})",
-            node);
-    }
-
-    public void Visit(VariableExpressionNode node)
-    {
-        ArgumentNullException.ThrowIfNull(node);
-
-        AppendNodeHeader(
-            $"Variable({node.Path})",
-            node);
-    }
-
-    public void Visit(InterpolatedStringExpressionNode node)
-    {
-        ArgumentNullException.ThrowIfNull(node);
-
-        AppendNodeHeader(
-            "InterpolatedString",
-            node);
-
-        using (_builder.Indent())
-        {
-            foreach (var part in node.Parts)
-            {
-                part.Accept(this);
-            }
-        }
-    }
-
-    public void VisitUnknownNode(UnknownNode node)
-    {
-        ArgumentNullException.ThrowIfNull(node);
-
-        switch (node)
-        {
-            case UnknownSimpleFieldNode field:
-                VisitUnknownSimpleField(field);
-                break;
-
-            case UnknownComplexFieldNode field:
-                VisitUnknownComplexField(field);
-                break;
-
-            case UnknownScalarNode scalar:
-                VisitUnknownScalar(scalar);
-                break;
-
-            case UnknownSequenceNode sequence:
-                VisitUnknownSequence(sequence);
-                break;
-
-            case UnknownMappingNode mapping:
-                VisitUnknownMapping(mapping);
-                break;
-
-            default:
-                throw new InvalidOperationException(
-                    $"Unsupported unknown node '{node.GetType().Name}'.");
-        }
-    }
-
+    // Fields
     public void Visit<TValue>(StringKeyFieldNode<TValue> node)
         where TValue : AstNode
     {
@@ -263,13 +180,11 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            foreach (var field in node.Fields)
-            {
-                VisitNode(field);
-            }
+            VisitNodes(node.Fields);
         }
     }
 
+    // Values
     public void Visit(ScalarNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -305,6 +220,57 @@ public sealed class AstPrinter
         {
             VisitNodes(node.Fields);
         }
+    }
+
+    // Expressions
+    public void Visit(BooleanLiteralExpressionNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            $"Boolean({node.Value})",
+            node);
+    }
+
+    public void Visit(IntegerLiteralExpressionNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            $"Integer({node.Value})",
+            node);
+    }
+
+    public void Visit(StringLiteralExpressionNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            $"String({StringRenderer.RenderQuoted(node.Value)})",
+            node);
+    }
+
+    public void Visit(InterpolatedStringExpressionNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            "InterpolatedString",
+            node);
+
+        using (_builder.Indent())
+        {
+            VisitNodes(node.Parts);
+        }
+    }
+
+    public void Visit(VariableExpressionNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            $"Variable({node.Path})",
+            node);
     }
 
     private void AppendNodeHeader(string text, AstNode node)
@@ -366,10 +332,22 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            foreach (var expression in expressions)
-            {
-                expression.Accept(this);
-            }
+            VisitNodes(expressions);
+        }
+    }
+
+    private void AppendUnknownFields(PipelineNodeBase node)
+    {
+        if (node.UnknownFields.Count is 0)
+        {
+            return;
+        }
+
+        _builder.AppendLine($"UnknownFields:");
+
+        using (_builder.Indent())
+        {
+            VisitNodes(node.UnknownFields);
         }
     }
 
@@ -388,73 +366,6 @@ public sealed class AstPrinter
         foreach (var node in nodes)
         {
             VisitNode(node);
-        }
-    }
-
-    private void VisitUnknownSimpleField(UnknownSimpleFieldNode node)
-    {
-        AppendNodeHeader(
-            $"UnknownField({node.Key})",
-            node);
-
-        using (_builder.Indent())
-        {
-            VisitNode(node.Value);
-        }
-    }
-
-    private void VisitUnknownComplexField(UnknownComplexFieldNode node)
-    {
-        AppendNodeHeader(
-            "UnknownComplexField",
-            node);
-
-        using (_builder.Indent())
-        {
-            _builder.AppendLine("Key:");
-
-            using (_builder.Indent())
-            {
-                VisitNode(node.Key);
-            }
-
-            _builder.AppendLine("Value:");
-
-            using (_builder.Indent())
-            {
-                VisitNode(node.Value);
-            }
-        }
-    }
-
-    private void VisitUnknownScalar(UnknownScalarNode node)
-    {
-        AppendNodeHeader(
-            $"UnknownScalar({StringRenderer.RenderQuoted(node.Value)})",
-            node);
-    }
-
-    private void VisitUnknownSequence(UnknownSequenceNode node)
-    {
-        AppendNodeHeader(
-            "UnknownSequence",
-            node);
-
-        using (_builder.Indent())
-        {
-            VisitNodes(node.Items);
-        }
-    }
-
-    private void VisitUnknownMapping(UnknownMappingNode node)
-    {
-        AppendNodeHeader(
-            "UnknownMapping",
-            node);
-
-        using (_builder.Indent())
-        {
-            VisitNodes(node.Fields);
         }
     }
 }
