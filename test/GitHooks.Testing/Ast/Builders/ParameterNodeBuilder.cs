@@ -1,5 +1,7 @@
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings.Parameters;
+using GitHooks.Domain.Common;
 
 namespace GitHooks.Testing.Ast.Builders;
 
@@ -8,50 +10,42 @@ public sealed class ParameterNodeBuilder
 {
     private readonly List<ExpressionNode> _values = [];
 
-    private string? _name;
-    private string? _displayName;
+    private StringKeyFieldNode<ExpressionNode>? _name;
+    private StringKeyFieldNode<ExpressionNode>? _displayName;
     private ParameterType _type = ParameterType.String;
-    private ExpressionNode? _defaultValue;
+    private StringKeyFieldNode<ExpressionNode>? _defaultValue;
 
     public ParameterNodeBuilder()
     {
-        _name = "configuration";
+        WithName("configuration");
     }
 
     public ParameterNodeBuilder WithName(
-        string name)
+        string name = "configuration")
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
-        _name = name;
+        _name = TestFields.StringKey(
+            "name",
+            name);
 
         return this;
     }
 
-    public ParameterNodeBuilder WithDisplayName(
-        string displayName)
+    public ParameterNodeBuilder WithDisplayName(string displayName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
 
-        _displayName = displayName;
+        _displayName = TestFields.StringKey(
+            "displayName",
+            displayName);
 
         return this;
     }
 
-    public ParameterNodeBuilder WithType(
-        ParameterType type)
+    public ParameterNodeBuilder WithType(ParameterType type)
     {
         _type = type;
-
-        return this;
-    }
-
-    public ParameterNodeBuilder WithDefaultValue(
-        ExpressionNode defaultValue)
-    {
-        ArgumentNullException.ThrowIfNull(defaultValue);
-
-        _defaultValue = defaultValue;
 
         return this;
     }
@@ -61,8 +55,9 @@ public sealed class ParameterNodeBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(defaultValue);
 
-        WithDefaultValue(
-            TestExpressions.String(defaultValue));
+        _defaultValue = TestFields.StringKey(
+            "defaultValue",
+            defaultValue);
 
         return this;
     }
@@ -114,7 +109,14 @@ public sealed class ParameterNodeBuilder
             DisplayName = _displayName,
             Type = _type,
             DefaultValue = _defaultValue,
-            Values = [.. _values],
+            Values = _values.Count == 0
+                ? null
+                : new SequenceFieldNode<ExpressionNode>
+                {
+                    Key = "values",
+                    Items = [.. _values],
+                    Span = SourceSpan.Unknown
+                },
             UnknownFields = [.. UnknownFields],
             Span = Span
         };

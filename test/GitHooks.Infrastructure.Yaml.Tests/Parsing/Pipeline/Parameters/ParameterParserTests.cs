@@ -6,6 +6,7 @@ using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Syntax;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Ast;
 using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Parameters;
@@ -15,24 +16,24 @@ public sealed class ParameterParserTests
     private readonly ParameterParser _parser = TestParserFactory.CreateParameterParser();
 
     [Fact]
-    public void Constructor_NullExpressionParser_Throws()
+    public void Constructor_NullFieldParser_Throws()
     {
         var exception = Assert.Throws<ArgumentNullException>(
-            () => new ParameterParser(null!, TestParserFactory.CreateUnknownNodeParser()));
+            () => new ParameterParser(null!, TestParserFactory.CreateFieldValueParser()));
 
         Assert.Equal(
-            "expressionParser",
+            "fieldParser",
             exception.ParamName);
     }
 
     [Fact]
-    public void Constructor_NullUnknownNodeParser_Throws()
+    public void Constructor_NullFieldValueParser_Throws()
     {
         var exception = Assert.Throws<ArgumentNullException>(
-            () => new ParameterParser(TestParserFactory.CreateExpressionParser(), null!));
+            () => new ParameterParser(TestParserFactory.CreateFieldParser(), null!));
 
         Assert.Equal(
-            "unknownNodeParser",
+            "fieldValueParser",
             exception.ParamName);
     }
 
@@ -130,9 +131,10 @@ public sealed class ParameterParserTests
             DiagnosticDescriptors.UnsupportedParameterType,
             "invalid");
 
-        Assert.Equal(
-            "configuration",
-            parameter.Name);
+        AstAssert.HasStringField(
+            parameter.Name,
+            "name",
+            "configuration");
 
         Assert.Equal(
             ParameterType.String,
@@ -195,7 +197,9 @@ public sealed class ParameterParserTests
             DiagnosticDescriptors.DuplicateField,
             "values");
 
-        var value = Assert.Single(result.Values);
+        Assert.NotNull(result.Values);
+
+        var value = Assert.Single(result.Values.Items);
 
         Assert.Equal(
             "Debug",
@@ -219,7 +223,10 @@ public sealed class ParameterParserTests
             context.Diagnostics,
             DiagnosticDescriptors.ParameterNameRequired);
 
-        Assert.Empty(parameter.Name);
+        AstAssert.HasStringField(
+            parameter.Name,
+            "name",
+            string.Empty);
 
         Assert.Equal(
             ParameterType.String,
@@ -248,15 +255,17 @@ public sealed class ParameterParserTests
         switch (field)
         {
             case ParameterFieldNames.Name:
-                Assert.Equal(
-                    expected,
-                    parameter.Name);
+                AstAssert.HasStringField(
+                    parameter.Name,
+                    ParameterFieldNames.Name,
+                    expected);
                 break;
 
             case ParameterFieldNames.DisplayName:
-                Assert.Equal(
-                    expected,
-                    parameter.DisplayName);
+                AstAssert.HasStringField(
+                    parameter.DisplayName!,
+                    ParameterFieldNames.DisplayName,
+                    expected);
                 break;
 
             case ParameterFieldNames.Type:
@@ -266,9 +275,10 @@ public sealed class ParameterParserTests
                 break;
 
             case ParameterFieldNames.DefaultValue:
-                Assert.Equal(
-                    expected,
-                    GetStringLiteralValue(parameter.DefaultValue));
+                AstAssert.HasStringField(
+                    parameter.DefaultValue!,
+                    ParameterFieldNames.DefaultValue,
+                    expected);
                 break;
 
             default:

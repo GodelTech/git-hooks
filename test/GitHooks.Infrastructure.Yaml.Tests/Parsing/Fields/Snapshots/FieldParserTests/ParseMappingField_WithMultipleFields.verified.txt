@@ -1,0 +1,5 @@
+﻿MappingField(mapping)
+  Field(configuration)
+    String("Release")
+  Field(platform)
+    String("x64")

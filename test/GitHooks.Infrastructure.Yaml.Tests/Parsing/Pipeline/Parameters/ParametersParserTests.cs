@@ -1,5 +1,6 @@
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Ast;
 
 using YamlDotNet.Core;
 
@@ -59,13 +60,15 @@ public sealed class ParametersParserTests
             2,
             result.Count);
 
-        Assert.Equal(
-            "configuration",
-            result[0].Name);
+        AstAssert.HasStringField(
+            result[0].Name,
+            "name",
+            "configuration");
 
-        Assert.Equal(
-            "framework",
-            result[1].Name);
+        AstAssert.HasStringField(
+            result[1].Name,
+            "name",
+            "framework");
     }
 
     [Fact]

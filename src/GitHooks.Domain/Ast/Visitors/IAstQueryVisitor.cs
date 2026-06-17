@@ -26,6 +26,9 @@ public interface IAstQueryVisitor<out TResult>
     public TResult Visit<TValue>(ComplexKeyFieldNode<TValue> node)
         where TValue : AstNode;
 
+    public TResult Visit<TValue>(SequenceFieldNode<TValue> node)
+        where TValue : AstNode;
+
     public TResult Visit<TField>(MappingFieldNode<TField> node)
         where TField : FieldNode;
 

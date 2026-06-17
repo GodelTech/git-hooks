@@ -1,0 +1,4 @@
+﻿SequenceField(values)
+  String("Release")
+  Integer(42)
+  Boolean(True)

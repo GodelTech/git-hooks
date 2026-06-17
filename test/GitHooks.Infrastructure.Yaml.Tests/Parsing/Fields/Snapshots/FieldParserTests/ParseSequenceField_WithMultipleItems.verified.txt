@@ -1,0 +1,3 @@
+﻿SequenceField(values)
+  String("Release")
+  String("Debug")

@@ -1,25 +1,22 @@
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings.Parameters;
-using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
-using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
+using GitHooks.Infrastructure.Yaml.Parsing.Fields;
 
 using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 
 internal sealed class ParameterParser(
-    ExpressionParser expressionParser,
-    UnknownNodeParser unknownNodeParser)
+    FieldParser fieldParser,
+    FieldValueParser fieldValueParser)
 {
-    private static readonly IReadOnlyList<ExpressionNode> s_emptyValues
-        = [];
+    private readonly FieldParser _fieldParser
+        = fieldParser ?? throw new ArgumentNullException(nameof(fieldParser));
 
-    private readonly ExpressionParser _expressionParser
-        = expressionParser ?? throw new ArgumentNullException(nameof(expressionParser));
-
-    private readonly UnknownNodeParser _unknownNodeParser
-        = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
+    private readonly FieldValueParser _fieldValueParser
+        = fieldValueParser ?? throw new ArgumentNullException(nameof(fieldValueParser));
 
     public ParameterNode Parse(ParsingContext context)
     {
@@ -27,19 +24,19 @@ internal sealed class ParameterParser(
 
         var start = context.Cursor.Read<MappingStart>();
 
-        var fields = new MappingFields(_unknownNodeParser);
+        var fieldTracker = new FieldTracker(_fieldValueParser);
 
-        string? name = null;
-        string? displayName = null;
+        StringKeyFieldNode<ExpressionNode>? name = null;
+        StringKeyFieldNode<ExpressionNode>? displayName = null;
         var type = ParameterType.String;
-        ExpressionNode? defaultValue = null;
-        List<ExpressionNode>? values = null;
+        StringKeyFieldNode<ExpressionNode>? defaultValue = null;
+        SequenceFieldNode<ExpressionNode>? values = null;
 
         while (!context.Cursor.Is<MappingEnd>())
         {
             if (!context.Cursor.Is<Scalar>())
             {
-                fields.AddUnknownField(context);
+                fieldTracker.AddUnknownField(context);
 
                 continue;
             }
@@ -49,23 +46,23 @@ internal sealed class ParameterParser(
             switch (key.Value.ToLowerInvariant())
             {
                 case "name":
-                    name = fields.ReadFirst(
+                    name = fieldTracker.ReadFirst(
                         key,
                         context,
                         name,
-                        static context => context.Cursor.Read<Scalar>().Value);
+                        context => _fieldParser.ParseStringKeyField(key, context));
                     break;
 
                 case "displayname":
-                    displayName = fields.ReadFirst(
+                    displayName = fieldTracker.ReadFirst(
                         key,
                         context,
                         displayName,
-                        static context => context.Cursor.Read<Scalar>().Value);
+                        context => _fieldParser.ParseStringKeyField(key, context));
                     break;
 
                 case "type":
-                    type = fields.ReadFirst(
+                    type = fieldTracker.ReadFirst(
                         key,
                         context,
                         type,
@@ -75,23 +72,23 @@ internal sealed class ParameterParser(
                     break;
 
                 case "default":
-                    defaultValue = fields.ReadFirst(
+                    defaultValue = fieldTracker.ReadFirst(
                         key,
                         context,
                         defaultValue,
-                        _expressionParser.Parse);
+                        context => _fieldParser.ParseStringKeyField(key, context));
                     break;
 
                 case "values":
-                    values = fields.ReadFirst(
+                    values = fieldTracker.ReadFirst(
                         key,
                         context,
                         values,
-                        ParseValues);
+                        context => _fieldParser.ParseSequenceField(key, context));
                     break;
 
                 default:
-                    fields.AddUnknownField(key, context);
+                    fieldTracker.AddUnknownField(key, context);
                     break;
             }
         }
@@ -107,7 +104,9 @@ internal sealed class ParameterParser(
                     DiagnosticDescriptors.ParameterNameRequired,
                     span));
 
-            name = string.Empty;
+            name = MissingFields.StringKeyField(
+                "name",
+                span);
         }
 
         return new ParameterNode
@@ -116,8 +115,8 @@ internal sealed class ParameterParser(
             DisplayName = displayName,
             Type = type,
             DefaultValue = defaultValue,
-            Values = values ?? s_emptyValues,
-            UnknownFields = fields.GetUnknownFields(),
+            Values = values,
+            UnknownFields = [.. fieldTracker.GetUnknownFields()],
             Span = span
         };
     }
@@ -149,23 +148,5 @@ internal sealed class ParameterParser(
 
                 return ParameterType.String;
         }
-    }
-
-    private List<ExpressionNode> ParseValues(ParsingContext context)
-    {
-        var values = new List<ExpressionNode>();
-
-        _ = context.Cursor.Read<SequenceStart>();
-
-        while (!context.Cursor.Is<SequenceEnd>())
-        {
-            var value = _expressionParser.Parse(context);
-
-            values.Add(value);
-        }
-
-        _ = context.Cursor.Read<SequenceEnd>();
-
-        return values;
     }
 }

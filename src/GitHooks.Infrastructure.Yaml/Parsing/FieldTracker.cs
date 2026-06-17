@@ -1,20 +1,23 @@
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Common;
-using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
+using GitHooks.Infrastructure.Yaml.Parsing.Fields;
 
 using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing;
 
-internal sealed class MappingFields(
-    UnknownNodeParser unknownNodeParser)
+internal sealed class FieldTracker(
+    FieldValueParser fieldValueParser)
 {
+    private readonly FieldValueParser _fieldValueParser
+        = fieldValueParser ?? throw new ArgumentNullException(nameof(fieldValueParser));
+
     private readonly Dictionary<string, SourceSpan> _fields
         = new(StringComparer.OrdinalIgnoreCase);
 
-    private readonly UnknownFieldTracker _unknownFieldTracker
-        = new(unknownNodeParser);
+    private readonly List<FieldNode> _unknownFields
+        = [];
 
     public T ReadFirst<T>(
         Scalar key,
@@ -60,16 +63,23 @@ internal sealed class MappingFields(
 
     public IReadOnlyList<FieldNode> GetUnknownFields()
     {
-        return _unknownFieldTracker.GetUnknownFields();
+        return [.. _unknownFields];
+    }
+
+    public void AddUnknownField(
+        Scalar key,
+        ParsingContext context)
+    {
+        _unknownFields.Add(
+            _fieldValueParser.ParseStringKeyField(
+                key,
+                context));
     }
 
     public void AddUnknownField(ParsingContext context)
     {
-        _unknownFieldTracker.AddUnknownField(context);
-    }
-
-    public void AddUnknownField(Scalar key, ParsingContext context)
-    {
-        _unknownFieldTracker.AddUnknownField(key, context);
+        _unknownFields.Add(
+            _fieldValueParser.ParseComplexKeyField(
+                context));
     }
 }

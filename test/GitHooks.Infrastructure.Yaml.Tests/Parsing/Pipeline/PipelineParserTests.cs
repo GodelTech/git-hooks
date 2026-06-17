@@ -19,7 +19,7 @@ public sealed class PipelineParserTests
                 () => new PipelineParser(
                     null!,
                     TestParserFactory.CreateStepsParser(),
-                    TestParserFactory.CreateUnknownNodeParser()));
+                    TestParserFactory.CreateFieldValueParser()));
 
         Assert.Equal(
             "parametersParser",
@@ -34,7 +34,7 @@ public sealed class PipelineParserTests
                 () => new PipelineParser(
                     TestParserFactory.CreateParametersParser(),
                     null!,
-                    TestParserFactory.CreateUnknownNodeParser()));
+                    TestParserFactory.CreateFieldValueParser()));
 
         Assert.Equal(
             "stepsParser",
@@ -42,7 +42,7 @@ public sealed class PipelineParserTests
     }
 
     [Fact]
-    public void Constructor_NullUnknownNodeParser_Throws()
+    public void Constructor_NullFieldValueParser_Throws()
     {
         var exception =
             Assert.Throws<ArgumentNullException>(
@@ -52,7 +52,7 @@ public sealed class PipelineParserTests
                     null!));
 
         Assert.Equal(
-            "unknownNodeParser",
+            "fieldValueParser",
             exception.ParamName);
     }
 

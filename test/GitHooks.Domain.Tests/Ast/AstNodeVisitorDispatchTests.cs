@@ -79,6 +79,12 @@ public sealed class AstNodeVisitorDispatchTests
             LastVisited = nameof(ComplexKeyFieldNode<>);
         }
 
+        public void Visit<TValue>(SequenceFieldNode<TValue> node)
+            where TValue : AstNode
+        {
+            LastVisited = nameof(SequenceFieldNode<>);
+        }
+
         public void Visit<TField>(MappingFieldNode<TField> node)
             where TField : FieldNode
         {
@@ -166,6 +172,12 @@ public sealed class AstNodeVisitorDispatchTests
             where TValue : AstNode
         {
             return nameof(ComplexKeyFieldNode<>);
+        }
+
+        public string Visit<TValue>(SequenceFieldNode<TValue> node)
+            where TValue : AstNode
+        {
+            return nameof(SequenceFieldNode<>);
         }
 
         public string Visit<TField>(MappingFieldNode<TField> node)

@@ -1,8 +1,11 @@
 ﻿Pipeline
-  Parameter(configuration)
-    DisplayName("Build Configuration")
+  Parameter
+    Field(name)
+      String("configuration")
+    Field(displayName)
+      String("Build Configuration")
     Type(String)
-    Values:
+    SequenceField(values)
       String("Debug")
       String("Release")
   ScriptStep

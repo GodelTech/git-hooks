@@ -69,6 +69,12 @@ internal sealed class ValidationVisitor(
         throw new NotImplementedException();
     }
 
+    public void Visit<TValue>(SequenceFieldNode<TValue> node)
+        where TValue : AstNode
+    {
+        throw new NotImplementedException();
+    }
+
     public void Visit<TField>(MappingFieldNode<TField> node)
         where TField : FieldNode
     {

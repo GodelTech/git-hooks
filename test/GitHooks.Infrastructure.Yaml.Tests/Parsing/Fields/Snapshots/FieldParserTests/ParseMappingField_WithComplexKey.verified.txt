@@ -1,0 +1,3 @@
+﻿MappingField(mapping)
+  Field(configuration)
+    String("Release")

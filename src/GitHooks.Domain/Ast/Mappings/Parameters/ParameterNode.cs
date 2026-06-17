@@ -1,4 +1,5 @@
 using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Mappings.Parameters;
@@ -9,16 +10,16 @@ public sealed record ParameterNode
     public override AstNodeKind Kind
         => AstNodeKind.Parameter;
 
-    public required string Name { get; init; }
+    public required StringKeyFieldNode<ExpressionNode> Name { get; init; }
 
-    public string? DisplayName { get; init; }
+    public StringKeyFieldNode<ExpressionNode>? DisplayName { get; init; }
 
+    // todo: dicide how to migrate into fields
     public ParameterType Type { get; init; }
 
-    public ExpressionNode? DefaultValue { get; init; }
+    public StringKeyFieldNode<ExpressionNode>? DefaultValue { get; init; }
 
-    public IReadOnlyList<ExpressionNode> Values { get; init; }
-        = [];
+    public SequenceFieldNode<ExpressionNode>? Values { get; init; }
 
     public override void Accept(IAstCommandVisitor visitor)
     {

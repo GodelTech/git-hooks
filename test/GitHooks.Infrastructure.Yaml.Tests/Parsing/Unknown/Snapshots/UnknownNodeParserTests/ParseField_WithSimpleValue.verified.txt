@@ -1,6 +1,0 @@
-﻿Field(test)
-  Mapping
-    Field(custom)
-      Mapping
-        Field(nested)
-          Scalar("value")

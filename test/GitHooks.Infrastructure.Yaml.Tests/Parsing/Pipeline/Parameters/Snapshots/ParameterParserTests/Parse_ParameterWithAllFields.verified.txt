@@ -1,8 +1,11 @@
-Parameter(configuration)
-  DisplayName("Configuration")
+Parameter
+  Field(name)
+    String("configuration")
+  Field(displayName)
+    String("Configuration")
   Type(String)
-  DefaultValue:
+  Field(default)
     String("Release")
-  Values:
+  SequenceField(values)
     String("Debug")
     String("Release")

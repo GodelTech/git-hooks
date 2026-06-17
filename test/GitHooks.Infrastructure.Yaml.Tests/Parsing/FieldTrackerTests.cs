@@ -9,20 +9,19 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
 
-public sealed class MappingFieldsTests
+public sealed class FieldTrackerTests
 {
-    private readonly MappingFields _fields =
-        new(TestParserFactory.CreateUnknownNodeParser());
+    private readonly FieldTracker _fieldTracker = TestParserFactory.CreateFieldTracker();
 
     [Fact]
-    public void Constructor_NullUnknownNodeParser_Throws()
+    public void Constructor_NullFieldValueParser_Throws()
     {
         var exception =
             Assert.Throws<ArgumentNullException>(
-                () => new MappingFields(null!));
+                () => new FieldTracker(null!));
 
         Assert.Equal(
-            "unknownNodeParser",
+            "fieldValueParser",
             exception.ParamName);
     }
 
@@ -33,13 +32,13 @@ public sealed class MappingFieldsTests
 
         var key = new Scalar("steps");
 
-        var firstResult = _fields.ReadFirst(
+        var firstResult = _fieldTracker.ReadFirst(
             key,
             context,
             "current",
             static _ => "first");
 
-        var secondResult = _fields.ReadFirst(
+        var secondResult = _fieldTracker.ReadFirst(
             key,
             context,
             firstResult,
@@ -63,7 +62,7 @@ public sealed class MappingFieldsTests
     public void GetUnknownFields_InitiallyEmpty()
     {
         Assert.Empty(
-            _fields.GetUnknownFields());
+            _fieldTracker.GetUnknownFields());
     }
 
     [Fact]
@@ -75,11 +74,11 @@ public sealed class MappingFieldsTests
 
         context.Cursor.StartDocument();
 
-        _fields.AddUnknownField(
+        _fieldTracker.AddUnknownField(
             new Scalar("custom"),
             context);
 
-        var fields = _fields.GetUnknownFields();
+        var fields = _fieldTracker.GetUnknownFields();
 
         var field = Assert.Single(fields);
 
@@ -93,10 +92,6 @@ public sealed class MappingFieldsTests
     [Fact]
     public void AddUnknownField_WithComplexKey_AddsField()
     {
-        var fields =
-            new MappingFields(
-                TestParserFactory.CreateUnknownNodeParser());
-
         var context =
             TestParserFactory.CreateContext(
                 """
@@ -108,13 +103,13 @@ public sealed class MappingFieldsTests
 
         _ = context.Cursor.Read<MappingStart>();
 
-        fields.AddUnknownField(context);
+        _fieldTracker.AddUnknownField(context);
 
         _ = context.Cursor.Read<MappingEnd>();
 
         var field =
             Assert.Single(
-                fields.GetUnknownFields());
+                _fieldTracker.GetUnknownFields());
 
         Assert.IsType<ComplexKeyFieldNode<ValueNode>>(field);
     }

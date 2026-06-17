@@ -1,10 +1,10 @@
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
+using GitHooks.Infrastructure.Yaml.Parsing.Fields;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
-using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
 namespace GitHooks.Infrastructure.Yaml.Tests;
 
@@ -28,29 +28,29 @@ internal static class TestParserFactory
 
     public static YamlPipelineParser CreateYamlPipelineParser()
     {
-        // unknown
-        var unknownNodeParser = CreateUnknownNodeParser();
-
         // expressions
         var expressionParser = CreateExpressionParser();
 
-        var expressionMappingParser = CreateExpressionMappingParser(
+        // values
+        var fieldValueParser = CreateFieldValueParser();
+
+        // fields
+        var fieldParser = CreateFieldParser(
             expressionParser,
-            unknownNodeParser);
+            fieldValueParser);
 
         // parameters
         var parameterParser = CreateParameterParser(
-            expressionParser,
-            unknownNodeParser);
+            fieldParser,
+            fieldValueParser);
 
         var parametersParser = CreateParametersParser(
             parameterParser);
 
         // steps
         var stepParser = CreateStepParser(
-            expressionParser,
-            expressionMappingParser,
-            unknownNodeParser);
+            fieldParser,
+            fieldValueParser);
 
         var stepsParser = CreateStepsParser(
             stepParser);
@@ -59,7 +59,7 @@ internal static class TestParserFactory
         var pipelineParser = CreatePipelineParser(
             parametersParser,
             stepsParser,
-            unknownNodeParser);
+            fieldValueParser);
 
         return new YamlPipelineParser(
             pipelineParser);
@@ -68,12 +68,12 @@ internal static class TestParserFactory
     public static PipelineParser CreatePipelineParser(
         ParametersParser? parametersParser = null,
         StepsParser? stepsParser = null,
-        UnknownNodeParser? unknownNodeParser = null)
+        FieldValueParser? fieldValueParser = null)
     {
         return new PipelineParser(
             parametersParser ?? CreateParametersParser(),
             stepsParser ?? CreateStepsParser(),
-            unknownNodeParser ?? CreateUnknownNodeParser());
+            fieldValueParser ?? CreateFieldValueParser());
     }
 
     public static ParametersParser CreateParametersParser(
@@ -84,12 +84,12 @@ internal static class TestParserFactory
     }
 
     public static ParameterParser CreateParameterParser(
-        ExpressionParser? expressionParser = null,
-        UnknownNodeParser? unknownNodeParser = null)
+        FieldParser? fieldParser = null,
+        FieldValueParser? fieldValueParser = null)
     {
         return new ParameterParser(
-            expressionParser ?? CreateExpressionParser(),
-            unknownNodeParser ?? CreateUnknownNodeParser());
+            fieldParser ?? CreateFieldParser(),
+            fieldValueParser ?? CreateFieldValueParser());
     }
 
     public static StepsParser CreateStepsParser(
@@ -100,17 +100,26 @@ internal static class TestParserFactory
     }
 
     public static StepParser CreateStepParser(
-        ExpressionParser? expressionParser = null,
-        ExpressionMappingParser? expressionMappingParser = null,
-        UnknownNodeParser? unknownNodeParser = null)
+        FieldParser? fieldParser = null,
+        FieldValueParser? fieldValueParser = null)
     {
-        expressionParser ??= CreateExpressionParser();
-        unknownNodeParser ??= CreateUnknownNodeParser();
-
         return new StepParser(
-            expressionParser,
-            expressionMappingParser ?? CreateExpressionMappingParser(expressionParser, unknownNodeParser),
-            unknownNodeParser);
+            fieldParser ?? CreateFieldParser(),
+            fieldValueParser ?? CreateFieldValueParser());
+    }
+
+    public static FieldParser CreateFieldParser(
+        ExpressionParser? expressionParser = null,
+        FieldValueParser? fieldValueParser = null)
+    {
+        return new FieldParser(
+            expressionParser ?? CreateExpressionParser(),
+            fieldValueParser ?? CreateFieldValueParser());
+    }
+
+    public static FieldValueParser CreateFieldValueParser()
+    {
+        return new FieldValueParser();
     }
 
     public static ExpressionParser CreateExpressionParser()
@@ -122,15 +131,6 @@ internal static class TestParserFactory
 
         return new ExpressionParser(
             interpolatedStringParser);
-    }
-
-    public static ExpressionMappingParser CreateExpressionMappingParser(
-        ExpressionParser? expressionParser = null,
-        UnknownNodeParser? unknownNodeParser = null)
-    {
-        return new ExpressionMappingParser(
-            expressionParser ?? CreateExpressionParser(),
-            unknownNodeParser ?? CreateUnknownNodeParser());
     }
 
     public static VariableExpressionParser CreateVariableExpressionParser()
@@ -145,8 +145,10 @@ internal static class TestParserFactory
             variableExpressionParser ?? CreateVariableExpressionParser());
     }
 
-    public static UnknownNodeParser CreateUnknownNodeParser()
+    public static FieldTracker CreateFieldTracker(
+        FieldValueParser? fieldValueParser = null)
     {
-        return new UnknownNodeParser();
+        return new FieldTracker(
+            fieldValueParser ?? CreateFieldValueParser());
     }
 }

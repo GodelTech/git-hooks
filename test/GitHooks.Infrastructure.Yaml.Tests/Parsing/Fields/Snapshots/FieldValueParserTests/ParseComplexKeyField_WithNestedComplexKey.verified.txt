@@ -1,12 +1,14 @@
 ﻿ComplexField
   Key:
-    Scalar("nested")
+    Sequence
+      Scalar("1")
+      Scalar("2")
   Value:
     Mapping
       ComplexField
         Key:
           Sequence
-            Scalar("1")
-            Scalar("2")
+            Scalar("3")
+            Scalar("4")
         Value:
           Scalar("value")

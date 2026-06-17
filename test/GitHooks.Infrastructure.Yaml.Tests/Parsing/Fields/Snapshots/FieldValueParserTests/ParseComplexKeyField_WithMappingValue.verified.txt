@@ -1,0 +1,9 @@
+﻿ComplexField
+  Key:
+    Sequence
+      Scalar("1")
+      Scalar("2")
+  Value:
+    Mapping
+      Field(nested)
+        Scalar("value")

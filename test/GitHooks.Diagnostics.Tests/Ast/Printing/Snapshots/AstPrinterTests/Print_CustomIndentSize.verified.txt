@@ -1,5 +1,7 @@
 ﻿Pipeline
-    Parameter(configuration)
+    Parameter
+        Field(name)
+            String("configuration")
         Type(String)
-        DefaultValue:
+        Field(defaultValue)
             String("Release")

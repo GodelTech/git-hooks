@@ -26,6 +26,9 @@ public interface IAstCommandVisitor
     public void Visit<TValue>(ComplexKeyFieldNode<TValue> node)
         where TValue : AstNode;
 
+    public void Visit<TValue>(SequenceFieldNode<TValue> node)
+        where TValue : AstNode;
+
     public void Visit<TField>(MappingFieldNode<TField> node)
         where TField : FieldNode;
 

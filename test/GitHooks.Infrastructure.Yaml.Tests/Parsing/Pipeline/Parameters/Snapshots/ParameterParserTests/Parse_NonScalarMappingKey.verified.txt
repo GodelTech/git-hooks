@@ -1,4 +1,6 @@
-﻿Parameter(configuration)
+﻿Parameter
+  Field(name)
+    String("configuration")
   Type(String)
   UnknownFields:
     ComplexField

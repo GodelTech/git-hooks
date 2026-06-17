@@ -56,15 +56,16 @@ public sealed class AstPrinter
         ArgumentNullException.ThrowIfNull(node);
 
         AppendNodeHeader(
-            $"Parameter({node.Name})",
+            $"Parameter",
             node);
 
         using (_builder.Indent())
         {
-            AppendField("DisplayName", node.DisplayName);
+            VisitNode(node.Name);
+            VisitNode(node.DisplayName);
             AppendField("Type", node.Type);
-            AppendExpression("DefaultValue", node.DefaultValue);
-            AppendExpressionCollection("Values", node.Values);
+            VisitNode(node.DefaultValue);
+            VisitNode(node.Values);
 
             AppendUnknownFields(node);
         }
@@ -166,6 +167,21 @@ public sealed class AstPrinter
             {
                 VisitNode(node.Value);
             }
+        }
+    }
+
+    public void Visit<TValue>(SequenceFieldNode<TValue> node)
+        where TValue : AstNode
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            $"SequenceField({node.Key})",
+            node);
+
+        using (_builder.Indent())
+        {
+            VisitNodes(node.Items);
         }
     }
 
@@ -290,49 +306,11 @@ public sealed class AstPrinter
         _builder.AppendLine(output);
     }
 
-    private void AppendField(string name, string? value)
-    {
-        if (value is not null)
-        {
-            _builder.AppendLine($"{name}({StringRenderer.RenderQuoted(value)})");
-        }
-    }
-
     private void AppendField(string name, Enum? value)
     {
         if (value is not null)
         {
             _builder.AppendLine($"{name}({value})");
-        }
-    }
-
-    private void AppendExpression(string fieldName, ExpressionNode? expression)
-    {
-        if (expression is null)
-        {
-            return;
-        }
-
-        _builder.AppendLine($"{fieldName}:");
-
-        using (_builder.Indent())
-        {
-            expression.Accept(this);
-        }
-    }
-
-    private void AppendExpressionCollection(string fieldName, IReadOnlyList<ExpressionNode> expressions)
-    {
-        if (expressions.Count is 0)
-        {
-            return;
-        }
-
-        _builder.AppendLine($"{fieldName}:");
-
-        using (_builder.Indent())
-        {
-            VisitNodes(expressions);
         }
     }
 

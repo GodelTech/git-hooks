@@ -22,6 +22,7 @@ internal static class TestAstFactory
         // Fields
         (CreateStringKeyFieldNode(), AstNodeKind.StringKeyField, nameof(StringKeyFieldNode<>)),
         (CreateComplexKeyFieldNode(), AstNodeKind.ComplexKeyField, nameof(ComplexKeyFieldNode<>)),
+        (CreateSequenceFieldNode(), AstNodeKind.SequenceField, nameof(SequenceFieldNode<>)),
         (CreateMappingFieldNode(), AstNodeKind.MappingField, nameof(MappingFieldNode<>)),
 
         // Values
@@ -41,7 +42,7 @@ internal static class TestAstFactory
     {
         return new ParameterNode
         {
-            Name = "configuration",
+            Name = CreateStringKeyFieldNode(),
             UnknownFields = [],
             Span = SourceSpan.Unknown
         };
@@ -105,6 +106,16 @@ internal static class TestAstFactory
         {
             Key = CreateScalarNode(),
             Value = CreateStringNode(),
+            Span = SourceSpan.Unknown
+        };
+    }
+
+    private static SequenceFieldNode<ExpressionNode> CreateSequenceFieldNode()
+    {
+        return new SequenceFieldNode<ExpressionNode>
+        {
+            Key = "field",
+            Items = [],
             Span = SourceSpan.Unknown
         };
     }

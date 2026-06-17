@@ -1,9 +1,9 @@
 using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
+using GitHooks.Infrastructure.Yaml.Parsing.Fields;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
-using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
 
 using YamlDotNet.Core.Events;
 
@@ -12,7 +12,7 @@ namespace GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 internal sealed class PipelineParser(
     ParametersParser parametersParser,
     StepsParser stepsParser,
-    UnknownNodeParser unknownNodeParser)
+    FieldValueParser fieldValueParser)
 {
     private readonly ParametersParser _parametersParser
         = parametersParser ?? throw new ArgumentNullException(nameof(parametersParser));
@@ -20,8 +20,8 @@ internal sealed class PipelineParser(
     private readonly StepsParser _stepsParser
         = stepsParser ?? throw new ArgumentNullException(nameof(stepsParser));
 
-    private readonly UnknownNodeParser _unknownNodeParser
-        = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
+    private readonly FieldValueParser _fieldValueParser
+        = fieldValueParser ?? throw new ArgumentNullException(nameof(fieldValueParser));
 
     public PipelineNode Parse(ParsingContext context)
     {
@@ -29,7 +29,7 @@ internal sealed class PipelineParser(
 
         var start = context.Cursor.Read<MappingStart>();
 
-        var fields = new MappingFields(_unknownNodeParser);
+        var fieldTracker = new FieldTracker(_fieldValueParser);
 
         IReadOnlyList<ParameterNode> parameters = [];
         IReadOnlyList<StepNode> steps = [];
@@ -38,7 +38,7 @@ internal sealed class PipelineParser(
         {
             if (!context.Cursor.Is<Scalar>())
             {
-                fields.AddUnknownField(context);
+                fieldTracker.AddUnknownField(context);
 
                 continue;
             }
@@ -48,7 +48,7 @@ internal sealed class PipelineParser(
             switch (key.Value.ToLowerInvariant())
             {
                 case "parameters":
-                    parameters = fields.ReadFirst(
+                    parameters = fieldTracker.ReadFirst(
                         key,
                         context,
                         parameters,
@@ -56,7 +56,7 @@ internal sealed class PipelineParser(
                     break;
 
                 case "steps":
-                    steps = fields.ReadFirst(
+                    steps = fieldTracker.ReadFirst(
                         key,
                         context,
                         steps,
@@ -64,7 +64,7 @@ internal sealed class PipelineParser(
                     break;
 
                 default:
-                    fields.AddUnknownField(key, context);
+                    fieldTracker.AddUnknownField(key, context);
                     break;
             }
         }
@@ -77,7 +77,7 @@ internal sealed class PipelineParser(
         {
             Parameters = parameters,
             Steps = steps,
-            UnknownFields = fields.GetUnknownFields(),
+            UnknownFields = fieldTracker.GetUnknownFields(),
             Span = span
         };
     }

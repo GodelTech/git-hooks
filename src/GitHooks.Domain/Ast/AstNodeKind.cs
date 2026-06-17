@@ -10,23 +10,21 @@ public enum AstNodeKind
     TemplateStep,
     InvalidStep,
 
+    // Fields
+    StringKeyField,
+    ComplexKeyField,
+    SequenceField,
+    MappingField,
+
+    // Values
+    Scalar,
+    Sequence,
+    Mapping,
+
+    // Expressions
     BooleanLiteralExpression,
     IntegerLiteralExpression,
     StringLiteralExpression,
     VariableExpression,
-    InterpolatedStringExpression,
-
-    UnknownSimpleField,
-    UnknownComplexField,
-    UnknownScalar,
-    UnknownSequence,
-    UnknownMapping,
-
-    StringKeyField,
-    ComplexKeyField,
-    MappingField,
-
-    Scalar,
-    Sequence,
-    Mapping
+    InterpolatedStringExpression
 }

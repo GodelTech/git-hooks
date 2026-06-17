@@ -1,28 +1,22 @@
 using GitHooks.Diagnostics;
-using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Common;
-using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
-using GitHooks.Infrastructure.Yaml.Parsing.Unknown;
+using GitHooks.Infrastructure.Yaml.Parsing.Fields;
 
 using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
 
 internal sealed class StepParser(
-    ExpressionParser expressionParser,
-    ExpressionMappingParser expressionMappingParser,
-    UnknownNodeParser unknownNodeParser)
+    FieldParser fieldParser,
+    FieldValueParser fieldValueParser)
 {
-    private readonly ExpressionParser _expressionParser
-        = expressionParser ?? throw new ArgumentNullException(nameof(expressionParser));
+    private readonly FieldParser _fieldParser
+        = fieldParser ?? throw new ArgumentNullException(nameof(fieldParser));
 
-    private readonly ExpressionMappingParser _expressionMappingParser
-        = expressionMappingParser ?? throw new ArgumentNullException(nameof(expressionMappingParser));
-
-    private readonly UnknownNodeParser _unknownNodeParser
-        = unknownNodeParser ?? throw new ArgumentNullException(nameof(unknownNodeParser));
+    private readonly FieldValueParser _fieldValueParser
+        = fieldValueParser ?? throw new ArgumentNullException(nameof(fieldValueParser));
 
     public StepNode Parse(ParsingContext context)
     {
@@ -30,7 +24,7 @@ internal sealed class StepParser(
 
         var start = context.Cursor.Read<MappingStart>();
 
-        var fields = new MappingFields(_unknownNodeParser);
+        var fieldTracker = new FieldTracker(_fieldValueParser);
 
         var step = new StepFields();
 
@@ -38,7 +32,7 @@ internal sealed class StepParser(
         {
             if (!context.Cursor.Is<Scalar>())
             {
-                fields.AddUnknownField(context);
+                fieldTracker.AddUnknownField(context);
 
                 continue;
             }
@@ -48,71 +42,71 @@ internal sealed class StepParser(
             switch (key.Value.ToLowerInvariant())
             {
                 case "script":
-                    step.Script = fields.ReadFirst(
+                    step.Script = fieldTracker.ReadFirst(
                         key,
                         context,
                         step.Script,
-                        context => ReadExpressionField(key, context));
+                        context => _fieldParser.ParseStringKeyField(key, context));
                     break;
 
                 case "template":
-                    step.Template = fields.ReadFirst(
+                    step.Template = fieldTracker.ReadFirst(
                         key,
                         context,
                         step.Template,
-                        context => ReadExpressionField(key, context));
+                        context => _fieldParser.ParseStringKeyField(key, context));
                     break;
 
                 case "displayname":
-                    step.DisplayName = fields.ReadFirst(
+                    step.DisplayName = fieldTracker.ReadFirst(
                         key,
                         context,
                         step.DisplayName,
-                        context => ReadExpressionField(key, context));
+                        context => _fieldParser.ParseStringKeyField(key, context));
                     break;
 
                 case "condition":
-                    step.Condition = fields.ReadFirst(
+                    step.Condition = fieldTracker.ReadFirst(
                         key,
                         context,
                         step.Condition,
-                        context => ReadExpressionField(key, context));
+                        context => _fieldParser.ParseStringKeyField(key, context));
                     break;
 
                 case "timeoutinminutes":
-                    step.TimeoutInMinutes = fields.ReadFirst(
+                    step.TimeoutInMinutes = fieldTracker.ReadFirst(
                         key,
                         context,
                         step.TimeoutInMinutes,
-                        context => ReadExpressionField(key, context));
+                        context => _fieldParser.ParseStringKeyField(key, context));
                     break;
 
                 case "workingdirectory":
-                    step.WorkingDirectory = fields.ReadFirst(
+                    step.WorkingDirectory = fieldTracker.ReadFirst(
                         key,
                         context,
                         step.WorkingDirectory,
-                        context => ReadExpressionField(key, context));
+                        context => _fieldParser.ParseStringKeyField(key, context));
                     break;
 
                 case "env":
-                    step.Env = fields.ReadFirst(
+                    step.Env = fieldTracker.ReadFirst(
                         key,
                         context,
                         step.Env,
-                        context => _expressionMappingParser.Parse(key, context));
+                        context => _fieldParser.ParseMappingField(key, context));
                     break;
 
                 case "parameters":
-                    step.Parameters = fields.ReadFirst(
+                    step.Parameters = fieldTracker.ReadFirst(
                         key,
                         context,
                         step.Parameters,
-                        context => _expressionMappingParser.Parse(key, context));
+                        context => _fieldParser.ParseMappingField(key, context));
                     break;
 
                 default:
-                    fields.AddUnknownField(key, context);
+                    fieldTracker.AddUnknownField(key, context);
                     break;
             }
         }
@@ -123,7 +117,7 @@ internal sealed class StepParser(
 
         return BuildStep(
             step,
-            fields.GetUnknownFields(),
+            fieldTracker.GetUnknownFields(),
             span,
             context);
     }
@@ -145,7 +139,7 @@ internal sealed class StepParser(
             return new InvalidStepNode
             {
                 Fields = [.. step.GetFields()],
-                UnknownFields = unknownFields,
+                UnknownFields = [.. unknownFields],
                 Span = span
             };
         }
@@ -162,7 +156,7 @@ internal sealed class StepParser(
                 TimeoutInMinutes = step.TimeoutInMinutes,
                 WorkingDirectory = step.WorkingDirectory,
                 Env = step.Env,
-                UnknownFields = unknownFields,
+                UnknownFields = [.. unknownFields],
                 Span = span
             };
         }
@@ -175,28 +169,12 @@ internal sealed class StepParser(
             {
                 Template = step.Template,
                 Parameters = step.Parameters,
-                UnknownFields = unknownFields,
+                UnknownFields = [.. unknownFields],
                 Span = span
             };
         }
 
         throw context.Cursor.CreateException(
             "Step must contain exactly one step type field");
-    }
-
-    private StringKeyFieldNode<ExpressionNode> ReadExpressionField(
-        Scalar key,
-        ParsingContext context)
-    {
-        var value = _expressionParser.Parse(context);
-
-        return new StringKeyFieldNode<ExpressionNode>
-        {
-            Key = key.Value,
-            Value = value,
-            Span = context.Cursor.CreateSpan(
-                key.Start,
-                value.Span)
-        };
     }
 }

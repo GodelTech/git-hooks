@@ -19,44 +19,28 @@ public sealed class StepParserTests
     private readonly StepParser _parser = TestParserFactory.CreateStepParser();
 
     [Fact]
-    public void Constructor_NullExpressionParser_Throws()
+    public void Constructor_NullFieldParser_Throws()
     {
         var exception = Assert.Throws<ArgumentNullException>(
             () => new StepParser(
                 null!,
-                TestParserFactory.CreateExpressionMappingParser(),
-                TestParserFactory.CreateUnknownNodeParser()));
+                TestParserFactory.CreateFieldValueParser()));
 
         Assert.Equal(
-            "expressionParser",
+            "fieldParser",
             exception.ParamName);
     }
 
     [Fact]
-    public void Constructor_NullExpressionMappingParser_Throws()
+    public void Constructor_NullFieldValueParser_Throws()
     {
         var exception = Assert.Throws<ArgumentNullException>(
             () => new StepParser(
-                TestParserFactory.CreateExpressionParser(),
-                null!,
-                TestParserFactory.CreateUnknownNodeParser()));
-
-        Assert.Equal(
-            "expressionMappingParser",
-            exception.ParamName);
-    }
-
-    [Fact]
-    public void Constructor_NullUnknownNodeParser_Throws()
-    {
-        var exception = Assert.Throws<ArgumentNullException>(
-            () => new StepParser(
-                TestParserFactory.CreateExpressionParser(),
-                TestParserFactory.CreateExpressionMappingParser(),
+                TestParserFactory.CreateFieldParser(),
                 null!));
 
         Assert.Equal(
-            "unknownNodeParser",
+            "fieldValueParser",
             exception.ParamName);
     }
 

@@ -1,7 +1,9 @@
 ﻿Pipeline
-  Parameter(configuration)
+  Parameter
+    Field(name)
+      String("configuration")
     Type(String)
-    DefaultValue:
+    Field(default)
       String("Release")
   ScriptStep
     Field(script)
