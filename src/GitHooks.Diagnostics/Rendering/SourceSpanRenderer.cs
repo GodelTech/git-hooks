@@ -4,7 +4,8 @@ namespace GitHooks.Diagnostics.Rendering;
 
 public static class SourceSpanRenderer
 {
-    public static string Render(SourceSpan span)
+    public static string Render(
+        SourceSpan span)
     {
         if (!span.HasDocument && span.HasUnknownPosition)
         {

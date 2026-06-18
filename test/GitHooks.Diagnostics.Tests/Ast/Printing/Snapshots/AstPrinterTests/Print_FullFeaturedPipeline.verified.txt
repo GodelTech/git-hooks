@@ -4,7 +4,6 @@
       String("configuration")
     Field(displayName)
       String("Build Configuration")
-    Type(String)
     SequenceField(values)
       String("Debug")
       String("Release")

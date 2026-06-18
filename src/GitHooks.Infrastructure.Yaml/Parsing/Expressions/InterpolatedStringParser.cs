@@ -11,14 +11,17 @@ internal sealed partial class InterpolatedStringParser(
     private readonly VariableExpressionParser _variableExpressionParser
         = variableExpressionParser ?? throw new ArgumentNullException(nameof(variableExpressionParser));
 
-    public static bool ContainsInterpolation(string value)
+    public static bool ContainsInterpolation(
+        string value)
     {
         ArgumentNullException.ThrowIfNull(value);
 
         return InterpolationPattern().IsMatch(value);
     }
 
-    public ExpressionNode Parse(string value, SourceSpan span)
+    public ExpressionNode Parse(
+        string value,
+        SourceSpan span)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(value);
 

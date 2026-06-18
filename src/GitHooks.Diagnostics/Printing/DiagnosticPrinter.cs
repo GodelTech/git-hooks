@@ -11,7 +11,8 @@ public sealed class DiagnosticPrinter(
     private readonly DiagnosticPrinterOptions _options
         = options ?? DiagnosticPrinterOptions.Default;
 
-    public string Print(IReadOnlyList<Diagnostic> diagnostics)
+    public string Print(
+        IReadOnlyList<Diagnostic> diagnostics)
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
 
@@ -26,7 +27,8 @@ public sealed class DiagnosticPrinter(
         return builder.ToString().TrimEnd();
     }
 
-    private string FormatDiagnostic(Diagnostic diagnostic)
+    private string FormatDiagnostic(
+        Diagnostic diagnostic)
     {
         var builder = new StringBuilder();
 

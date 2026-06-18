@@ -12,7 +12,7 @@ public sealed class ParameterNodeBuilder
 
     private StringKeyFieldNode<ExpressionNode>? _name;
     private StringKeyFieldNode<ExpressionNode>? _displayName;
-    private ParameterType _type = ParameterType.String;
+    private StringKeyFieldNode<ExpressionNode>? _type;
     private StringKeyFieldNode<ExpressionNode>? _defaultValue;
 
     public ParameterNodeBuilder()
@@ -32,7 +32,8 @@ public sealed class ParameterNodeBuilder
         return this;
     }
 
-    public ParameterNodeBuilder WithDisplayName(string displayName)
+    public ParameterNodeBuilder WithDisplayName(
+        string displayName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
 
@@ -43,9 +44,14 @@ public sealed class ParameterNodeBuilder
         return this;
     }
 
-    public ParameterNodeBuilder WithType(ParameterType type)
+    public ParameterNodeBuilder WithType(
+        string type)
     {
-        _type = type;
+        ArgumentException.ThrowIfNullOrWhiteSpace(type);
+
+        _type = TestFields.StringKey(
+            "type",
+            type);
 
         return this;
     }
@@ -100,7 +106,8 @@ public sealed class ParameterNodeBuilder
     {
         if (_name is null)
         {
-            throw new InvalidOperationException("Name is required to build a ParameterNode.");
+            throw new InvalidOperationException(
+                "Name is required to build a ParameterNode.");
         }
 
         return new ParameterNode

@@ -19,7 +19,9 @@ internal static class ParserSnapshotVerifier
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentNullException.ThrowIfNull(parseFunc);
 
-        var result = parseFunc(yaml, new SourceDocument("test.yaml"));
+        var result = parseFunc(
+            yaml,
+            new SourceDocument("test.yaml"));
 
         if (result.Root is null)
         {

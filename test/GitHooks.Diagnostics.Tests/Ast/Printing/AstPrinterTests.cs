@@ -1,9 +1,10 @@
+using System.Runtime.CompilerServices;
+
 using GitHooks.Diagnostics.Ast.Printing;
+using GitHooks.Domain.Ast;
 using GitHooks.Domain.Common;
 using GitHooks.Testing.Ast;
 using GitHooks.Testing.Ast.Builders;
-
-using static GitHooks.Diagnostics.Tests.Ast.Printing.AstPrinterTestHelper;
 
 namespace GitHooks.Diagnostics.Tests.Ast.Printing;
 
@@ -174,5 +175,18 @@ public sealed class AstPrinterTests
                 TestExpressions.Variable("parameters.project"));
 
         await VerifyAstAsync(expression);
+    }
+
+    private static async Task VerifyAstAsync(
+        AstNode node,
+        AstPrinterOptions? options = null,
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string sourceFilePath = "")
+    {
+        await AstPrinterTestHelper.VerifyAstAsync(
+            node,
+            options,
+            memberName,
+            sourceFilePath);
     }
 }

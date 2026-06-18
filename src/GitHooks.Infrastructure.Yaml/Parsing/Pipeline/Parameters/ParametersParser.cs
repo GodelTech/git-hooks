@@ -10,7 +10,8 @@ internal sealed class ParametersParser(
     private readonly ParameterParser _parameterParser
         = parameterParser ?? throw new ArgumentNullException(nameof(parameterParser));
 
-    public IReadOnlyList<ParameterNode> Parse(ParsingContext context)
+    public IReadOnlyList<ParameterNode> Parse(
+        ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

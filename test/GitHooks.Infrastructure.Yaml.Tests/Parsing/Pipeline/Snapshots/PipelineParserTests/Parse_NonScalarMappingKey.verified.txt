@@ -2,7 +2,8 @@
   Parameter
     Field(name)
       String("configuration")
-    Type(String)
+    Field(type)
+      String("string")
   ScriptStep
     Field(script)
       String("dotnet test")

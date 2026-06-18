@@ -4,25 +4,24 @@ namespace GitHooks.Diagnostics.Tests;
 
 public sealed class DiagnosticBagTests
 {
+    private readonly DiagnosticBag _diagnosticBag
+        = new();
+
     [Fact]
     public void Diagnostics_IsEmptyByDefault()
     {
-        var diagnostics = new DiagnosticBag();
-
-        Assert.Empty(diagnostics.Diagnostics);
+        Assert.Empty(_diagnosticBag.Diagnostics);
     }
 
     [Fact]
     public void Report_AddsDiagnostic()
     {
-        var diagnostics = new DiagnosticBag();
-
-        diagnostics.Report(
+        _diagnosticBag.Report(
             Diagnostic.Create(
                 DiagnosticDescriptors.InvalidYaml,
                 SourceSpan.Unknown));
 
-        var result = Assert.Single(diagnostics.Diagnostics);
+        var result = Assert.Single(_diagnosticBag.Diagnostics);
 
         Assert.Same(
             DiagnosticDescriptors.InvalidYaml,

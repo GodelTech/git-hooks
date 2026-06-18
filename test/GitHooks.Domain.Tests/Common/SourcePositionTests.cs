@@ -56,7 +56,9 @@ public sealed class SourcePositionTests
     [InlineData(-1, 0)]
     [InlineData(0, 0)]
     [InlineData(100, 200)]
-    public void IsUnknown_WhenAtLeastOneDimensionIsKnown_ReturnsFalse(long line, long column)
+    public void IsUnknown_WhenAtLeastOneDimensionIsKnown_ReturnsFalse(
+        long line,
+        long column)
     {
         var position = new SourcePosition(line, column);
 

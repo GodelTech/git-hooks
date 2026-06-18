@@ -16,13 +16,15 @@ public sealed class AstPrinter
     private readonly AstPrinterStringBuilder _builder;
     private readonly AstPrinterOptions _options;
 
-    public AstPrinter(AstPrinterOptions? options = null)
+    public AstPrinter(
+        AstPrinterOptions? options = null)
     {
         _options = options ?? AstPrinterOptions.Default;
         _builder = new AstPrinterStringBuilder(_options.IndentSize);
     }
 
-    public string Print(AstNode node)
+    public string Print(
+        AstNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -33,7 +35,8 @@ public sealed class AstPrinter
         return _builder.ToString();
     }
 
-    public void Visit(PipelineNode node)
+    public void Visit(
+        PipelineNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -51,7 +54,8 @@ public sealed class AstPrinter
         }
     }
 
-    public void Visit(ParameterNode node)
+    public void Visit(
+        ParameterNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -63,7 +67,7 @@ public sealed class AstPrinter
         {
             VisitNode(node.Name);
             VisitNode(node.DisplayName);
-            AppendField("Type", node.Type);
+            VisitNode(node.Type);
             VisitNode(node.DefaultValue);
             VisitNode(node.Values);
 
@@ -71,7 +75,8 @@ public sealed class AstPrinter
         }
     }
 
-    public void Visit(ScriptStepNode node)
+    public void Visit(
+        ScriptStepNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -93,7 +98,8 @@ public sealed class AstPrinter
         }
     }
 
-    public void Visit(TemplateStepNode node)
+    public void Visit(
+        TemplateStepNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -111,7 +117,8 @@ public sealed class AstPrinter
         }
     }
 
-    public void Visit(InvalidStepNode node)
+    public void Visit(
+        InvalidStepNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -128,7 +135,8 @@ public sealed class AstPrinter
     }
 
     // Fields
-    public void Visit<TValue>(StringKeyFieldNode<TValue> node)
+    public void Visit<TValue>(
+        StringKeyFieldNode<TValue> node)
         where TValue : AstNode
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -143,7 +151,8 @@ public sealed class AstPrinter
         }
     }
 
-    public void Visit<TValue>(ComplexKeyFieldNode<TValue> node)
+    public void Visit<TValue>(
+        ComplexKeyFieldNode<TValue> node)
         where TValue : AstNode
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -170,7 +179,8 @@ public sealed class AstPrinter
         }
     }
 
-    public void Visit<TValue>(SequenceFieldNode<TValue> node)
+    public void Visit<TValue>(
+        SequenceFieldNode<TValue> node)
         where TValue : AstNode
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -185,7 +195,8 @@ public sealed class AstPrinter
         }
     }
 
-    public void Visit<TField>(MappingFieldNode<TField> node)
+    public void Visit<TField>(
+        MappingFieldNode<TField> node)
         where TField : FieldNode
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -201,7 +212,8 @@ public sealed class AstPrinter
     }
 
     // Values
-    public void Visit(ScalarNode node)
+    public void Visit(
+        ScalarNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -210,7 +222,8 @@ public sealed class AstPrinter
             node);
     }
 
-    public void Visit(SequenceNode node)
+    public void Visit(
+        SequenceNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -224,7 +237,8 @@ public sealed class AstPrinter
         }
     }
 
-    public void Visit(MappingNode node)
+    public void Visit(
+        MappingNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -239,7 +253,8 @@ public sealed class AstPrinter
     }
 
     // Expressions
-    public void Visit(BooleanLiteralExpressionNode node)
+    public void Visit(
+        BooleanLiteralExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -248,7 +263,8 @@ public sealed class AstPrinter
             node);
     }
 
-    public void Visit(IntegerLiteralExpressionNode node)
+    public void Visit(
+        IntegerLiteralExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -257,7 +273,8 @@ public sealed class AstPrinter
             node);
     }
 
-    public void Visit(StringLiteralExpressionNode node)
+    public void Visit(
+        StringLiteralExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -266,7 +283,8 @@ public sealed class AstPrinter
             node);
     }
 
-    public void Visit(InterpolatedStringExpressionNode node)
+    public void Visit(
+        InterpolatedStringExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -280,7 +298,8 @@ public sealed class AstPrinter
         }
     }
 
-    public void Visit(VariableExpressionNode node)
+    public void Visit(
+        VariableExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -289,7 +308,9 @@ public sealed class AstPrinter
             node);
     }
 
-    private void AppendNodeHeader(string text, AstNode node)
+    private void AppendNodeHeader(
+        string text,
+        AstNode node)
     {
         var output = text;
 
@@ -306,15 +327,8 @@ public sealed class AstPrinter
         _builder.AppendLine(output);
     }
 
-    private void AppendField(string name, Enum? value)
-    {
-        if (value is not null)
-        {
-            _builder.AppendLine($"{name}({value})");
-        }
-    }
-
-    private void AppendUnknownFields(PipelineNodeBase node)
+    private void AppendUnknownFields(
+        PipelineNodeBase node)
     {
         if (node.UnknownFields.Count is 0)
         {
@@ -329,7 +343,8 @@ public sealed class AstPrinter
         }
     }
 
-    private void VisitNode(AstNode? node)
+    private void VisitNode(
+        AstNode? node)
     {
         if (node is null)
         {
@@ -339,7 +354,8 @@ public sealed class AstPrinter
         node.Accept(this);
     }
 
-    private void VisitNodes(IEnumerable<AstNode> nodes)
+    private void VisitNodes(
+        IEnumerable<AstNode> nodes)
     {
         foreach (var node in nodes)
         {

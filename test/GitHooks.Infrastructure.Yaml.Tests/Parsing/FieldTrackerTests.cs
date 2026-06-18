@@ -11,7 +11,8 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
 
 public sealed class FieldTrackerTests
 {
-    private readonly FieldTracker _fieldTracker = TestParserFactory.CreateFieldTracker();
+    private readonly FieldTracker _fieldTracker
+        = TestParserFactory.CreateFieldTracker();
 
     [Fact]
     public void Constructor_NullFieldValueParser_Throws()

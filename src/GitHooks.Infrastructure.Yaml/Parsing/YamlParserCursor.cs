@@ -15,7 +15,9 @@ internal sealed class YamlParserCursor(
     private readonly SourceDocument _sourceDocument
         = sourceDocument ?? throw new ArgumentNullException(nameof(sourceDocument));
 
-    public static YamlParserCursor Create(string yaml, SourceDocument sourceDocument)
+    public static YamlParserCursor Create(
+        string yaml,
+        SourceDocument sourceDocument)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentNullException.ThrowIfNull(sourceDocument);
@@ -47,7 +49,9 @@ internal sealed class YamlParserCursor(
         return _parser.Accept<T>(out _);
     }
 
-    public SourceSpan CreateSpan(ParsingEvent start, ParsingEvent end)
+    public SourceSpan CreateSpan(
+        ParsingEvent start,
+        ParsingEvent end)
     {
         ArgumentNullException.ThrowIfNull(start);
         ArgumentNullException.ThrowIfNull(end);
@@ -57,7 +61,8 @@ internal sealed class YamlParserCursor(
             end.End);
     }
 
-    public SourceSpan CreateSpan(YamlException exception)
+    public SourceSpan CreateSpan(
+        YamlException exception)
     {
         ArgumentNullException.ThrowIfNull(exception);
 
@@ -66,7 +71,9 @@ internal sealed class YamlParserCursor(
             exception.End);
     }
 
-    public SourceSpan CreateSpan(Mark start, Mark end)
+    public SourceSpan CreateSpan(
+        Mark start,
+        Mark end)
     {
         return new SourceSpan(
             _sourceDocument,
@@ -78,7 +85,9 @@ internal sealed class YamlParserCursor(
                 end.Column));
     }
 
-    public SourceSpan CreateSpan(Mark start, SourceSpan end)
+    public SourceSpan CreateSpan(
+        Mark start,
+        SourceSpan end)
     {
         return new SourceSpan(
             _sourceDocument,
@@ -98,7 +107,8 @@ internal sealed class YamlParserCursor(
     }
 
     // TODO: recoverable parsing instead of throwing exceptions
-    internal YamlException CreateException(string message)
+    internal YamlException CreateException(
+        string message)
     {
         return new YamlException(
             _parser.Current?.Start ?? Mark.Empty,

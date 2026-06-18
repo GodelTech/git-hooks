@@ -4,7 +4,8 @@ namespace GitHooks.Diagnostics.Printing;
 
 public static class DiagnosticLocationRenderer
 {
-    public static string Render(SourceSpan span)
+    public static string Render(
+        SourceSpan span)
     {
         var location = RenderLocation(span);
 
@@ -16,7 +17,8 @@ public static class DiagnosticLocationRenderer
         return $"{span.Document!.Name}({location})";
     }
 
-    private static string RenderLocation(SourceSpan span)
+    private static string RenderLocation(
+        SourceSpan span)
     {
         if (!span.Start.HasKnownLine ||
             !span.Start.HasKnownColumn ||

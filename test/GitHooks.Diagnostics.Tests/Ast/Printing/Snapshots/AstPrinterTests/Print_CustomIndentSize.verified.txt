@@ -2,6 +2,5 @@
     Parameter
         Field(name)
             String("configuration")
-        Type(String)
         Field(defaultValue)
             String("Release")

@@ -7,7 +7,8 @@ public sealed class AstValidator
 {
     private readonly ValidationRuleSet _rules = new();
 
-    public DiagnosticBag Validate(AstNode root)
+    public DiagnosticBag Validate(
+        AstNode root)
     {
         ArgumentNullException.ThrowIfNull(root);
 

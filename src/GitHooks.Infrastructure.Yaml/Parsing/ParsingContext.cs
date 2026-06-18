@@ -26,7 +26,8 @@ internal sealed class ParsingContext
 
     public YamlParserCursor Cursor { get; }
 
-    public void Report(Diagnostic diagnostic)
+    public void Report(
+        Diagnostic diagnostic)
     {
         ArgumentNullException.ThrowIfNull(diagnostic);
 

@@ -5,9 +5,11 @@ namespace GitHooks.Testing.Ast.Builders;
 public abstract class AstNodeBuilder<TBuilder>
     where TBuilder : AstNodeBuilder<TBuilder>
 {
-    protected SourceSpan Span { get; private set; } = SourceSpan.Unknown;
+    protected SourceSpan Span { get; private set; }
+        = SourceSpan.Unknown;
 
-    public TBuilder WithSpan(SourceSpan span)
+    public TBuilder WithSpan(
+        SourceSpan span)
     {
         Span = span;
 

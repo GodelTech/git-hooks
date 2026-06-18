@@ -10,7 +10,8 @@ internal sealed class StepsParser(
     private readonly StepParser _stepParser
         = stepParser ?? throw new ArgumentNullException(nameof(stepParser));
 
-    public IReadOnlyList<StepNode> Parse(ParsingContext context)
+    public IReadOnlyList<StepNode> Parse(
+        ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

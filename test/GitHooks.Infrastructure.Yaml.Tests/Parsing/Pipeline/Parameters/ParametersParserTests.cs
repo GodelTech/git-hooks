@@ -8,7 +8,8 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Parameters;
 
 public sealed class ParametersParserTests
 {
-    private readonly ParametersParser _parser = TestParserFactory.CreateParametersParser();
+    private readonly ParametersParser _parser
+        = TestParserFactory.CreateParametersParser();
 
     [Fact]
     public void Constructor_NullParameterParser_Throws()

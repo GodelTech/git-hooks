@@ -1,7 +1,6 @@
 ﻿Parameter
   Field(name)
     String("configuration")
-  Type(String)
   UnknownFields:
     Field(custom)
       Mapping

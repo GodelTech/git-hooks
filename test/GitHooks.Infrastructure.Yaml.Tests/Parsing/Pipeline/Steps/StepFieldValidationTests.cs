@@ -33,7 +33,8 @@ public sealed class StepFieldValidationTests
     [Theory]
     [InlineData(StepFieldNames.Template)]
     [InlineData(StepFieldNames.Parameters)]
-    public void ValidateScriptStep_InvalidField_ReportsDiagnostic(string field)
+    public void ValidateScriptStep_InvalidField_ReportsDiagnostic(
+        string field)
     {
         var context = TestParserFactory.CreateDummyContext();
 
@@ -75,24 +76,21 @@ public sealed class StepFieldValidationTests
             SourceSpan.Unknown,
             context);
 
-        Assert.Collection(
-            context.Diagnostics,
-            diagnostic =>
-            {
-                DiagnosticAssert.Matches(
-                    diagnostic,
-                    DiagnosticDescriptors.InvalidStepField,
-                    "template",
-                    "script");
-            },
-            diagnostic =>
-            {
-                DiagnosticAssert.Matches(
-                    diagnostic,
-                    DiagnosticDescriptors.InvalidStepField,
-                    "parameters",
-                    "script");
-            });
+        Assert.Equal(
+            2,
+            context.Diagnostics.Count);
+
+        DiagnosticAssert.Matches(
+            context.Diagnostics[0],
+            DiagnosticDescriptors.InvalidStepField,
+            "template",
+            "script");
+
+        DiagnosticAssert.Matches(
+            context.Diagnostics[1],
+            DiagnosticDescriptors.InvalidStepField,
+            "parameters",
+            "script");
     }
 
     [Fact]
@@ -119,7 +117,8 @@ public sealed class StepFieldValidationTests
     [InlineData(StepFieldNames.TimeoutInMinutes)]
     [InlineData(StepFieldNames.WorkingDirectory)]
     [InlineData(StepFieldNames.Env)]
-    public void ValidateTemplateStep_InvalidField_ReportsDiagnostic(string field)
+    public void ValidateTemplateStep_InvalidField_ReportsDiagnostic(
+        string field)
     {
         var context = TestParserFactory.CreateDummyContext();
 
@@ -161,24 +160,21 @@ public sealed class StepFieldValidationTests
             SourceSpan.Unknown,
             context);
 
-        Assert.Collection(
-            context.Diagnostics,
-            diagnostic =>
-            {
-                DiagnosticAssert.Matches(
-                    diagnostic,
-                    DiagnosticDescriptors.InvalidStepField,
-                    "displayName",
-                    "template");
-            },
-            diagnostic =>
-            {
-                DiagnosticAssert.Matches(
-                    diagnostic,
-                    DiagnosticDescriptors.InvalidStepField,
-                    "env",
-                    "template");
-            });
+        Assert.Equal(
+            2,
+            context.Diagnostics.Count);
+
+        DiagnosticAssert.Matches(
+            context.Diagnostics[0],
+            DiagnosticDescriptors.InvalidStepField,
+            "displayName",
+            "template");
+
+        DiagnosticAssert.Matches(
+            context.Diagnostics[1],
+            DiagnosticDescriptors.InvalidStepField,
+            "env",
+            "template");
     }
 
     private static void SetField(

@@ -14,7 +14,9 @@ internal sealed class YamlPipelineParser(
     private readonly PipelineParser _pipelineParser
         = pipelineParser ?? throw new ArgumentNullException(nameof(pipelineParser));
 
-    public YamlParserResult Parse(string yaml, SourceDocument sourceDocument)
+    public YamlParserResult Parse(
+        string yaml,
+        SourceDocument sourceDocument)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentNullException.ThrowIfNull(sourceDocument);

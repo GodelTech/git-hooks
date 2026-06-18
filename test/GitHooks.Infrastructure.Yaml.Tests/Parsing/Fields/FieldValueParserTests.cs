@@ -10,7 +10,8 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Fields;
 
 public sealed class FieldValueParserTests
 {
-    private readonly FieldValueParser _parser = TestParserFactory.CreateFieldValueParser();
+    private readonly FieldValueParser _parser
+        = TestParserFactory.CreateFieldValueParser();
 
     [Fact]
     public void ParseStringKeyField_WithNullKey_Throws()

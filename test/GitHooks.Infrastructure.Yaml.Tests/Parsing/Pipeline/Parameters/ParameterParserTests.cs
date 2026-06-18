@@ -13,13 +13,16 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Parameters;
 
 public sealed class ParameterParserTests
 {
-    private readonly ParameterParser _parser = TestParserFactory.CreateParameterParser();
+    private readonly ParameterParser _parser
+        = TestParserFactory.CreateParameterParser();
 
     [Fact]
     public void Constructor_NullFieldParser_Throws()
     {
         var exception = Assert.Throws<ArgumentNullException>(
-            () => new ParameterParser(null!, TestParserFactory.CreateFieldValueParser()));
+            () => new ParameterParser(
+                null!,
+                TestParserFactory.CreateFieldValueParser()));
 
         Assert.Equal(
             "fieldParser",
@@ -30,7 +33,9 @@ public sealed class ParameterParserTests
     public void Constructor_NullFieldValueParser_Throws()
     {
         var exception = Assert.Throws<ArgumentNullException>(
-            () => new ParameterParser(TestParserFactory.CreateFieldParser(), null!));
+            () => new ParameterParser(
+                TestParserFactory.CreateFieldParser(),
+                null!));
 
         Assert.Equal(
             "fieldValueParser",
@@ -83,62 +88,6 @@ public sealed class ParameterParserTests
               nested:
                 - value
             """);
-    }
-
-    [Theory]
-    [InlineData("string", ParameterType.String)]
-    [InlineData("boolean", ParameterType.Boolean)]
-    [InlineData("number", ParameterType.Number)]
-    [InlineData("object", ParameterType.Object)]
-    public void Parse_ValidType_ReturnsParameterType(
-        string value,
-        ParameterType expected)
-    {
-        var context =
-            TestParserFactory.CreateContext(
-                $$"""
-                name: configuration
-                type: {{value}}
-                """);
-
-        context.Cursor.StartDocument();
-
-        var result = _parser.Parse(context);
-
-        context.Cursor.EndDocument();
-
-        Assert.Equal(
-            expected,
-            result.Type);
-    }
-
-    [Fact]
-    public void Parse_UnsupportedType_ReportsDiagnostic()
-    {
-        var context =
-            TestParserFactory.CreateContext(
-                """
-                name: configuration
-                type: invalid
-                """);
-
-        context.Cursor.StartDocument();
-
-        var parameter = _parser.Parse(context);
-
-        DiagnosticAssert.Single(
-            context.Diagnostics,
-            DiagnosticDescriptors.UnsupportedParameterType,
-            "invalid");
-
-        AstAssert.HasStringField(
-            parameter.Name,
-            "name",
-            "configuration");
-
-        Assert.Equal(
-            ParameterType.String,
-            parameter.Type);
     }
 
     [Theory]
@@ -228,19 +177,22 @@ public sealed class ParameterParserTests
             "name",
             string.Empty);
 
-        Assert.Equal(
-            ParameterType.String,
-            parameter.Type);
+        AstAssert.HasStringField(
+            parameter.Type!,
+            "type",
+            "string");
     }
 
-    private static string GetRequiredNamePrefix(string field)
+    private static string GetRequiredNamePrefix(
+        string field)
     {
         return field is ParameterFieldNames.Name
             ? string.Empty
             : $"{ParameterFieldNames.Name}: configuration";
     }
 
-    private static string GetStringLiteralValue(ExpressionNode? expression)
+    private static string GetStringLiteralValue(
+        ExpressionNode? expression)
     {
         var literal = Assert.IsType<StringLiteralExpressionNode>(expression);
 
@@ -269,9 +221,10 @@ public sealed class ParameterParserTests
                 break;
 
             case ParameterFieldNames.Type:
-                Assert.Equal(
-                    ParameterType.Number,
-                    parameter.Type);
+                AstAssert.HasStringField(
+                    parameter.Type!,
+                    ParameterFieldNames.Type,
+                    expected);
                 break;
 
             case ParameterFieldNames.DefaultValue:

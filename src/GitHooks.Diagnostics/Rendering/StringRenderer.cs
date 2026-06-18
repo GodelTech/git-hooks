@@ -2,14 +2,16 @@ namespace GitHooks.Diagnostics.Rendering;
 
 public static class StringRenderer
 {
-    public static string RenderQuoted(string value)
+    public static string RenderQuoted(
+        string value)
     {
         ArgumentNullException.ThrowIfNull(value);
 
         return $"\"{Escape(value)}\"";
     }
 
-    private static string Escape(string value)
+    private static string Escape(
+        string value)
     {
         return value
             .Replace("\\", "\\\\", StringComparison.Ordinal)

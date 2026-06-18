@@ -18,7 +18,8 @@ internal sealed class ParameterParser(
     private readonly FieldValueParser _fieldValueParser
         = fieldValueParser ?? throw new ArgumentNullException(nameof(fieldValueParser));
 
-    public ParameterNode Parse(ParsingContext context)
+    public ParameterNode Parse(
+        ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -28,7 +29,7 @@ internal sealed class ParameterParser(
 
         StringKeyFieldNode<ExpressionNode>? name = null;
         StringKeyFieldNode<ExpressionNode>? displayName = null;
-        var type = ParameterType.String;
+        StringKeyFieldNode<ExpressionNode>? type = null;
         StringKeyFieldNode<ExpressionNode>? defaultValue = null;
         SequenceFieldNode<ExpressionNode>? values = null;
 
@@ -66,9 +67,7 @@ internal sealed class ParameterParser(
                         key,
                         context,
                         type,
-                        static context => ParseType(
-                            context.Cursor.Read<Scalar>().Value,
-                            context));
+                        context => _fieldParser.ParseStringKeyField(key, context));
                     break;
 
                 case "default":
@@ -116,37 +115,8 @@ internal sealed class ParameterParser(
             Type = type,
             DefaultValue = defaultValue,
             Values = values,
-            UnknownFields = [.. fieldTracker.GetUnknownFields()],
+            UnknownFields = fieldTracker.GetUnknownFields(),
             Span = span
         };
-    }
-
-    private static ParameterType ParseType(
-        string value,
-        ParsingContext context)
-    {
-        switch (value.ToLowerInvariant())
-        {
-            case "string":
-                return ParameterType.String;
-
-            case "boolean":
-                return ParameterType.Boolean;
-
-            case "number":
-                return ParameterType.Number;
-
-            case "object":
-                return ParameterType.Object;
-
-            default:
-                context.Report(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.UnsupportedParameterType,
-                        context.Cursor.CurrentSpan(),
-                        value));
-
-                return ParameterType.String;
-        }
     }
 }

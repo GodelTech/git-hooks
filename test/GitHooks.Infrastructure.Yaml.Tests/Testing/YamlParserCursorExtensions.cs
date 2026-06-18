@@ -6,7 +6,8 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Testing;
 
 internal static class YamlParserCursorExtensions
 {
-    public static void StartDocument(this YamlParserCursor cursor)
+    public static void StartDocument(
+        this YamlParserCursor cursor)
     {
         ArgumentNullException.ThrowIfNull(cursor);
 
@@ -14,7 +15,8 @@ internal static class YamlParserCursorExtensions
         _ = cursor.Read<DocumentStart>();
     }
 
-    public static void EndDocument(this YamlParserCursor cursor)
+    public static void EndDocument(
+        this YamlParserCursor cursor)
     {
         ArgumentNullException.ThrowIfNull(cursor);
 

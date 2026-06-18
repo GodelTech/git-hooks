@@ -27,7 +27,8 @@ internal sealed class FieldValueParser
         };
     }
 
-    public ComplexKeyFieldNode<ValueNode> ParseComplexKeyField(ParsingContext context)
+    public ComplexKeyFieldNode<ValueNode> ParseComplexKeyField(
+        ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -44,7 +45,8 @@ internal sealed class FieldValueParser
         };
     }
 
-    private ValueNode ParseValue(ParsingContext context)
+    private ValueNode ParseValue(
+        ParsingContext context)
     {
         if (context.Cursor.Is<Scalar>())
         {
@@ -66,7 +68,8 @@ internal sealed class FieldValueParser
     }
 
 #pragma warning disable CA1822 // Mark members as static
-    private ScalarNode ParseScalar(ParsingContext context)
+    private ScalarNode ParseScalar(
+        ParsingContext context)
 #pragma warning restore CA1822 // Mark members as static
     {
         var scalar = context.Cursor.Read<Scalar>();
@@ -80,7 +83,8 @@ internal sealed class FieldValueParser
         };
     }
 
-    private SequenceNode ParseSequence(ParsingContext context)
+    private SequenceNode ParseSequence(
+        ParsingContext context)
     {
         var start = context.Cursor.Read<SequenceStart>();
 
@@ -103,7 +107,8 @@ internal sealed class FieldValueParser
         };
     }
 
-    private MappingNode ParseMapping(ParsingContext context)
+    private MappingNode ParseMapping(
+        ParsingContext context)
     {
         var start = context.Cursor.Read<MappingStart>();
 

@@ -18,7 +18,8 @@ internal sealed class StepParser(
     private readonly FieldValueParser _fieldValueParser
         = fieldValueParser ?? throw new ArgumentNullException(nameof(fieldValueParser));
 
-    public StepNode Parse(ParsingContext context)
+    public StepNode Parse(
+        ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -139,7 +140,7 @@ internal sealed class StepParser(
             return new InvalidStepNode
             {
                 Fields = [.. step.GetFields()],
-                UnknownFields = [.. unknownFields],
+                UnknownFields = unknownFields,
                 Span = span
             };
         }
@@ -156,7 +157,7 @@ internal sealed class StepParser(
                 TimeoutInMinutes = step.TimeoutInMinutes,
                 WorkingDirectory = step.WorkingDirectory,
                 Env = step.Env,
-                UnknownFields = [.. unknownFields],
+                UnknownFields = unknownFields,
                 Span = span
             };
         }
@@ -169,7 +170,7 @@ internal sealed class StepParser(
             {
                 Template = step.Template,
                 Parameters = step.Parameters,
-                UnknownFields = [.. unknownFields],
+                UnknownFields = unknownFields,
                 Span = span
             };
         }

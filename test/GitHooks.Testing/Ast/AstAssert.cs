@@ -33,7 +33,7 @@ public static class AstAssert
         return field;
     }
 
-    private static void HasIntegerValue(
+    public static void HasIntegerValue(
         ExpressionNode expression,
         int expected)
     {
@@ -46,7 +46,7 @@ public static class AstAssert
             literal.Value);
     }
 
-    private static void HasStringValue(
+    public static void HasStringValue(
         ExpressionNode expression,
         string expected)
     {
@@ -57,5 +57,18 @@ public static class AstAssert
         Assert.Equal(
             expected,
             literal.Value);
+    }
+
+    public static void HasVariableValue(
+        ExpressionNode expression,
+        string expected)
+    {
+        Assert.NotNull(expression);
+
+        var variable = Assert.IsType<VariableExpressionNode>(expression);
+
+        Assert.Equal(
+            expected,
+            variable.Path);
     }
 }

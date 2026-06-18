@@ -8,9 +8,11 @@ public abstract class MappingNodeBuilder<TBuilder>
     : AstNodeBuilder<TBuilder>
     where TBuilder : MappingNodeBuilder<TBuilder>
 {
-    protected Collection<FieldNode> UnknownFields { get; private set; } = [];
+    protected Collection<FieldNode> UnknownFields { get; private set; }
+        = [];
 
-    public TBuilder WithUnknownField(FieldNode unknownField)
+    public TBuilder WithUnknownField(
+        FieldNode unknownField)
     {
         ArgumentNullException.ThrowIfNull(unknownField);
 
@@ -19,7 +21,9 @@ public abstract class MappingNodeBuilder<TBuilder>
         return (TBuilder)this;
     }
 
-    public TBuilder WithUnknownField(string key, string value)
+    public TBuilder WithUnknownField(
+        string key,
+        string value)
     {
         return WithUnknownField(
             TestFields.StringKey(key, value));

@@ -7,7 +7,8 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Expressions;
 
 public sealed class ExpressionParserTests
 {
-    private readonly ExpressionParser _parser = TestParserFactory.CreateExpressionParser();
+    private readonly ExpressionParser _parser
+        = TestParserFactory.CreateExpressionParser();
 
     [Fact]
     public void Constructor_NullInterpolatedStringParser_Throws()

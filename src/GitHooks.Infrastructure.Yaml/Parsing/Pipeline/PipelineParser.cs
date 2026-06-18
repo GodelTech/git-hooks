@@ -23,7 +23,8 @@ internal sealed class PipelineParser(
     private readonly FieldValueParser _fieldValueParser
         = fieldValueParser ?? throw new ArgumentNullException(nameof(fieldValueParser));
 
-    public PipelineNode Parse(ParsingContext context)
+    public PipelineNode Parse(
+        ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

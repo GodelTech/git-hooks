@@ -76,7 +76,8 @@ internal sealed class FieldTracker(
                 context));
     }
 
-    public void AddUnknownField(ParsingContext context)
+    public void AddUnknownField(
+        ParsingContext context)
     {
         _unknownFields.Add(
             _fieldValueParser.ParseComplexKeyField(

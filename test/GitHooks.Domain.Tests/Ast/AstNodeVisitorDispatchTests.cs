@@ -37,193 +37,229 @@ public sealed class AstNodeVisitorDispatchTests
         }
     }
 
-    private sealed class TrackingCommandVisitor : IAstCommandVisitor
+    private sealed class TrackingCommandVisitor
+        : IAstCommandVisitor
     {
         public string LastVisited { get; private set; } = string.Empty;
 
-        public void Visit(PipelineNode node)
+        public void Visit(
+            PipelineNode node)
         {
             LastVisited = nameof(PipelineNode);
         }
 
-        public void Visit(ParameterNode node)
+        public void Visit(
+            ParameterNode node)
         {
             LastVisited = nameof(ParameterNode);
         }
 
-        public void Visit(ScriptStepNode node)
+        public void Visit(
+            ScriptStepNode node)
         {
             LastVisited = nameof(ScriptStepNode);
         }
 
-        public void Visit(TemplateStepNode node)
+        public void Visit(
+            TemplateStepNode node)
         {
             LastVisited = nameof(TemplateStepNode);
         }
 
-        public void Visit(InvalidStepNode node)
+        public void Visit(
+            InvalidStepNode node)
         {
             LastVisited = nameof(InvalidStepNode);
         }
 
         // Fields
-        public void Visit<TValue>(StringKeyFieldNode<TValue> node)
+        public void Visit<TValue>(
+            StringKeyFieldNode<TValue> node)
             where TValue : AstNode
         {
             LastVisited = nameof(StringKeyFieldNode<>);
         }
 
-        public void Visit<TValue>(ComplexKeyFieldNode<TValue> node)
+        public void Visit<TValue>(
+            ComplexKeyFieldNode<TValue> node)
             where TValue : AstNode
         {
             LastVisited = nameof(ComplexKeyFieldNode<>);
         }
 
-        public void Visit<TValue>(SequenceFieldNode<TValue> node)
+        public void Visit<TValue>(
+            SequenceFieldNode<TValue> node)
             where TValue : AstNode
         {
             LastVisited = nameof(SequenceFieldNode<>);
         }
 
-        public void Visit<TField>(MappingFieldNode<TField> node)
+        public void Visit<TField>(
+            MappingFieldNode<TField> node)
             where TField : FieldNode
         {
             LastVisited = nameof(MappingFieldNode<>);
         }
 
         // Values
-        public void Visit(ScalarNode node)
+        public void Visit(
+            ScalarNode node)
         {
             LastVisited = nameof(ScalarNode);
         }
 
-        public void Visit(SequenceNode node)
+        public void Visit(
+            SequenceNode node)
         {
             LastVisited = nameof(SequenceNode);
         }
 
-        public void Visit(MappingNode node)
+        public void Visit(
+            MappingNode node)
         {
             LastVisited = nameof(MappingNode);
         }
 
         // Expressions
-        public void Visit(BooleanLiteralExpressionNode node)
+        public void Visit(
+            BooleanLiteralExpressionNode node)
         {
             LastVisited = nameof(BooleanLiteralExpressionNode);
         }
 
-        public void Visit(IntegerLiteralExpressionNode node)
+        public void Visit(
+            IntegerLiteralExpressionNode node)
         {
             LastVisited = nameof(IntegerLiteralExpressionNode);
         }
 
-        public void Visit(StringLiteralExpressionNode node)
+        public void Visit(
+            StringLiteralExpressionNode node)
         {
             LastVisited = nameof(StringLiteralExpressionNode);
         }
 
-        public void Visit(InterpolatedStringExpressionNode node)
+        public void Visit(
+            InterpolatedStringExpressionNode node)
         {
             LastVisited = nameof(InterpolatedStringExpressionNode);
         }
 
-        public void Visit(VariableExpressionNode node)
+        public void Visit(
+            VariableExpressionNode node)
         {
             LastVisited = nameof(VariableExpressionNode);
         }
     }
 
-    private sealed class TrackingQueryVisitor : IAstQueryVisitor<string>
+    private sealed class TrackingQueryVisitor
+        : IAstQueryVisitor<string>
     {
-        public string Visit(PipelineNode node)
+        public string Visit(
+            PipelineNode node)
         {
             return nameof(PipelineNode);
         }
 
-        public string Visit(ParameterNode node)
+        public string Visit(
+            ParameterNode node)
         {
             return nameof(ParameterNode);
         }
 
-        public string Visit(ScriptStepNode node)
+        public string Visit(
+            ScriptStepNode node)
         {
             return nameof(ScriptStepNode);
         }
 
-        public string Visit(TemplateStepNode node)
+        public string Visit(
+            TemplateStepNode node)
         {
             return nameof(TemplateStepNode);
         }
 
-        public string Visit(InvalidStepNode node)
+        public string Visit(
+            InvalidStepNode node)
         {
             return nameof(InvalidStepNode);
         }
 
         // Fields
-        public string Visit<TValue>(StringKeyFieldNode<TValue> node)
+        public string Visit<TValue>(
+            StringKeyFieldNode<TValue> node)
             where TValue : AstNode
         {
             return nameof(StringKeyFieldNode<>);
         }
 
-        public string Visit<TValue>(ComplexKeyFieldNode<TValue> node)
+        public string Visit<TValue>(
+            ComplexKeyFieldNode<TValue> node)
             where TValue : AstNode
         {
             return nameof(ComplexKeyFieldNode<>);
         }
 
-        public string Visit<TValue>(SequenceFieldNode<TValue> node)
+        public string Visit<TValue>(
+            SequenceFieldNode<TValue> node)
             where TValue : AstNode
         {
             return nameof(SequenceFieldNode<>);
         }
 
-        public string Visit<TField>(MappingFieldNode<TField> node)
+        public string Visit<TField>(
+            MappingFieldNode<TField> node)
             where TField : FieldNode
         {
             return nameof(MappingFieldNode<>);
         }
 
         // Values
-        public string Visit(ScalarNode node)
+        public string Visit(
+            ScalarNode node)
         {
             return nameof(ScalarNode);
         }
 
-        public string Visit(SequenceNode node)
+        public string Visit(
+            SequenceNode node)
         {
             return nameof(SequenceNode);
         }
 
-        public string Visit(MappingNode node)
+        public string Visit(
+            MappingNode node)
         {
             return nameof(MappingNode);
         }
 
         // Expressions
-        public string Visit(BooleanLiteralExpressionNode node)
+        public string Visit(
+            BooleanLiteralExpressionNode node)
         {
             return nameof(BooleanLiteralExpressionNode);
         }
 
-        public string Visit(IntegerLiteralExpressionNode node)
+        public string Visit(
+            IntegerLiteralExpressionNode node)
         {
             return nameof(IntegerLiteralExpressionNode);
         }
 
-        public string Visit(StringLiteralExpressionNode node)
+        public string Visit(
+            StringLiteralExpressionNode node)
         {
             return nameof(StringLiteralExpressionNode);
         }
 
-        public string Visit(InterpolatedStringExpressionNode node)
+        public string Visit(
+            InterpolatedStringExpressionNode node)
         {
             return nameof(InterpolatedStringExpressionNode);
         }
 
-        public string Visit(VariableExpressionNode node)
+        public string Visit(
+            VariableExpressionNode node)
         {
             return nameof(VariableExpressionNode);
         }

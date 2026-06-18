@@ -16,7 +16,8 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Steps;
 
 public sealed class StepParserTests
 {
-    private readonly StepParser _parser = TestParserFactory.CreateStepParser();
+    private readonly StepParser _parser
+        = TestParserFactory.CreateStepParser();
 
     [Fact]
     public void Constructor_NullFieldParser_Throws()

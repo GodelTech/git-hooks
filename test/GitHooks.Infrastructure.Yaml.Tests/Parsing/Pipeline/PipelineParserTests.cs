@@ -9,7 +9,8 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline;
 
 public sealed class PipelineParserTests
 {
-    private readonly PipelineParser _parser = TestParserFactory.CreatePipelineParser();
+    private readonly PipelineParser _parser
+        = TestParserFactory.CreatePipelineParser();
 
     [Fact]
     public void Constructor_NullParametersParser_Throws()

@@ -12,12 +12,14 @@ public sealed record ComplexKeyFieldNode<TValue>
 
     public required ValueNode Key { get; init; }
 
-    public override void Accept(IAstCommandVisitor visitor)
+    public override void Accept(
+        IAstCommandVisitor visitor)
     {
         visitor.Visit(this);
     }
 
-    public override TResult Accept<TResult>(IAstQueryVisitor<TResult> visitor)
+    public override TResult Accept<TResult>(
+        IAstQueryVisitor<TResult> visitor)
     {
         return visitor.Visit(this);
     }

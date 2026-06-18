@@ -10,12 +10,14 @@ public sealed record VariableExpressionNode
 
     public required string Path { get; init; }
 
-    public override void Accept(IAstCommandVisitor visitor)
+    public override void Accept(
+        IAstCommandVisitor visitor)
     {
         visitor.Visit(this);
     }
 
-    public override TResult Accept<TResult>(IAstQueryVisitor<TResult> visitor)
+    public override TResult Accept<TResult>(
+        IAstQueryVisitor<TResult> visitor)
     {
         return visitor.Visit(this);
     }

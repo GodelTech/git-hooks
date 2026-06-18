@@ -13,12 +13,14 @@ public sealed record SequenceFieldNode<TValue>
 
     public required IReadOnlyList<TValue> Items { get; init; }
 
-    public override void Accept(IAstCommandVisitor visitor)
+    public override void Accept(
+        IAstCommandVisitor visitor)
     {
         visitor.Visit(this);
     }
 
-    public override TResult Accept<TResult>(IAstQueryVisitor<TResult> visitor)
+    public override TResult Accept<TResult>(
+        IAstQueryVisitor<TResult> visitor)
     {
         return visitor.Visit(this);
     }

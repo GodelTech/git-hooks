@@ -8,7 +8,8 @@ public sealed class DiagnosticBag
     public IReadOnlyList<Diagnostic> Diagnostics
         => _diagnostics;
 
-    public void Report(Diagnostic diagnostic)
+    public void Report(
+        Diagnostic diagnostic)
     {
         ArgumentNullException.ThrowIfNull(diagnostic);
 

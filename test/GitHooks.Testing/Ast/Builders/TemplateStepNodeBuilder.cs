@@ -65,7 +65,8 @@ public sealed class TemplateStepNodeBuilder
     {
         if (_template is null)
         {
-            throw new InvalidOperationException("Template is required to build a TemplateStepNode.");
+            throw new InvalidOperationException(
+                "Template is required to build a TemplateStepNode.");
         }
 
         return new TemplateStepNode

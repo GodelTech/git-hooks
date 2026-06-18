@@ -6,14 +6,15 @@ namespace GitHooks.Diagnostics.Tests.Printing;
 
 public sealed class DiagnosticPrinterTests
 {
+    private readonly DiagnosticPrinter _printer
+        = new();
+
     [Fact]
     public void Print_NullDiagnosticsProvided_Throws()
     {
-        var printer = new DiagnosticPrinter();
-
         var exception =
             Assert.Throws<ArgumentNullException>(
-                () => printer.Print(null!));
+                () => _printer.Print(null!));
 
         Assert.Equal(
             "diagnostics",
@@ -29,9 +30,7 @@ public sealed class DiagnosticPrinterTests
             Span = SourceSpan.Unknown
         };
 
-        var printer = new DiagnosticPrinter();
-
-        var result = printer.Print([diagnostic]);
+        var result = _printer.Print([diagnostic]);
 
         Assert.Equal(
             "<unknown>: error GH0001: Invalid YAML: {0}",
@@ -59,9 +58,7 @@ public sealed class DiagnosticPrinterTests
             }
         ];
 
-        var printer = new DiagnosticPrinter();
-
-        var result = printer.Print(diagnostics);
+        var result = _printer.Print(diagnostics);
 
         Assert.Equal(
             """
@@ -140,9 +137,7 @@ public sealed class DiagnosticPrinterTests
     [Fact]
     public void Print_EmptyDiagnosticsProvided_ReturnsEmptyString()
     {
-        var printer = new DiagnosticPrinter();
-
-        var result = printer.Print([]);
+        var result = _printer.Print([]);
 
         Assert.Equal(
             string.Empty,

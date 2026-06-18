@@ -5,7 +5,8 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Expressions;
 
 public sealed class VariableExpressionParserTests
 {
-    private readonly VariableExpressionParser _parser = TestParserFactory.CreateVariableExpressionParser();
+    private readonly VariableExpressionParser _parser
+        = TestParserFactory.CreateVariableExpressionParser();
 
     [Fact]
     public void Parse_ExpressionProvided_ReturnsVariableExpression()

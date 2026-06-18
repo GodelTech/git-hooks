@@ -4,45 +4,42 @@ namespace GitHooks.Diagnostics.Tests.Ast.Printing;
 
 public sealed class AstPrinterStringBuilderTests
 {
+    private readonly AstPrinterStringBuilder _builder
+        = new();
+
     [Fact]
     public void AppendLine_TextProvided_AppendsText()
     {
-        var builder = new AstPrinterStringBuilder();
-
-        builder.AppendLine("Hello");
+        _builder.AppendLine("Hello");
 
         Assert.Equal(
             "Hello",
-            builder.ToString());
+            _builder.ToString());
     }
 
     [Fact]
     public void AppendLine_IndentedTextProvided_AppendsIndentedText()
     {
-        var builder = new AstPrinterStringBuilder();
-
-        using (builder.Indent())
+        using (_builder.Indent())
         {
-            builder.AppendLine("Hello");
+            _builder.AppendLine("Hello");
         }
 
         Assert.Equal(
             "  Hello",
-            builder.ToString());
+            _builder.ToString());
     }
 
     [Fact]
     public void AppendLine_NestedIndentationProvided_AppendsIndentedText()
     {
-        var builder = new AstPrinterStringBuilder();
-
-        using (builder.Indent())
+        using (_builder.Indent())
         {
-            builder.AppendLine("Level1");
+            _builder.AppendLine("Level1");
 
-            using (builder.Indent())
+            using (_builder.Indent())
             {
-                builder.AppendLine("Level2");
+                _builder.AppendLine("Level2");
             }
         }
 
@@ -51,45 +48,39 @@ public sealed class AstPrinterStringBuilderTests
               Level1
                 Level2
             """,
-            builder.ToString());
+            _builder.ToString());
     }
 
     [Fact]
     public void ToString_MultipleLinesProvided_RemovesTrailingNewLine()
     {
-        var builder = new AstPrinterStringBuilder();
-
-        builder.AppendLine("Line1");
-        builder.AppendLine("Line2");
+        _builder.AppendLine("Line1");
+        _builder.AppendLine("Line2");
 
         Assert.Equal(
             """
             Line1
             Line2
             """,
-            builder.ToString());
+            _builder.ToString());
     }
 
     [Fact]
     public void Clear_ContentProvided_RemovesContent()
     {
-        var builder = new AstPrinterStringBuilder();
+        _builder.AppendLine("Hello");
 
-        builder.AppendLine("Hello");
-
-        builder.Clear();
+        _builder.Clear();
 
         Assert.Equal(
             string.Empty,
-            builder.ToString());
+            _builder.ToString());
     }
 
     [Fact]
     public void Dispose_Twice_Throws()
     {
-        var builder = new AstPrinterStringBuilder();
-
-        var scope = builder.Indent();
+        var scope = _builder.Indent();
 
         scope.Dispose();
 

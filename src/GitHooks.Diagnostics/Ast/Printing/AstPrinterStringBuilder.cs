@@ -13,7 +13,8 @@ internal sealed class AstPrinterStringBuilder(
 
     private int _indentLevel;
 
-    public void AppendLine(string text)
+    public void AppendLine(
+        string text)
     {
         AppendIndent();
 
@@ -59,10 +60,12 @@ internal sealed class AstPrinterStringBuilder(
         _indentLevel--;
     }
 
-    private sealed class IndentScope(AstPrinterStringBuilder builder)
+    private sealed class IndentScope(
+        AstPrinterStringBuilder builder)
         : IDisposable
     {
-        private readonly AstPrinterStringBuilder _builder = builder;
+        private readonly AstPrinterStringBuilder _builder
+            = builder;
 
         public void Dispose()
         {

@@ -1,12 +1,14 @@
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
+using GitHooks.Testing.Ast;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Expressions;
 
 public sealed class InterpolatedStringParserTests
 {
-    private readonly InterpolatedStringParser _parser = TestParserFactory.CreateInterpolatedStringParser();
+    private readonly InterpolatedStringParser _parser
+        = TestParserFactory.CreateInterpolatedStringParser();
 
     [Fact]
     public void Constructor_NullVariableExpressionParser_Throws()
@@ -73,24 +75,17 @@ public sealed class InterpolatedStringParserTests
 
         var interpolated = Assert.IsType<InterpolatedStringExpressionNode>(result);
 
-        Assert.Collection(
-            interpolated.Parts,
-            part =>
-            {
-                var literal = Assert.IsType<StringLiteralExpressionNode>(part);
+        Assert.Equal(
+            2,
+            interpolated.Parts.Count);
 
-                Assert.Equal(
-                    "/src/",
-                    literal.Value);
-            },
-            part =>
-            {
-                var variable = Assert.IsType<VariableExpressionNode>(part);
+        AstAssert.HasStringValue(
+            interpolated.Parts[0],
+            "/src/");
 
-                Assert.Equal(
-                    "parameters.project",
-                    variable.Path);
-            });
+        AstAssert.HasVariableValue(
+            interpolated.Parts[1],
+            "parameters.project");
     }
 
     [Fact]
@@ -103,24 +98,17 @@ public sealed class InterpolatedStringParserTests
 
         var interpolated = Assert.IsType<InterpolatedStringExpressionNode>(result);
 
-        Assert.Collection(
-            interpolated.Parts,
-            part =>
-            {
-                var variable = Assert.IsType<VariableExpressionNode>(part);
+        Assert.Equal(
+            2,
+            interpolated.Parts.Count);
 
-                Assert.Equal(
-                    "parameters.os",
-                    variable.Path);
-            },
-            part =>
-            {
-                var variable = Assert.IsType<VariableExpressionNode>(part);
+        AstAssert.HasVariableValue(
+            interpolated.Parts[0],
+            "parameters.os");
 
-                Assert.Equal(
-                    "parameters.configuration",
-                    variable.Path);
-            });
+        AstAssert.HasVariableValue(
+            interpolated.Parts[1],
+            "parameters.configuration");
     }
 
     [Fact]
@@ -133,32 +121,21 @@ public sealed class InterpolatedStringParserTests
 
         var interpolated = Assert.IsType<InterpolatedStringExpressionNode>(result);
 
-        Assert.Collection(
-            interpolated.Parts,
-            part =>
-            {
-                var variable = Assert.IsType<VariableExpressionNode>(part);
+        Assert.Equal(
+            3,
+            interpolated.Parts.Count);
 
-                Assert.Equal(
-                    "parameters.os",
-                    variable.Path);
-            },
-            part =>
-            {
-                var literal = Assert.IsType<StringLiteralExpressionNode>(part);
+        AstAssert.HasVariableValue(
+            interpolated.Parts[0],
+            "parameters.os");
 
-                Assert.Equal(
-                    "-",
-                    literal.Value);
-            },
-            part =>
-            {
-                var variable = Assert.IsType<VariableExpressionNode>(part);
+        AstAssert.HasStringValue(
+            interpolated.Parts[1],
+            "-");
 
-                Assert.Equal(
-                    "parameters.configuration",
-                    variable.Path);
-            });
+        AstAssert.HasVariableValue(
+            interpolated.Parts[2],
+            "parameters.configuration");
     }
 
     [Fact]
@@ -171,23 +148,16 @@ public sealed class InterpolatedStringParserTests
 
         var interpolated = Assert.IsType<InterpolatedStringExpressionNode>(result);
 
-        Assert.Collection(
-            interpolated.Parts,
-            part =>
-            {
-                var variable = Assert.IsType<VariableExpressionNode>(part);
+        Assert.Equal(
+            2,
+            interpolated.Parts.Count);
 
-                Assert.Equal(
-                    "parameters.project",
-                    variable.Path);
-            },
-            part =>
-            {
-                var literal = Assert.IsType<StringLiteralExpressionNode>(part);
+        AstAssert.HasVariableValue(
+            interpolated.Parts[0],
+            "parameters.project");
 
-                Assert.Equal(
-                    "/bin",
-                    literal.Value);
-            });
+        AstAssert.HasStringValue(
+            interpolated.Parts[1],
+            "/bin");
     }
 }

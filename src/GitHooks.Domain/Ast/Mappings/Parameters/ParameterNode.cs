@@ -14,19 +14,20 @@ public sealed record ParameterNode
 
     public StringKeyFieldNode<ExpressionNode>? DisplayName { get; init; }
 
-    // todo: dicide how to migrate into fields
-    public ParameterType Type { get; init; }
+    public StringKeyFieldNode<ExpressionNode>? Type { get; init; }
 
     public StringKeyFieldNode<ExpressionNode>? DefaultValue { get; init; }
 
     public SequenceFieldNode<ExpressionNode>? Values { get; init; }
 
-    public override void Accept(IAstCommandVisitor visitor)
+    public override void Accept(
+        IAstCommandVisitor visitor)
     {
         visitor.Visit(this);
     }
 
-    public override TResult Accept<TResult>(IAstQueryVisitor<TResult> visitor)
+    public override TResult Accept<TResult>(
+        IAstQueryVisitor<TResult> visitor)
     {
         return visitor.Visit(this);
     }

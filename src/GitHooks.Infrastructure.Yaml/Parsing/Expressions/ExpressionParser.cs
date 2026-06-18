@@ -12,7 +12,8 @@ internal sealed class ExpressionParser(
     private readonly InterpolatedStringParser _interpolatedStringParser
         = interpolatedStringParser ?? throw new ArgumentNullException(nameof(interpolatedStringParser));
 
-    public ExpressionNode Parse(ParsingContext context)
+    public ExpressionNode Parse(
+        ParsingContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

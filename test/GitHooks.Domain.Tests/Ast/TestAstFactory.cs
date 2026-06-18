@@ -12,31 +12,31 @@ namespace GitHooks.Domain.Tests.Ast;
 internal static class TestAstFactory
 {
     public static IReadOnlyList<(AstNode Node, AstNodeKind ExpectedKind, string ExpectedVisit)> NodeCases { get; } =
-    [
-        (CreatePipelineNode(), AstNodeKind.Pipeline, nameof(PipelineNode)),
-        (CreateParameterNode(), AstNodeKind.Parameter, nameof(ParameterNode)),
-        (CreateScriptStepNode(), AstNodeKind.ScriptStep, nameof(ScriptStepNode)),
-        (CreateTemplateStepNode(), AstNodeKind.TemplateStep, nameof(TemplateStepNode)),
-        (CreateInvalidStepNode(), AstNodeKind.InvalidStep, nameof(InvalidStepNode)),
+        [
+            (CreatePipelineNode(), AstNodeKind.Pipeline, nameof(PipelineNode)),
+            (CreateParameterNode(), AstNodeKind.Parameter, nameof(ParameterNode)),
+            (CreateScriptStepNode(), AstNodeKind.ScriptStep, nameof(ScriptStepNode)),
+            (CreateTemplateStepNode(), AstNodeKind.TemplateStep, nameof(TemplateStepNode)),
+            (CreateInvalidStepNode(), AstNodeKind.InvalidStep, nameof(InvalidStepNode)),
 
-        // Fields
-        (CreateStringKeyFieldNode(), AstNodeKind.StringKeyField, nameof(StringKeyFieldNode<>)),
-        (CreateComplexKeyFieldNode(), AstNodeKind.ComplexKeyField, nameof(ComplexKeyFieldNode<>)),
-        (CreateSequenceFieldNode(), AstNodeKind.SequenceField, nameof(SequenceFieldNode<>)),
-        (CreateMappingFieldNode(), AstNodeKind.MappingField, nameof(MappingFieldNode<>)),
+            // Fields
+            (CreateStringKeyFieldNode(), AstNodeKind.StringKeyField, nameof(StringKeyFieldNode<>)),
+            (CreateComplexKeyFieldNode(), AstNodeKind.ComplexKeyField, nameof(ComplexKeyFieldNode<>)),
+            (CreateSequenceFieldNode(), AstNodeKind.SequenceField, nameof(SequenceFieldNode<>)),
+            (CreateMappingFieldNode(), AstNodeKind.MappingField, nameof(MappingFieldNode<>)),
 
-        // Values
-        (CreateScalarNode(), AstNodeKind.Scalar, nameof(ScalarNode)),
-        (CreateSequenceNode(), AstNodeKind.Sequence, nameof(SequenceNode)),
-        (CreateMappingNode(), AstNodeKind.Mapping, nameof(MappingNode)),
+            // Values
+            (CreateScalarNode(), AstNodeKind.Scalar, nameof(ScalarNode)),
+            (CreateSequenceNode(), AstNodeKind.Sequence, nameof(SequenceNode)),
+            (CreateMappingNode(), AstNodeKind.Mapping, nameof(MappingNode)),
 
-        // Expressions
-        (CreateBooleanNode(), AstNodeKind.BooleanLiteralExpression, nameof(BooleanLiteralExpressionNode)),
-        (CreateIntegerNode(), AstNodeKind.IntegerLiteralExpression, nameof(IntegerLiteralExpressionNode)),
-        (CreateStringNode(), AstNodeKind.StringLiteralExpression, nameof(StringLiteralExpressionNode)),
-        (CreateInterpolatedNode(), AstNodeKind.InterpolatedStringExpression, nameof(InterpolatedStringExpressionNode)),
-        (CreateVariableNode(), AstNodeKind.VariableExpression, nameof(VariableExpressionNode))
-    ];
+            // Expressions
+            (CreateBooleanNode(), AstNodeKind.BooleanLiteralExpression, nameof(BooleanLiteralExpressionNode)),
+            (CreateIntegerNode(), AstNodeKind.IntegerLiteralExpression, nameof(IntegerLiteralExpressionNode)),
+            (CreateStringNode(), AstNodeKind.StringLiteralExpression, nameof(StringLiteralExpressionNode)),
+            (CreateInterpolatedNode(), AstNodeKind.InterpolatedStringExpression, nameof(InterpolatedStringExpressionNode)),
+            (CreateVariableNode(), AstNodeKind.VariableExpression, nameof(VariableExpressionNode))
+        ];
 
     public static ParameterNode CreateParameterNode()
     {

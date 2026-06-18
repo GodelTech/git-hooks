@@ -2,7 +2,8 @@ namespace GitHooks.Diagnostics.Rendering;
 
 public static class DiagnosticSeverityRenderer
 {
-    public static string Render(DiagnosticSeverity severity)
+    public static string Render(
+        DiagnosticSeverity severity)
     {
         return severity switch
         {

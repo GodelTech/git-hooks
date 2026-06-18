@@ -33,7 +33,8 @@ public sealed class ScriptStepNodeBuilder
         return this;
     }
 
-    public ScriptStepNodeBuilder WithDisplayName(string displayName)
+    public ScriptStepNodeBuilder WithDisplayName(
+        string displayName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
 
@@ -44,7 +45,8 @@ public sealed class ScriptStepNodeBuilder
         return this;
     }
 
-    public ScriptStepNodeBuilder WithCondition(string condition)
+    public ScriptStepNodeBuilder WithCondition(
+        string condition)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(condition);
 
@@ -55,7 +57,8 @@ public sealed class ScriptStepNodeBuilder
         return this;
     }
 
-    public ScriptStepNodeBuilder WithTimeoutInMinutes(int timeoutInMinutes)
+    public ScriptStepNodeBuilder WithTimeoutInMinutes(
+        int timeoutInMinutes)
     {
         _timeoutInMinutes = TestFields.StringKey(
             "timeoutInMinutes",
@@ -64,7 +67,8 @@ public sealed class ScriptStepNodeBuilder
         return this;
     }
 
-    public ScriptStepNodeBuilder WithWorkingDirectory(string workingDirectory)
+    public ScriptStepNodeBuilder WithWorkingDirectory(
+        string workingDirectory)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(workingDirectory);
 
@@ -111,7 +115,8 @@ public sealed class ScriptStepNodeBuilder
     {
         if (_script is null)
         {
-            throw new InvalidOperationException("Script is required to build a ScriptStepNode.");
+            throw new InvalidOperationException(
+                "Script is required to build a ScriptStepNode.");
         }
 
         return new ScriptStepNode

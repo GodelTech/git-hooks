@@ -18,7 +18,8 @@ internal sealed class ValidationVisitor(
     private readonly ValidationRuleSet _rules = rules;
     private readonly DiagnosticBag _diagnostics = diagnostics;
 
-    public void Visit(PipelineNode node)
+    public void Visit(
+        PipelineNode node)
     {
         foreach (var rule in _rules.PipelineRules)
         {
@@ -36,89 +37,105 @@ internal sealed class ValidationVisitor(
         }
     }
 
-    public void Visit(ParameterNode node)
+    public void Visit(
+        ParameterNode node)
     {
         throw new NotImplementedException();
     }
 
-    public void Visit(ScriptStepNode node)
+    public void Visit(
+        ScriptStepNode node)
     {
         throw new NotImplementedException();
     }
 
-    public void Visit(TemplateStepNode node)
+    public void Visit(
+        TemplateStepNode node)
     {
         throw new NotImplementedException();
     }
 
-    public void Visit(InvalidStepNode node)
+    public void Visit(
+        InvalidStepNode node)
     {
         throw new NotImplementedException();
     }
 
     // Fields
-    public void Visit<TValue>(StringKeyFieldNode<TValue> node)
+    public void Visit<TValue>(
+        StringKeyFieldNode<TValue> node)
         where TValue : AstNode
     {
         throw new NotImplementedException();
     }
 
-    public void Visit<TValue>(ComplexKeyFieldNode<TValue> node)
+    public void Visit<TValue>(
+        ComplexKeyFieldNode<TValue> node)
         where TValue : AstNode
     {
         throw new NotImplementedException();
     }
 
-    public void Visit<TValue>(SequenceFieldNode<TValue> node)
+    public void Visit<TValue>(
+        SequenceFieldNode<TValue> node)
         where TValue : AstNode
     {
         throw new NotImplementedException();
     }
 
-    public void Visit<TField>(MappingFieldNode<TField> node)
+    public void Visit<TField>(
+        MappingFieldNode<TField> node)
         where TField : FieldNode
     {
         throw new NotImplementedException();
     }
 
     // Values
-    public void Visit(ScalarNode node)
+    public void Visit(
+        ScalarNode node)
     {
         throw new NotImplementedException();
     }
 
-    public void Visit(SequenceNode node)
+    public void Visit(
+        SequenceNode node)
     {
         throw new NotImplementedException();
     }
 
-    public void Visit(MappingNode node)
+    public void Visit(
+        MappingNode node)
     {
         throw new NotImplementedException();
     }
 
     // Expressions
-    public void Visit(BooleanLiteralExpressionNode node)
+    public void Visit(
+        BooleanLiteralExpressionNode node)
     {
         throw new NotImplementedException();
     }
 
-    public void Visit(IntegerLiteralExpressionNode node)
+    public void Visit(
+        IntegerLiteralExpressionNode node)
     {
         throw new NotImplementedException();
     }
 
-    public void Visit(StringLiteralExpressionNode node)
+    public void Visit(
+        StringLiteralExpressionNode node)
     {
         throw new NotImplementedException();
     }
 
-    public void Visit(InterpolatedStringExpressionNode node)
+    public void Visit(
+        InterpolatedStringExpressionNode node)
     {
         throw new NotImplementedException();
     }
 
-    public void Visit(VariableExpressionNode node)
+    public void Visit(
+        VariableExpressionNode node)
     {
         throw new NotImplementedException();
     }

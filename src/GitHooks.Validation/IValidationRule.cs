@@ -6,5 +6,7 @@ namespace GitHooks.Validation;
 public interface IValidationRule<in TNode>
     where TNode : AstNode
 {
-    public void Validate(TNode node, DiagnosticBag diagnostics);
+    public void Validate(
+        TNode node,
+        DiagnosticBag diagnostics);
 }
