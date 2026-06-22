@@ -1,4 +1,4 @@
 namespace GitHooks.Domain.Ast.Expressions;
 
-public abstract record ExpressionNode
+public abstract class ExpressionNode
     : AstNode;

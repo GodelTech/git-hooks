@@ -2,7 +2,7 @@ using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Values;
 
-public sealed record SequenceNode
+public sealed class SequenceNode
     : ValueNode
 {
     public override AstNodeKind Kind

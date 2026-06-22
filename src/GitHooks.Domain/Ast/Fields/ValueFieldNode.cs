@@ -1,6 +1,6 @@
 namespace GitHooks.Domain.Ast.Fields;
 
-public abstract record ValueFieldNode<TValue>
+public abstract class ValueFieldNode<TValue>
     : FieldNode
     where TValue : AstNode
 {

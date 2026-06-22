@@ -1,4 +1,4 @@
 namespace GitHooks.Domain.Ast.Mappings.Steps;
 
-public abstract record StepNode
+public abstract class StepNode
     : PipelineNodeBase;

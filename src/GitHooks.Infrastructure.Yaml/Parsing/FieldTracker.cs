@@ -1,5 +1,6 @@
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Fields;
+using GitHooks.Domain.Ast.Values;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing.Fields;
 
@@ -76,11 +77,13 @@ internal sealed class FieldTracker(
                 context));
     }
 
-    public void AddUnknownField(
+    public ComplexKeyFieldNode<ValueNode> AddUnknownField(
         ParsingContext context)
     {
-        _unknownFields.Add(
-            _fieldValueParser.ParseComplexKeyField(
-                context));
+        var field = _fieldValueParser.ParseComplexKeyField(context);
+
+        _unknownFields.Add(field);
+
+        return field;
     }
 }

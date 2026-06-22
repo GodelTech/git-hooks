@@ -33,7 +33,7 @@ internal sealed class StepParser(
         {
             if (!context.Cursor.Is<Scalar>())
             {
-                fieldTracker.AddUnknownField(context);
+                _ = fieldTracker.AddUnknownField(context);
 
                 continue;
             }
@@ -137,17 +137,12 @@ internal sealed class StepParser(
                     DiagnosticDescriptors.MultipleStepTypes,
                     span));
 
-            return new InvalidStepNode
-            {
-                Fields = [.. step.GetFields()],
-                UnknownFields = unknownFields,
-                Span = span
-            };
+            return CreateInvalidStep(step, unknownFields, span);
         }
 
         if (step.Script is not null)
         {
-            StepFieldValidation.ValidateScriptStep(step, span, context);
+            StepFieldValidation.ValidateScriptStep(step, context);
 
             return new ScriptStepNode
             {
@@ -164,7 +159,7 @@ internal sealed class StepParser(
 
         if (step.Template is not null)
         {
-            StepFieldValidation.ValidateTemplateStep(step, span, context);
+            StepFieldValidation.ValidateTemplateStep(step, context);
 
             return new TemplateStepNode
             {
@@ -175,7 +170,24 @@ internal sealed class StepParser(
             };
         }
 
-        throw context.Cursor.CreateException(
-            "Step must contain exactly one step type field");
+        context.Report(
+            Diagnostic.Create(
+                DiagnosticDescriptors.MissingStepType,
+                span));
+
+        return CreateInvalidStep(step, unknownFields, span);
+    }
+
+    private static InvalidStepNode CreateInvalidStep(
+        StepFields step,
+        IReadOnlyList<FieldNode> unknownFields,
+        SourceSpan span)
+    {
+        return new InvalidStepNode
+        {
+            Fields = [.. step.GetFields().Select(x => x.Field)],
+            UnknownFields = unknownFields,
+            Span = span
+        };
     }
 }

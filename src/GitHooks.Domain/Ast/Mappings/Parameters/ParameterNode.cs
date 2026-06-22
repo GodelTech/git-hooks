@@ -4,7 +4,7 @@ using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Mappings.Parameters;
 
-public sealed record ParameterNode
+public sealed class ParameterNode
     : PipelineNodeBase
 {
     public override AstNodeKind Kind

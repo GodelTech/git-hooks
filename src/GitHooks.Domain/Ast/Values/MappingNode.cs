@@ -3,7 +3,7 @@ using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Values;
 
-public sealed record MappingNode
+public sealed class MappingNode
     : ValueNode
 {
     public override AstNodeKind Kind

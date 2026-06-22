@@ -2,7 +2,7 @@ using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Expressions;
 
-public sealed record InterpolatedStringExpressionNode
+public sealed class InterpolatedStringExpressionNode
     : ExpressionNode
 {
     public override AstNodeKind Kind

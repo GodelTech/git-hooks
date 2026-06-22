@@ -2,7 +2,7 @@ using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Fields;
 
-public sealed record MappingFieldNode<TField>
+public sealed class MappingFieldNode<TField>
     : FieldNode
     where TField : FieldNode
 {

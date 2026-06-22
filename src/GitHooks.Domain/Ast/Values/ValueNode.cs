@@ -1,4 +1,4 @@
 namespace GitHooks.Domain.Ast.Values;
 
-public abstract record ValueNode
+public abstract class ValueNode
     : AstNode;

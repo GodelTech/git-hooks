@@ -3,7 +3,7 @@ using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Mappings.Steps;
 
-public sealed record InvalidStepNode
+public sealed class InvalidStepNode
     : StepNode
 {
     public override AstNodeKind Kind

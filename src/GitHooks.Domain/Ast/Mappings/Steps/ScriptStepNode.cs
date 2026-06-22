@@ -4,7 +4,7 @@ using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Mappings.Steps;
 
-public sealed record ScriptStepNode
+public sealed class ScriptStepNode
     : StepNode
 {
     public override AstNodeKind Kind

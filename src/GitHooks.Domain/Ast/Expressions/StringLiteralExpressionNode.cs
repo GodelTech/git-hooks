@@ -2,7 +2,7 @@ using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Expressions;
 
-public sealed record StringLiteralExpressionNode
+public sealed class StringLiteralExpressionNode
     : ExpressionNode
 {
     public override AstNodeKind Kind

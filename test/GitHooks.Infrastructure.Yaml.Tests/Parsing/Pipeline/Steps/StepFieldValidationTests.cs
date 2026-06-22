@@ -1,5 +1,4 @@
 using GitHooks.Diagnostics;
-using GitHooks.Domain.Common;
 using GitHooks.Domain.Syntax;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
 using GitHooks.Testing.Ast;
@@ -10,12 +9,14 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Steps;
 public sealed class StepFieldValidationTests
 {
     [Fact]
-    public void ValidateScriptStep_ValidFields_DoesNotThrow()
+    public void ValidateScriptStep_ValidFields_DoesNotReportsDiagnostic()
     {
+        var context = TestParserFactory.CreateDummyContext();
+
         var step = new StepFields
         {
             Script = TestFields.StringKey("script"),
-            DisplayName = TestFields.StringKey("displayNode"),
+            DisplayName = TestFields.StringKey("displayName"),
             Condition = TestFields.StringKey("condition"),
             TimeoutInMinutes = TestFields.StringKey("timeoutInMinutes"),
             WorkingDirectory = TestFields.StringKey("workingDirectory"),
@@ -26,8 +27,9 @@ public sealed class StepFieldValidationTests
 
         StepFieldValidation.ValidateScriptStep(
             step,
-            SourceSpan.Unknown,
-            TestParserFactory.CreateDummyContext());
+            context);
+
+        Assert.Empty(context.Diagnostics);
     }
 
     [Theory]
@@ -47,7 +49,6 @@ public sealed class StepFieldValidationTests
 
         StepFieldValidation.ValidateScriptStep(
             step,
-            SourceSpan.Unknown,
             context);
 
         DiagnosticAssert.Single(
@@ -73,7 +74,6 @@ public sealed class StepFieldValidationTests
 
         StepFieldValidation.ValidateScriptStep(
             step,
-            SourceSpan.Unknown,
             context);
 
         Assert.Equal(
@@ -94,8 +94,10 @@ public sealed class StepFieldValidationTests
     }
 
     [Fact]
-    public void ValidateTemplateStep_ValidFields_DoesNotThrow()
+    public void ValidateTemplateStep_ValidFields_DoesNotReportsDiagnostic()
     {
+        var context = TestParserFactory.CreateDummyContext();
+
         var step = new StepFields
         {
             Template = TestFields.StringKey("template"),
@@ -106,8 +108,9 @@ public sealed class StepFieldValidationTests
 
         StepFieldValidation.ValidateTemplateStep(
             step,
-            SourceSpan.Unknown,
-            TestParserFactory.CreateDummyContext());
+            context);
+
+        Assert.Empty(context.Diagnostics);
     }
 
     [Theory]
@@ -131,7 +134,6 @@ public sealed class StepFieldValidationTests
 
         StepFieldValidation.ValidateTemplateStep(
             step,
-            SourceSpan.Unknown,
             context);
 
         DiagnosticAssert.Single(
@@ -157,7 +159,6 @@ public sealed class StepFieldValidationTests
 
         StepFieldValidation.ValidateTemplateStep(
             step,
-            SourceSpan.Unknown,
             context);
 
         Assert.Equal(

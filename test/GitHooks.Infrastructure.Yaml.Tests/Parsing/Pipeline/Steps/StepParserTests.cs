@@ -3,14 +3,14 @@ using System.Runtime.CompilerServices;
 
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast;
+using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Syntax;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 using GitHooks.Testing.Ast;
 using GitHooks.Testing.Diagnostics;
-
-using YamlDotNet.Core;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Steps;
 
@@ -362,7 +362,7 @@ public sealed class StepParserTests
     }
 
     [Fact]
-    public void Parse_MissingStepType_Throws()
+    public void Parse_MissingStepType_ReturnsInvalidStep()
     {
         var context =
             TestParserFactory.CreateContext(
@@ -372,13 +372,22 @@ public sealed class StepParserTests
 
         context.Cursor.StartDocument();
 
-        var exception =
-            Assert.Throws<YamlException>(
-                () => _parser.Parse(context));
+        var step = _parser.Parse(context);
 
-        Assert.StartsWith(
-            "Step must contain exactly one step type field",
-            exception.Message);
+        DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.MissingStepType);
+
+        var invalidStep = Assert.IsType<InvalidStepNode>(step);
+
+        Assert.Single(invalidStep.Fields);
+
+        var field = Assert.IsType<StringKeyFieldNode<ExpressionNode>>(invalidStep.Fields[0]);
+
+        AstAssert.HasStringField(
+            field,
+            "displayName",
+            "Test");
     }
 
     private static string GetRequiredStepTypePrefix(string field)

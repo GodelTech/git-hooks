@@ -39,7 +39,7 @@ internal sealed class PipelineParser(
         {
             if (!context.Cursor.Is<Scalar>())
             {
-                fieldTracker.AddUnknownField(context);
+                _ = fieldTracker.AddUnknownField(context);
 
                 continue;
             }

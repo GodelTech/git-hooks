@@ -198,15 +198,37 @@ public sealed class FieldParserTests
     }
 
     [Fact]
-    public async Task ParseMappingField_WithComplexKey()
+    public void ParseMappingField_WithComplexKey_ReportsDiagnostic()
     {
-        await VerifyMappingFieldAsync(
-            """
-            ? [1, 2]
-            : value
+        var key = new Scalar("mapping");
 
-            configuration: Release
-            """);
+        var context =
+            TestParserFactory.CreateContext(
+                """
+                ? [1, 2]
+                : value
+
+                configuration: Release
+                """);
+
+        context.Cursor.StartDocument();
+
+        var result =
+            _parser.ParseMappingField(
+                key,
+                context);
+
+        DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.ExpectedScalarKeyInMapping,
+            key.Value);
+
+        var field = Assert.Single(result.Fields);
+
+        AstAssert.HasStringField(
+            field,
+            "configuration",
+            "Release");
     }
 
     private async Task VerifyStringKeyFieldAsync(

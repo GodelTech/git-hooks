@@ -22,90 +22,46 @@ internal sealed class StepFields
 
     public MappingFieldNode<StringKeyFieldNode<ExpressionNode>>? Parameters { get; set; }
 
-    public IEnumerable<FieldNode> GetFields()
+    public IEnumerable<(string Name, FieldNode Field)> GetFields()
     {
         if (Script is not null)
         {
-            yield return Script;
+            yield return (StepFieldNames.Script, Script);
         }
 
         if (Template is not null)
         {
-            yield return Template;
+            yield return (StepFieldNames.Template, Template);
         }
 
         if (DisplayName is not null)
         {
-            yield return DisplayName;
+            yield return (StepFieldNames.DisplayName, DisplayName);
         }
 
         if (Condition is not null)
         {
-            yield return Condition;
+            yield return (StepFieldNames.Condition, Condition);
         }
 
         if (TimeoutInMinutes is not null)
         {
-            yield return TimeoutInMinutes;
+            yield return (StepFieldNames.TimeoutInMinutes, TimeoutInMinutes);
         }
 
         if (WorkingDirectory is not null)
         {
-            yield return WorkingDirectory;
+            yield return (StepFieldNames.WorkingDirectory, WorkingDirectory);
         }
 
         if (Env is not null)
         {
-            yield return Env;
+            yield return (StepFieldNames.Env, Env);
         }
 
         if (Parameters is not null)
         {
-            yield return Parameters;
-        }
-    }
-
-    // todo: solve this as it almost duplicates the GetFields method
-    public IEnumerable<string> GetPresentFields()
-    {
-        if (Script is not null)
-        {
-            yield return StepFieldNames.Script;
-        }
-
-        if (Template is not null)
-        {
-            yield return StepFieldNames.Template;
-        }
-
-        if (DisplayName is not null)
-        {
-            yield return StepFieldNames.DisplayName;
-        }
-
-        if (Condition is not null)
-        {
-            yield return StepFieldNames.Condition;
-        }
-
-        if (TimeoutInMinutes is not null)
-        {
-            yield return StepFieldNames.TimeoutInMinutes;
-        }
-
-        if (WorkingDirectory is not null)
-        {
-            yield return StepFieldNames.WorkingDirectory;
-        }
-
-        if (Env is not null)
-        {
-            yield return StepFieldNames.Env;
-        }
-
-        if (Parameters is not null)
-        {
-            yield return StepFieldNames.Parameters;
+            yield return (StepFieldNames.Parameters, Parameters);
         }
     }
 }

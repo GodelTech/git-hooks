@@ -4,7 +4,6 @@ using GitHooks.Diagnostics.Rendering;
 
 namespace GitHooks.Diagnostics.Printing;
 
-// todo: show RelatedLocations
 public sealed class DiagnosticPrinter(
     DiagnosticPrinterOptions? options = null)
 {
@@ -48,6 +47,21 @@ public sealed class DiagnosticPrinter(
         {
             _ = builder.Append(diagnostic.Code);
             _ = builder.Append(": ");
+        }
+
+        foreach (var location in diagnostic.RelatedLocations)
+        {
+            _ = builder.AppendLine();
+
+            _ = builder.Append("  -> ");
+
+            _ = builder.Append(DiagnosticLocationRenderer.Render(location.Span));
+
+            if (!string.IsNullOrWhiteSpace(location.Message))
+            {
+                _ = builder.Append(": ");
+                _ = builder.Append(location.Message);
+            }
         }
 
         _ = builder.Append(diagnostic.Message);

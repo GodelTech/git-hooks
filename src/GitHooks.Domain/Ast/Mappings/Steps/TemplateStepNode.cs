@@ -4,7 +4,7 @@ using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Mappings.Steps;
 
-public sealed record TemplateStepNode
+public sealed class TemplateStepNode
     : StepNode
 {
     public override AstNodeKind Kind

@@ -37,7 +37,7 @@ internal sealed class ParameterParser(
         {
             if (!context.Cursor.Is<Scalar>())
             {
-                fieldTracker.AddUnknownField(context);
+                _ = fieldTracker.AddUnknownField(context);
 
                 continue;
             }

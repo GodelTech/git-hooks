@@ -1,3 +1,4 @@
+using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Fields;
 using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
@@ -81,8 +82,13 @@ internal sealed class FieldParser(
         {
             if (!context.Cursor.Is<Scalar>())
             {
-                // TODO: we need to use these unknown fields somewhere
-                fieldTracker.AddUnknownField(context);
+                var unsupportedField = fieldTracker.AddUnknownField(context);
+
+                context.Report(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.ExpectedScalarKeyInMapping,
+                        unsupportedField.Span,
+                        key.Value));
 
                 continue;
             }

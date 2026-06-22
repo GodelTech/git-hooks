@@ -20,6 +20,14 @@ public static class DiagnosticDescriptors
             MessageFormat = "Duplicate '{0}' field."
         };
 
+    public static readonly DiagnosticDescriptor ExpectedScalarKeyInMapping =
+        new()
+        {
+            Code = DiagnosticCode.Create(1002),
+            Severity = DiagnosticSeverity.Error,
+            MessageFormat = "Expected a scalar key in '{0}' mapping."
+        };
+
     // GH2000-GH2999 Pipeline
     public static readonly DiagnosticDescriptor PipelineMustContainStep =
         new()
@@ -63,12 +71,12 @@ public static class DiagnosticDescriptors
             MessageFormat = "Step cannot contain multiple step type fields."
         };
 
-    public static readonly DiagnosticDescriptor StepTypeRequired =
+    public static readonly DiagnosticDescriptor MissingStepType =
         new()
         {
             Code = DiagnosticCode.Create(4003),
             Severity = DiagnosticSeverity.Error,
-            MessageFormat = "Step must contain a step type field."
+            MessageFormat = "Step must contain either 'script' or 'template' field."
         };
 
     // GH5000-GH5999 Semantic validation

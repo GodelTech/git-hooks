@@ -2,7 +2,7 @@ using GitHooks.Domain.Ast.Visitors;
 
 namespace GitHooks.Domain.Ast.Fields;
 
-public sealed record StringKeyFieldNode<TValue>
+public sealed class StringKeyFieldNode<TValue>
     : ValueFieldNode<TValue>
     where TValue : AstNode
 {
