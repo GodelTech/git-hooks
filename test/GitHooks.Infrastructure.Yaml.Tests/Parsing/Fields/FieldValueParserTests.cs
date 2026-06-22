@@ -134,7 +134,7 @@ public sealed class FieldValueParserTests
                 () => _parser.ParseComplexKeyField(context));
 
         Assert.StartsWith(
-            "Expected scalar, sequence, or mapping.",
+            "Unexpected YAML node. Expected scalar, sequence, or mapping.",
             exception.Message);
     }
 

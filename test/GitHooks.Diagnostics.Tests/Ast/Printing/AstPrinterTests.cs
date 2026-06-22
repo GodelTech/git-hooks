@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 
 using GitHooks.Diagnostics.Ast.Printing;
 using GitHooks.Domain.Ast;
+using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Common;
 using GitHooks.Testing.Ast;
 using GitHooks.Testing.Ast.Builders;
@@ -69,6 +70,29 @@ public sealed class AstPrinterTests
         var step = new ScriptStepNodeBuilder()
             .WithScript("echo \"Hello\"\nexit 0")
             .Build();
+
+        await VerifyAstAsync(step);
+    }
+
+    [Fact]
+    public async Task Print_InvalidStep()
+    {
+        var step = new InvalidStepNode
+        {
+            Fields =
+            [
+                TestFields.StringKey(
+                "displayName",
+                "Test")
+            ],
+            UnknownFields =
+            [
+                TestFields.StringKey(
+                "custom",
+                "value")
+            ],
+            Span = SourceSpan.Unknown
+        };
 
         await VerifyAstAsync(step);
     }

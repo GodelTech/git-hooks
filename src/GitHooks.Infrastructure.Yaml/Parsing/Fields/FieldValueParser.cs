@@ -64,7 +64,7 @@ internal sealed class FieldValueParser
         }
 
         throw context.Cursor.CreateException(
-            "Expected scalar, sequence, or mapping.");
+            "Unexpected YAML node. Expected scalar, sequence, or mapping.");
     }
 
 #pragma warning disable CA1822 // Mark members as static

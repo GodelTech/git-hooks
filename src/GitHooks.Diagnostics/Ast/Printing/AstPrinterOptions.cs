@@ -1,6 +1,6 @@
 namespace GitHooks.Diagnostics.Ast.Printing;
 
-public sealed record AstPrinterOptions
+public sealed class AstPrinterOptions
 {
     public static AstPrinterOptions Default { get; }
         = new();

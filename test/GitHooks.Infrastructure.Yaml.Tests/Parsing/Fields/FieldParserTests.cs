@@ -16,6 +16,34 @@ public sealed class FieldParserTests
         = TestParserFactory.CreateFieldParser();
 
     [Fact]
+    public void Constructor_NullExpressionParser_Throws()
+    {
+        var exception =
+            Assert.Throws<ArgumentNullException>(
+                () => new FieldParser(
+                    null!,
+                    new FieldValueParser()));
+
+        Assert.Equal(
+            "expressionParser",
+            exception.ParamName);
+    }
+
+    [Fact]
+    public void Constructor_NullFieldValueParser_Throws()
+    {
+        var exception =
+            Assert.Throws<ArgumentNullException>(
+                () => new FieldParser(
+                    TestParserFactory.CreateExpressionParser(),
+                    null!));
+
+        Assert.Equal(
+            "fieldValueParser",
+            exception.ParamName);
+    }
+
+    [Fact]
     public void ParseStringKeyField_WithNullKey_Throws()
     {
         var exception =

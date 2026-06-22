@@ -7,7 +7,6 @@ using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Parsing;
 
-// todo: recoverable parsing.
 internal sealed class YamlPipelineParser(
     PipelineParser pipelineParser)
 {

@@ -1,6 +1,6 @@
 namespace GitHooks.Diagnostics.Printing;
 
-public sealed record DiagnosticPrinterOptions
+public sealed class DiagnosticPrinterOptions
 {
     public static DiagnosticPrinterOptions Default { get; }
         = new();

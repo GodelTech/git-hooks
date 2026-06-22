@@ -1,0 +1,1 @@
+﻿<unknown>: error GH0001: Invalid YAML: {0}

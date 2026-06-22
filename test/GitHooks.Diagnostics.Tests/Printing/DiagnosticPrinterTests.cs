@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 using GitHooks.Diagnostics.Printing;
 
 using GitHooks.Domain.Common;
@@ -22,7 +24,7 @@ public sealed class DiagnosticPrinterTests
     }
 
     [Fact]
-    public void Print_ErrorDiagnosticProvided_ReturnsFormattedDiagnostic()
+    public async Task Print_ErrorDiagnosticProvided_ReturnsFormattedDiagnostic()
     {
         var diagnostic = new Diagnostic
         {
@@ -30,15 +32,11 @@ public sealed class DiagnosticPrinterTests
             Span = SourceSpan.Unknown
         };
 
-        var result = _printer.Print([diagnostic]);
-
-        Assert.Equal(
-            "<unknown>: error GH0001: Invalid YAML: {0}",
-            result);
+        await VerifyDiagnosticAsync(diagnostic);
     }
 
     [Fact]
-    public void Print_MultipleDiagnosticsProvided_ReturnsFormattedDiagnostics()
+    public async Task Print_MultipleDiagnosticsProvided_ReturnsFormattedDiagnostics()
     {
         Diagnostic[] diagnostics =
         [
@@ -58,80 +56,87 @@ public sealed class DiagnosticPrinterTests
             }
         ];
 
-        var result = _printer.Print(diagnostics);
-
-        Assert.Equal(
-            """
-            <unknown>: error GH0001: Invalid YAML: {0}
-            pipeline.yaml(5,1,5,10): error GH2001: Pipeline must contain at least one step.
-            """,
-            result);
+        await VerifyDiagnosticAsync(diagnostics);
     }
 
     [Fact]
-    public void Print_IncludeSeverityDisabled_ReturnsDiagnosticWithoutSeverity()
+    public async Task Print_IncludeSeverityDisabled_ReturnsDiagnosticWithoutSeverity()
     {
+        var options = new DiagnosticPrinterOptions
+        {
+            IncludeSeverity = false
+        };
+
         var diagnostic = new Diagnostic
         {
             Descriptor = DiagnosticDescriptors.InvalidYaml,
             Span = SourceSpan.Unknown
         };
 
-        var printer = new DiagnosticPrinter(
-            new DiagnosticPrinterOptions
-            {
-                IncludeSeverity = false
-            });
-
-        var result = printer.Print([diagnostic]);
-
-        Assert.Equal(
-            "<unknown>: GH0001: Invalid YAML: {0}",
-            result);
+        await VerifyDiagnosticAsync(
+            diagnostic,
+            options);
     }
 
     [Fact]
-    public void Print_IncludeCodesDisabled_ReturnsDiagnosticWithoutCode()
+    public async Task Print_IncludeCodesDisabled_ReturnsDiagnosticWithoutCode()
     {
+        var options = new DiagnosticPrinterOptions
+        {
+            IncludeCodes = false
+        };
+
         var diagnostic = new Diagnostic
         {
             Descriptor = DiagnosticDescriptors.InvalidYaml,
             Span = SourceSpan.Unknown
         };
 
-        var printer = new DiagnosticPrinter(
-            new DiagnosticPrinterOptions
-            {
-                IncludeCodes = false
-            });
-
-        var result = printer.Print([diagnostic]);
-
-        Assert.Equal(
-            "<unknown>: error Invalid YAML: {0}",
-            result);
+        await VerifyDiagnosticAsync(
+            diagnostic,
+            options);
     }
 
     [Fact]
-    public void Print_IncludeSourceSpansDisabled_ReturnsDiagnosticWithoutSpan()
+    public async Task Print_IncludeSourceSpansDisabled_ReturnsDiagnosticWithoutSpan()
     {
+        var options = new DiagnosticPrinterOptions
+        {
+            IncludeSourceSpans = false
+        };
+
         var diagnostic = new Diagnostic
         {
             Descriptor = DiagnosticDescriptors.InvalidYaml,
             Span = SourceSpan.Unknown
         };
 
-        var printer = new DiagnosticPrinter(
-            new DiagnosticPrinterOptions
-            {
-                IncludeSourceSpans = false
-            });
+        await VerifyDiagnosticAsync(
+            diagnostic,
+            options);
+    }
 
-        var result = printer.Print([diagnostic]);
+    [Fact]
+    public async Task Print_WithRelatedLocation()
+    {
+        var diagnostic =
+            Diagnostic.Create(
+                DiagnosticDescriptors.DuplicateField,
+                new SourceSpan(
+                    new SourceDocument("test.yaml"),
+                    new SourcePosition(5, 1),
+                    new SourcePosition(5, 10)),
+                [
+                    DiagnosticLocation.Create(
+                        new SourceSpan(
+                            new SourceDocument("test.yaml"),
+                            new SourcePosition(1, 1),
+                            new SourcePosition(1, 10)),
+                        "First declaration is here.")
+                ],
+                "name");
 
-        Assert.Equal(
-            "error GH0001: Invalid YAML: {0}",
-            result);
+        await VerifyDiagnosticAsync(diagnostic);
     }
 
     [Fact]
@@ -142,5 +147,31 @@ public sealed class DiagnosticPrinterTests
         Assert.Equal(
             string.Empty,
             result);
+    }
+
+    private static async Task VerifyDiagnosticAsync(
+        Diagnostic diagnostic,
+        DiagnosticPrinterOptions? options = null,
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string sourceFilePath = "")
+    {
+        await VerifyDiagnosticAsync(
+            [diagnostic],
+            options,
+            memberName,
+            sourceFilePath);
+    }
+
+    private static async Task VerifyDiagnosticAsync(
+        IReadOnlyList<Diagnostic> diagnostics,
+        DiagnosticPrinterOptions? options = null,
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string sourceFilePath = "")
+    {
+        await DiagnosticPrinterTestHelper.VerifyDiagnosticAsync(
+            diagnostics,
+            options,
+            memberName,
+            sourceFilePath);
     }
 }

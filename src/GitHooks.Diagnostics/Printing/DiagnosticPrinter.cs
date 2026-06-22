@@ -49,6 +49,8 @@ public sealed class DiagnosticPrinter(
             _ = builder.Append(": ");
         }
 
+        _ = builder.Append(diagnostic.Message);
+
         foreach (var location in diagnostic.RelatedLocations)
         {
             _ = builder.AppendLine();
@@ -63,8 +65,6 @@ public sealed class DiagnosticPrinter(
                 _ = builder.Append(location.Message);
             }
         }
-
-        _ = builder.Append(diagnostic.Message);
 
         return builder.ToString();
     }

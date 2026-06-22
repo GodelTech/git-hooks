@@ -1,0 +1,2 @@
+﻿test.yaml(5,1,5,10): error GH1001: Duplicate 'name' field.
+  -> test.yaml(1,1,1,10): First declaration is here.

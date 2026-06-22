@@ -1,0 +1,6 @@
+﻿InvalidStep
+  Field(displayName)
+    String("Test")
+  UnknownFields:
+    Field(custom)
+      String("value")
