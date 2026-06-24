@@ -9,7 +9,7 @@ namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Steps;
 public sealed class StepFieldValidationTests
 {
     [Fact]
-    public void ValidateScriptStep_ValidFields_DoesNotReportsDiagnostic()
+    public void ValidateScriptStep_ValidFields_DoesNotReportDiagnostic()
     {
         var context = TestParserFactory.CreateDummyContext();
 
@@ -29,7 +29,7 @@ public sealed class StepFieldValidationTests
             step,
             context);
 
-        Assert.Empty(context.Diagnostics);
+        DiagnosticAssert.Empty(context.Diagnostics);
     }
 
     [Theory]
@@ -94,7 +94,7 @@ public sealed class StepFieldValidationTests
     }
 
     [Fact]
-    public void ValidateTemplateStep_ValidFields_DoesNotReportsDiagnostic()
+    public void ValidateTemplateStep_ValidFields_DoesNotReportDiagnostic()
     {
         var context = TestParserFactory.CreateDummyContext();
 
@@ -110,7 +110,7 @@ public sealed class StepFieldValidationTests
             step,
             context);
 
-        Assert.Empty(context.Diagnostics);
+        DiagnosticAssert.Empty(context.Diagnostics);
     }
 
     [Theory]

@@ -10,32 +10,32 @@ public sealed class PipelineMustContainStepRuleTests
     private readonly PipelineMustContainStepRule _rule = new();
 
     [Fact]
-    public void Validate_WhenPipelineContainsNoSteps_ShouldReportDiagnostic()
+    public void Validate_PipelineWithNoSteps_ReportsDiagnostic()
     {
-        var diagnostics = new DiagnosticBag();
+        var context = TestValidationFactory.CreateContext(out var diagnostics);
 
         var pipeline = new PipelineNodeBuilder()
             .WithoutSteps()
             .Build();
 
-        _rule.Validate(pipeline, diagnostics);
+        _rule.Validate(pipeline, context);
 
         DiagnosticAssert.Single(
-            diagnostics.Diagnostics,
+            diagnostics,
             DiagnosticDescriptors.PipelineMustContainStep);
     }
 
     [Fact]
-    public void Validate_WhenPipelineContainsSteps_ShouldNotReportDiagnostic()
+    public void Validate_PipelineWithSteps_DoesNotReportDiagnostic()
     {
-        var diagnostics = new DiagnosticBag();
+        var context = TestValidationFactory.CreateContext(out var diagnostics);
 
         var pipeline = new PipelineNodeBuilder()
             .WithScriptStep()
             .Build();
 
-        _rule.Validate(pipeline, diagnostics);
+        _rule.Validate(pipeline, context);
 
-        Assert.Empty(diagnostics.Diagnostics);
+        DiagnosticAssert.Empty(diagnostics);
     }
 }

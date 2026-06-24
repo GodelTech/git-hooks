@@ -100,7 +100,7 @@ internal sealed class ParameterParser(
         {
             context.Report(
                 Diagnostic.Create(
-                    DiagnosticDescriptors.ParameterNameRequired,
+                    DiagnosticDescriptors.ParameterNameIsRequired,
                     span));
 
             name = MissingFields.StringKeyField(

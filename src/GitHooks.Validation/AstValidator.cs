@@ -7,19 +7,19 @@ public sealed class AstValidator
 {
     private readonly ValidationRuleSet _rules = new();
 
-    public DiagnosticBag Validate(
-        AstNode root)
+    public void Validate(
+        AstNode root,
+        DiagnosticBag diagnostics)
     {
         ArgumentNullException.ThrowIfNull(root);
+        ArgumentNullException.ThrowIfNull(diagnostics);
 
-        var diagnostics = new DiagnosticBag();
+        var context = new ValidationContext(diagnostics);
 
         var visitor = new ValidationVisitor(
             _rules,
-            diagnostics);
+            context);
 
         root.Accept(visitor);
-
-        return diagnostics;
     }
 }

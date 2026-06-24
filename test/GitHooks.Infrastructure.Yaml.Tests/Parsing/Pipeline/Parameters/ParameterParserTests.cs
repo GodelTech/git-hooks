@@ -112,10 +112,14 @@ public sealed class ParameterParserTests
 
         var result = _parser.Parse(context);
 
-        DiagnosticAssert.Single(
+        var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
             field);
+
+        DiagnosticAssert.SingleRelatedLocation(
+            diagnostic,
+            "First declaration is here.");
 
         AssertFirstFieldValue(
             result,
@@ -141,10 +145,14 @@ public sealed class ParameterParserTests
 
         var result = _parser.Parse(context);
 
-        DiagnosticAssert.Single(
+        var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
             "values");
+
+        DiagnosticAssert.SingleRelatedLocation(
+            diagnostic,
+            "First declaration is here.");
 
         Assert.NotNull(result.Values);
 
@@ -170,7 +178,7 @@ public sealed class ParameterParserTests
 
         DiagnosticAssert.Single(
             context.Diagnostics,
-            DiagnosticDescriptors.ParameterNameRequired);
+            DiagnosticDescriptors.ParameterNameIsRequired);
 
         AstAssert.HasStringField(
             parameter.Name,

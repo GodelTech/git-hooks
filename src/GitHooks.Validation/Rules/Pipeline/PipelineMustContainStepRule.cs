@@ -8,17 +8,13 @@ internal sealed class PipelineMustContainStepRule
 {
     public void Validate(
         PipelineNode node,
-        DiagnosticBag diagnostics)
+        ValidationContext context)
     {
-        ArgumentNullException.ThrowIfNull(node);
-        ArgumentNullException.ThrowIfNull(diagnostics);
-
         if (node.Steps.Count == 0)
         {
-            diagnostics.Report(
-                Diagnostic.Create(
-                    DiagnosticDescriptors.PipelineMustContainStep,
-                    node.Span));
+            context.Report(
+                DiagnosticDescriptors.PipelineMustContainStep,
+                node.Span);
         }
     }
 }

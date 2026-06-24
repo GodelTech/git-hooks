@@ -212,10 +212,14 @@ public sealed class FieldParserTests
                 new Scalar("parameters"),
                 context);
 
-        DiagnosticAssert.Single(
+        var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
             "configuration");
+
+        DiagnosticAssert.SingleRelatedLocation(
+            diagnostic,
+            "First declaration is here.");
 
         var field = Assert.Single(result.Fields);
 
@@ -248,7 +252,7 @@ public sealed class FieldParserTests
 
         DiagnosticAssert.Single(
             context.Diagnostics,
-            DiagnosticDescriptors.ExpectedScalarKeyInMapping,
+            DiagnosticDescriptors.MappingKeyMustBeScalar,
             key.Value);
 
         var field = Assert.Single(result.Fields);

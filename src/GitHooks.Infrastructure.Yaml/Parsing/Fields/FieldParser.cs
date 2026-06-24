@@ -86,7 +86,7 @@ internal sealed class FieldParser(
 
                 context.Report(
                     Diagnostic.Create(
-                        DiagnosticDescriptors.ExpectedScalarKeyInMapping,
+                        DiagnosticDescriptors.MappingKeyMustBeScalar,
                         unsupportedField.Span,
                         key.Value));
 

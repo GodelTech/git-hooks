@@ -121,10 +121,14 @@ public sealed class PipelineParserTests
 
         _ = _parser.Parse(context);
 
-        DiagnosticAssert.Single(
+        var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
             "parameters");
+
+        DiagnosticAssert.SingleRelatedLocation(
+            diagnostic,
+            "First declaration is here.");
     }
 
     [Fact]
@@ -144,10 +148,14 @@ public sealed class PipelineParserTests
 
         _ = _parser.Parse(context);
 
-        DiagnosticAssert.Single(
+        var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
             "steps");
+
+        DiagnosticAssert.SingleRelatedLocation(
+            diagnostic,
+            "First declaration is here.");
     }
 
     private async Task VerifyAstAsync(

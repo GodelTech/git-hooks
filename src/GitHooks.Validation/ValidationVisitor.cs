@@ -1,4 +1,3 @@
-using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Fields;
@@ -12,18 +11,18 @@ namespace GitHooks.Validation;
 
 internal sealed class ValidationVisitor(
     ValidationRuleSet rules,
-    DiagnosticBag diagnostics)
+    ValidationContext context)
     : IAstCommandVisitor
 {
     private readonly ValidationRuleSet _rules = rules;
-    private readonly DiagnosticBag _diagnostics = diagnostics;
+    private readonly ValidationContext _context = context;
 
     public void Visit(
         PipelineNode node)
     {
         foreach (var rule in _rules.PipelineRules)
         {
-            rule.Validate(node, _diagnostics);
+            rule.Validate(node, _context);
         }
 
         foreach (var parameter in node.Parameters)
@@ -40,25 +39,37 @@ internal sealed class ValidationVisitor(
     public void Visit(
         ParameterNode node)
     {
-        throw new NotImplementedException();
+        foreach (var rule in _rules.ParameterRules)
+        {
+            rule.Validate(node, _context);
+        }
     }
 
     public void Visit(
         ScriptStepNode node)
     {
-        throw new NotImplementedException();
+        foreach (var rule in _rules.ScriptStepRules)
+        {
+            rule.Validate(node, _context);
+        }
     }
 
     public void Visit(
         TemplateStepNode node)
     {
-        throw new NotImplementedException();
+        foreach (var rule in _rules.TemplateStepRules)
+        {
+            rule.Validate(node, _context);
+        }
     }
 
     public void Visit(
         InvalidStepNode node)
     {
-        throw new NotImplementedException();
+        foreach (var rule in _rules.InvalidStepRules)
+        {
+            rule.Validate(node, _context);
+        }
     }
 
     // Fields
@@ -113,30 +124,36 @@ internal sealed class ValidationVisitor(
     public void Visit(
         BooleanLiteralExpressionNode node)
     {
-        throw new NotImplementedException();
+        // No validation rules for boolean literals yet.
     }
 
     public void Visit(
         IntegerLiteralExpressionNode node)
     {
-        throw new NotImplementedException();
+        // No validation rules for integer literals yet.
     }
 
     public void Visit(
         StringLiteralExpressionNode node)
     {
-        throw new NotImplementedException();
+        // No validation rules for plain string literals yet.
     }
 
     public void Visit(
         InterpolatedStringExpressionNode node)
     {
-        throw new NotImplementedException();
+        foreach (var part in node.Parts)
+        {
+            part.Accept(this);
+        }
     }
 
     public void Visit(
         VariableExpressionNode node)
     {
-        throw new NotImplementedException();
+        foreach (var rule in _rules.VariableRules)
+        {
+            rule.Validate(node, _context);
+        }
     }
 }

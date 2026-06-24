@@ -53,10 +53,14 @@ public sealed class FieldTrackerTests
             "first",
             secondResult);
 
-        DiagnosticAssert.Single(
+        var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
             "steps");
+
+        DiagnosticAssert.SingleRelatedLocation(
+            diagnostic,
+            "First declaration is here.");
     }
 
     [Fact]

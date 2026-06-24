@@ -202,10 +202,14 @@ public sealed class StepParserTests
 
         var result = _parser.Parse(context);
 
-        DiagnosticAssert.Single(
+        var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
             field);
+
+        DiagnosticAssert.SingleRelatedLocation(
+            diagnostic,
+            "First declaration is here.");
 
         AssertFirstFieldValue(
             result,
@@ -230,10 +234,14 @@ public sealed class StepParserTests
 
         var result = _parser.Parse(context);
 
-        DiagnosticAssert.Single(
+        var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
             "CONFIGURATION");
+
+        DiagnosticAssert.SingleRelatedLocation(
+            diagnostic,
+            "First declaration is here.");
 
         var scriptStep = Assert.IsType<ScriptStepNode>(result);
 
@@ -264,10 +272,14 @@ public sealed class StepParserTests
 
         var result = _parser.Parse(context);
 
-        DiagnosticAssert.Single(
+        var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
             "configuration");
+
+        DiagnosticAssert.SingleRelatedLocation(
+            diagnostic,
+            "First declaration is here.");
 
         var templateStep = Assert.IsType<TemplateStepNode>(result);
 
