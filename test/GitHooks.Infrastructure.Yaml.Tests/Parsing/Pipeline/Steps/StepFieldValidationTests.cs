@@ -2,6 +2,7 @@ using GitHooks.Diagnostics;
 using GitHooks.Domain.Syntax;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
 using GitHooks.Testing.Ast;
+using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Steps;
@@ -11,7 +12,7 @@ public sealed class StepFieldValidationTests
     [Fact]
     public void ValidateScriptStep_ValidFields_DoesNotReportDiagnostic()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var step = new StepFields
         {
@@ -38,7 +39,9 @@ public sealed class StepFieldValidationTests
     public void ValidateScriptStep_InvalidField_ReportsDiagnostic(
         string field)
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var document = TestSourceDocument.Default;
+
+        var context = TestParsingContextFactory.CreateEmpty(document);
 
         var step = new StepFields
         {
@@ -54,6 +57,7 @@ public sealed class StepFieldValidationTests
         DiagnosticAssert.Single(
             context.Diagnostics,
             DiagnosticDescriptors.InvalidStepField,
+            TestSourceSpan.Create(document),
             field,
             "script");
     }
@@ -61,7 +65,9 @@ public sealed class StepFieldValidationTests
     [Fact]
     public void ValidateScriptStep_MultipleInvalidFields_ReportsDiagnostic()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var document = TestSourceDocument.Default;
+
+        var context = TestParsingContextFactory.CreateEmpty(document);
 
         var step = new StepFields
         {
@@ -83,12 +89,14 @@ public sealed class StepFieldValidationTests
         DiagnosticAssert.Matches(
             context.Diagnostics[0],
             DiagnosticDescriptors.InvalidStepField,
+            TestSourceSpan.Create(document),
             "template",
             "script");
 
         DiagnosticAssert.Matches(
             context.Diagnostics[1],
             DiagnosticDescriptors.InvalidStepField,
+            TestSourceSpan.Create(document),
             "parameters",
             "script");
     }
@@ -96,7 +104,7 @@ public sealed class StepFieldValidationTests
     [Fact]
     public void ValidateTemplateStep_ValidFields_DoesNotReportDiagnostic()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var step = new StepFields
         {
@@ -123,7 +131,9 @@ public sealed class StepFieldValidationTests
     public void ValidateTemplateStep_InvalidField_ReportsDiagnostic(
         string field)
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var document = TestSourceDocument.Default;
+
+        var context = TestParsingContextFactory.CreateEmpty(document);
 
         var step = new StepFields
         {
@@ -139,6 +149,7 @@ public sealed class StepFieldValidationTests
         DiagnosticAssert.Single(
             context.Diagnostics,
             DiagnosticDescriptors.InvalidStepField,
+            TestSourceSpan.Create(document),
             field,
             "template");
     }
@@ -146,7 +157,9 @@ public sealed class StepFieldValidationTests
     [Fact]
     public void ValidateTemplateStep_MultipleInvalidFields_ReportsDiagnostic()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var document = TestSourceDocument.Default;
+
+        var context = TestParsingContextFactory.CreateEmpty(document);
 
         var step = new StepFields
         {
@@ -168,12 +181,14 @@ public sealed class StepFieldValidationTests
         DiagnosticAssert.Matches(
             context.Diagnostics[0],
             DiagnosticDescriptors.InvalidStepField,
+            TestSourceSpan.Create(document),
             "displayName",
             "template");
 
         DiagnosticAssert.Matches(
             context.Diagnostics[1],
             DiagnosticDescriptors.InvalidStepField,
+            TestSourceSpan.Create(document),
             "env",
             "template");
     }

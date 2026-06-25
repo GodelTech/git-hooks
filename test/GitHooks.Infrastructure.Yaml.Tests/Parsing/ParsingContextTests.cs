@@ -1,6 +1,7 @@
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
+using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
@@ -36,7 +37,7 @@ public sealed class ParsingContextTests
     }
 
     [Fact]
-    public void Constructor_NullSourceDocument_Throws()
+    public void Constructor_NullDocument_Throws()
     {
         var exception =
             Assert.Throws<ArgumentNullException>(
@@ -45,7 +46,7 @@ public sealed class ParsingContextTests
                     null!));
 
         Assert.Equal(
-            "sourceDocument",
+            "document",
             exception.ParamName);
     }
 
@@ -76,20 +77,25 @@ public sealed class ParsingContextTests
     [Fact]
     public void Report_AddsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
         var context =
             new ParsingContext(
                 "{}",
-                new SourceDocument("test.yaml"));
+                document);
+
+        var span = TestSourceSpan.Create(document, 1, 2, 3, 4);
 
         context.Report(
             Diagnostic.Create(
                 DiagnosticDescriptors.InvalidYaml,
-                SourceSpan.Unknown,
+                span,
                 "Test"));
 
         DiagnosticAssert.Single(
             context.Diagnostics,
             DiagnosticDescriptors.InvalidYaml,
+            span,
             "Test");
     }
 }

@@ -4,9 +4,8 @@ using GitHooks.Diagnostics;
 using GitHooks.Infrastructure.Yaml.Parsing.Fields;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 using GitHooks.Testing.Ast;
+using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
-
-using YamlDotNet.Core.Events;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Fields;
 
@@ -50,7 +49,8 @@ public sealed class FieldParserTests
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseStringKeyField(
                     null!,
-                    TestParserFactory.CreateDummyContext()));
+                    TestParsingContextFactory.CreateEmpty(
+                        TestSourceDocument.Default)));
 
         Assert.Equal(
             "key",
@@ -60,10 +60,12 @@ public sealed class FieldParserTests
     [Fact]
     public void ParseStringKeyField_WithNullContext_Throws()
     {
+        var key = TestScalar.Create("test");
+
         var exception =
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseStringKeyField(
-                    new Scalar("test"),
+                    key,
                     null!));
 
         Assert.Equal(
@@ -78,7 +80,8 @@ public sealed class FieldParserTests
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseSequenceField(
                     null!,
-                    TestParserFactory.CreateDummyContext()));
+                    TestParsingContextFactory.CreateEmpty(
+                        TestSourceDocument.Default)));
 
         Assert.Equal(
             "key",
@@ -88,10 +91,12 @@ public sealed class FieldParserTests
     [Fact]
     public void ParseSequenceField_WithNullContext_Throws()
     {
+        var key = TestScalar.Create("values");
+
         var exception =
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseSequenceField(
-                    new Scalar("values"),
+                    key,
                     null!));
 
         Assert.Equal(
@@ -106,7 +111,8 @@ public sealed class FieldParserTests
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseMappingField(
                     null!,
-                    TestParserFactory.CreateDummyContext()));
+                    TestParsingContextFactory.CreateEmpty(
+                        TestSourceDocument.Default)));
 
         Assert.Equal(
             "key",
@@ -116,10 +122,12 @@ public sealed class FieldParserTests
     [Fact]
     public void ParseMappingField_WithNullContext_Throws()
     {
+        var key = TestScalar.Create("env");
+
         var exception =
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseMappingField(
-                    new Scalar("env"),
+                    key,
                     null!));
 
         Assert.Equal(
@@ -198,28 +206,38 @@ public sealed class FieldParserTests
     [Fact]
     public void ParseMappingField_WithDuplicateField_ReportsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var key = TestScalar.Create("parameters");
+
+        var firstSpan = TestSourceSpan.Create(document, 1, 1, 1, 14);
+        var secondSpan = TestSourceSpan.Create(document, 2, 1, 2, 14);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 configuration: Debug
                 configuration: Release
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
         var result =
             _parser.ParseMappingField(
-                new Scalar("parameters"),
+                key,
                 context);
 
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
+            secondSpan,
             "configuration");
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.");
+            "First declaration is here.",
+            firstSpan);
 
         var field = Assert.Single(result.Fields);
 
@@ -232,18 +250,23 @@ public sealed class FieldParserTests
     [Fact]
     public void ParseMappingField_WithComplexKey_ReportsDiagnostic()
     {
-        var key = new Scalar("mapping");
+        var document = TestSourceDocument.Default;
+
+        var expectedSpan = TestSourceSpan.Create(document, 1, 3, 2, 8);
 
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 ? [1, 2]
                 : value
 
                 configuration: Release
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
+
+        var key = TestScalar.Create("mapping");
 
         var result =
             _parser.ParseMappingField(
@@ -253,6 +276,7 @@ public sealed class FieldParserTests
         DiagnosticAssert.Single(
             context.Diagnostics,
             DiagnosticDescriptors.MappingKeyMustBeScalar,
+            expectedSpan,
             key.Value);
 
         var field = Assert.Single(result.Fields);
@@ -268,7 +292,7 @@ public sealed class FieldParserTests
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
-        var key = new Scalar("test");
+        var key = TestScalar.Create("test");
 
         await ParserSnapshotVerifier.VerifyAstAsync(
             yaml,
@@ -284,7 +308,7 @@ public sealed class FieldParserTests
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
-        var key = new Scalar("values");
+        var key = TestScalar.Create("values");
 
         await ParserSnapshotVerifier.VerifyAstAsync(
             yaml,
@@ -300,7 +324,7 @@ public sealed class FieldParserTests
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
-        var key = new Scalar("mapping");
+        var key = TestScalar.Create("mapping");
 
         await ParserSnapshotVerifier.VerifyAstAsync(
             yaml,

@@ -7,25 +7,25 @@ namespace GitHooks.Infrastructure.Yaml.Parsing;
 
 internal sealed class YamlParserCursor(
     Parser parser,
-    SourceDocument sourceDocument)
+    SourceDocument document)
 {
     private readonly Parser _parser
         = parser ?? throw new ArgumentNullException(nameof(parser));
 
-    private readonly SourceDocument _sourceDocument
-        = sourceDocument ?? throw new ArgumentNullException(nameof(sourceDocument));
+    private readonly SourceDocument _document
+        = document ?? throw new ArgumentNullException(nameof(document));
 
     public static YamlParserCursor Create(
         string yaml,
-        SourceDocument sourceDocument)
+        SourceDocument document)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
-        ArgumentNullException.ThrowIfNull(sourceDocument);
+        ArgumentNullException.ThrowIfNull(document);
 
         return new(
             new Parser(
                 new StringReader(yaml)),
-            sourceDocument);
+            document);
     }
 
     public T Read<T>()
@@ -76,7 +76,7 @@ internal sealed class YamlParserCursor(
         Mark end)
     {
         return new SourceSpan(
-            _sourceDocument,
+            _document,
             new SourcePosition(
                 start.Line,
                 start.Column),
@@ -90,7 +90,7 @@ internal sealed class YamlParserCursor(
         SourceSpan end)
     {
         return new SourceSpan(
-            _sourceDocument,
+            _document,
             new SourcePosition(
                 start.Line,
                 start.Column),

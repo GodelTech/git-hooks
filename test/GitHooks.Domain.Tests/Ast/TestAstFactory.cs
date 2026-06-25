@@ -38,6 +38,8 @@ internal static class TestAstFactory
             (CreateVariableNode(), AstNodeKind.VariableExpression, nameof(VariableExpressionNode))
         ];
 
+    // todo: use ParameterNodeBuilder to create ParameterNode
+    // same for other nodes, use builders to create nodes in tests instead of this factory
     public static ParameterNode CreateParameterNode()
     {
         return new ParameterNode

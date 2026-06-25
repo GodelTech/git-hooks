@@ -1,9 +1,9 @@
 using System.Runtime.CompilerServices;
 
 using GitHooks.Diagnostics;
-using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing;
@@ -94,6 +94,10 @@ public sealed class YamlPipelineParserTests
     [Fact]
     public void Parse_InvalidYaml_ReturnsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var expectedSpan = TestSourceSpan.Create(document, 4, 1, 4, 1);
+
         var result =
             _parser.Parse(
                 """
@@ -101,13 +105,14 @@ public sealed class YamlPipelineParserTests
                   - script: test
                     invalid: [
                 """,
-                new SourceDocument("test.yaml"));
+                document);
 
         Assert.Null(result.Root);
 
         DiagnosticAssert.Single(
             result.Diagnostics,
             DiagnosticDescriptors.InvalidYaml,
+            expectedSpan,
             "While parsing a node, did not find expected node content.");
     }
 

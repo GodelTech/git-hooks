@@ -3,10 +3,12 @@ using System.Runtime.CompilerServices;
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Mappings.Parameters;
+using GitHooks.Domain.Common;
 using GitHooks.Domain.Syntax;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 using GitHooks.Testing.Ast;
+using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Parameters;
@@ -100,13 +102,21 @@ public sealed class ParameterParserTests
         string firstValue,
         string secondValue)
     {
+        ArgumentNullException.ThrowIfNull(field);
+
+        var document = TestSourceDocument.Default;
+
+        var firstSpan = CreateFieldSpan(document, 2, field);
+        var secondSpan = CreateFieldSpan(document, 3, field);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 $$"""
                 {{GetRequiredNamePrefix(field)}}
                 {{field}}: {{firstValue}}
                 {{field}}: {{secondValue}}
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -115,11 +125,13 @@ public sealed class ParameterParserTests
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
+            secondSpan,
             field);
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.");
+            "First declaration is here.",
+            firstSpan);
 
         AssertFirstFieldValue(
             result,
@@ -130,8 +142,13 @@ public sealed class ParameterParserTests
     [Fact]
     public void Parse_DuplicateValuesField_ReportsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var firstSpan = TestSourceSpan.Create(document, 2, 1, 2, 7);
+        var secondSpan = TestSourceSpan.Create(document, 5, 1, 5, 7);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 name: configuration
                 values:
@@ -139,7 +156,8 @@ public sealed class ParameterParserTests
 
                 values:
                   - Release
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -148,11 +166,13 @@ public sealed class ParameterParserTests
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
+            secondSpan,
             "values");
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.");
+            "First declaration is here.",
+            firstSpan);
 
         Assert.NotNull(result.Values);
 
@@ -166,11 +186,16 @@ public sealed class ParameterParserTests
     [Fact]
     public void Parse_MissingName_ReportsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var expectedSpan = TestSourceSpan.Create(document, 1, 1, 2, 1);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 type: string
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -178,7 +203,8 @@ public sealed class ParameterParserTests
 
         DiagnosticAssert.Single(
             context.Diagnostics,
-            DiagnosticDescriptors.ParameterNameIsRequired);
+            DiagnosticDescriptors.ParameterNameIsRequired,
+            expectedSpan);
 
         AstAssert.HasStringField(
             parameter.Name,
@@ -189,6 +215,19 @@ public sealed class ParameterParserTests
             parameter.Type!,
             "type",
             "string");
+    }
+
+    private static SourceSpan CreateFieldSpan(
+        SourceDocument document,
+        int line,
+        string field)
+    {
+        return TestSourceSpan.Create(
+            document,
+            line,
+            1,
+            line,
+            field.Length + 1);
     }
 
     private static string GetRequiredNamePrefix(

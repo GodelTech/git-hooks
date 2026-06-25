@@ -6,10 +6,12 @@ using GitHooks.Domain.Ast;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings.Steps;
+using GitHooks.Domain.Common;
 using GitHooks.Domain.Syntax;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 using GitHooks.Testing.Ast;
+using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline.Steps;
@@ -108,14 +110,15 @@ public sealed class StepParserTests
     public void Parse_ScriptStepWithNonScalarEnvKey_SkipsEntry()
     {
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 script: dotnet test
 
                 env:
                   [CONFIGURATION]: Release
                   FRAMEWORK: net10.0
-                """);
+                """,
+                TestSourceDocument.Default);
 
         context.Cursor.StartDocument();
 
@@ -190,13 +193,21 @@ public sealed class StepParserTests
         string firstValue,
         string secondValue)
     {
+        ArgumentNullException.ThrowIfNull(field);
+
+        var document = TestSourceDocument.Default;
+
+        var firstSpan = CreateFieldSpan(document, 2, field);
+        var secondSpan = CreateFieldSpan(document, 3, field);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 $$"""
                 {{GetRequiredStepTypePrefix(field)}}
                 {{field}}: {{firstValue}}
                 {{field}}: {{secondValue}}
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -205,11 +216,13 @@ public sealed class StepParserTests
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
+            secondSpan,
             field);
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.");
+            "First declaration is here.",
+            firstSpan);
 
         AssertFirstFieldValue(
             result,
@@ -220,15 +233,21 @@ public sealed class StepParserTests
     [Fact]
     public void Parse_DuplicateEnvKey_ReportsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var firstSpan = TestSourceSpan.Create(document, 4, 3, 4, 16);
+        var secondSpan = TestSourceSpan.Create(document, 5, 3, 5, 16);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 script: dotnet test
 
                 env:
                   CONFIGURATION: Debug
                   CONFIGURATION: Release
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -237,11 +256,13 @@ public sealed class StepParserTests
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
+            secondSpan,
             "CONFIGURATION");
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.");
+            "First declaration is here.",
+            firstSpan);
 
         var scriptStep = Assert.IsType<ScriptStepNode>(result);
 
@@ -258,15 +279,21 @@ public sealed class StepParserTests
     [Fact]
     public void Parse_DuplicateParameterKey_ReportsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var firstSpan = TestSourceSpan.Create(document, 4, 3, 4, 16);
+        var secondSpan = TestSourceSpan.Create(document, 5, 3, 5, 16);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 template: build.yml
 
                 parameters:
                   configuration: Debug
                   configuration: Release
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -275,11 +302,13 @@ public sealed class StepParserTests
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
+            secondSpan,
             "configuration");
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.");
+            "First declaration is here.",
+            firstSpan);
 
         var templateStep = Assert.IsType<TemplateStepNode>(result);
 
@@ -296,12 +325,17 @@ public sealed class StepParserTests
     [Fact]
     public async Task Parse_ScriptAndTemplate_ReportsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var expectedSpan = TestSourceSpan.Create(document, 1, 1, 3, 1);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 script: dotnet test
                 template: build.yml
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -309,7 +343,8 @@ public sealed class StepParserTests
 
         DiagnosticAssert.Single(
             context.Diagnostics,
-            DiagnosticDescriptors.MultipleStepTypes);
+            DiagnosticDescriptors.MultipleStepTypes,
+            expectedSpan);
 
         var invalidStep = Assert.IsType<InvalidStepNode>(result);
 
@@ -319,13 +354,18 @@ public sealed class StepParserTests
     [Fact]
     public void Parse_ScriptStepWithParameters_ReportsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var expectedSpan = TestSourceSpan.Create(document, 2, 1, 4, 1);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 script: dotnet test
                 parameters:
                   configuration: Release
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -336,6 +376,7 @@ public sealed class StepParserTests
         DiagnosticAssert.Single(
             context.Diagnostics,
             DiagnosticDescriptors.InvalidStepField,
+            expectedSpan,
             "parameters",
             "script");
 
@@ -348,12 +389,17 @@ public sealed class StepParserTests
     [Fact]
     public void Parse_TemplateStepWithDisplayName_ReportsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var expectedSpan = TestSourceSpan.Create(document, 2, 1, 2, 19);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 template: build.yml
                 displayName: Build
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -364,6 +410,7 @@ public sealed class StepParserTests
         DiagnosticAssert.Single(
             context.Diagnostics,
             DiagnosticDescriptors.InvalidStepField,
+            expectedSpan,
             "displayName",
             "template");
 
@@ -376,11 +423,16 @@ public sealed class StepParserTests
     [Fact]
     public void Parse_MissingStepType_ReturnsInvalidStep()
     {
+        var document = TestSourceDocument.Default;
+
+        var expectedSpan = TestSourceSpan.Create(document, 1, 1, 2, 1);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 displayName: Test
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -388,7 +440,8 @@ public sealed class StepParserTests
 
         DiagnosticAssert.Single(
             context.Diagnostics,
-            DiagnosticDescriptors.MissingStepType);
+            DiagnosticDescriptors.MissingStepType,
+            expectedSpan);
 
         var invalidStep = Assert.IsType<InvalidStepNode>(step);
 
@@ -400,6 +453,19 @@ public sealed class StepParserTests
             field,
             "displayName",
             "Test");
+    }
+
+    private static SourceSpan CreateFieldSpan(
+        SourceDocument document,
+        int line,
+        string field)
+    {
+        return TestSourceSpan.Create(
+            document,
+            line,
+            1,
+            line,
+            field.Length + 1);
     }
 
     private static string GetRequiredStepTypePrefix(string field)

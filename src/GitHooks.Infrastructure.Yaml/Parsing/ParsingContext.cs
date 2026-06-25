@@ -9,16 +9,16 @@ internal sealed class ParsingContext
 
     public ParsingContext(
         string yaml,
-        SourceDocument sourceDocument)
+        SourceDocument document)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
-        ArgumentNullException.ThrowIfNull(sourceDocument);
+        ArgumentNullException.ThrowIfNull(document);
 
         _diagnostics = new DiagnosticBag();
 
         Cursor = YamlParserCursor.Create(
             yaml,
-            sourceDocument);
+            document);
     }
 
     public IReadOnlyList<Diagnostic> Diagnostics

@@ -1,6 +1,7 @@
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 using GitHooks.Testing.Ast;
+using GitHooks.Testing.Common;
 
 using YamlDotNet.Core;
 
@@ -26,8 +27,9 @@ public sealed class ParametersParserTests
     public void Parse_EmptySequence_ReturnsEmptyCollection()
     {
         var context =
-            TestParserFactory.CreateContext(
-                "[]");
+            TestParsingContextFactory.Create(
+                "[]",
+                TestSourceDocument.Default);
 
         context.Cursor.StartDocument();
 
@@ -42,14 +44,15 @@ public sealed class ParametersParserTests
     public void Parse_MultipleParameters_ReturnsParameters()
     {
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 - name: configuration
                   type: string
 
                 - name: framework
                   type: string
-                """);
+                """,
+                TestSourceDocument.Default);
 
         context.Cursor.StartDocument();
 
@@ -76,11 +79,12 @@ public sealed class ParametersParserTests
     public void Parse_NotSequence_Throws()
     {
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 name: configuration
                 type: string
-                """);
+                """,
+                TestSourceDocument.Default);
 
         context.Cursor.StartDocument();
 

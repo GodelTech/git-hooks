@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using GitHooks.Diagnostics;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Pipeline;
@@ -108,14 +109,20 @@ public sealed class PipelineParserTests
     [Fact]
     public void Parse_DuplicateParametersField_ReportsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var firstSpan = TestSourceSpan.Create(document, 1, 1, 1, 11);
+        var secondSpan = TestSourceSpan.Create(document, 2, 1, 2, 11);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 parameters: []
                 parameters: []
                 steps:
                   - script: dotnet test
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -124,25 +131,33 @@ public sealed class PipelineParserTests
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
+            secondSpan,
             "parameters");
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.");
+            "First declaration is here.",
+            firstSpan);
     }
 
     [Fact]
     public void Parse_DuplicateStepsField_ReportsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var firstSpan = TestSourceSpan.Create(document, 1, 1, 1, 6);
+        var secondSpan = TestSourceSpan.Create(document, 4, 1, 4, 6);
+
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 steps:
                   - script: dotnet test
 
                 steps:
                   - script: dotnet build
-                """);
+                """,
+                document);
 
         context.Cursor.StartDocument();
 
@@ -151,11 +166,13 @@ public sealed class PipelineParserTests
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
+            secondSpan,
             "steps");
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.");
+            "First declaration is here.",
+            firstSpan);
     }
 
     private async Task VerifyAstAsync(

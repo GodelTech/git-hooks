@@ -1,4 +1,3 @@
-using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
 using GitHooks.Infrastructure.Yaml.Parsing.Fields;
@@ -10,22 +9,6 @@ namespace GitHooks.Infrastructure.Yaml.Tests;
 
 internal static class TestParserFactory
 {
-    public static ParsingContext CreateContext(
-        string yaml,
-        SourceDocument? sourceDocument = null)
-    {
-        return new ParsingContext(
-            yaml,
-            sourceDocument ?? new SourceDocument("test.yaml"));
-    }
-
-    public static ParsingContext CreateDummyContext()
-    {
-        return new ParsingContext(
-            "{}",
-            new SourceDocument("test.yaml"));
-    }
-
     public static YamlPipelineParser CreateYamlPipelineParser()
     {
         // expressions

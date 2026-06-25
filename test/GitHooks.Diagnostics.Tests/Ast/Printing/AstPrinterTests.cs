@@ -6,6 +6,7 @@ using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Common;
 using GitHooks.Testing.Ast;
 using GitHooks.Testing.Ast.Builders;
+using GitHooks.Testing.Common;
 
 namespace GitHooks.Diagnostics.Tests.Ast.Printing;
 
@@ -152,6 +153,7 @@ public sealed class AstPrinterTests
     public async Task Print_UnknownSourceSpan()
     {
         var pipeline = new PipelineNodeBuilder()
+            .WithSpan(TestSourceSpan.Unknown)
             .Build();
 
         await VerifyAstAsync(

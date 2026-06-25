@@ -15,14 +15,14 @@ internal sealed class YamlPipelineParser(
 
     public YamlParserResult Parse(
         string yaml,
-        SourceDocument sourceDocument)
+        SourceDocument document)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
-        ArgumentNullException.ThrowIfNull(sourceDocument);
+        ArgumentNullException.ThrowIfNull(document);
 
         var context = new ParsingContext(
             yaml,
-            sourceDocument);
+            document);
 
         try
         {

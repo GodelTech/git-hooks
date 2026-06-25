@@ -1,5 +1,6 @@
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
+using GitHooks.Testing.Common;
 
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -23,7 +24,7 @@ public sealed class YamlParserCursorTests
     }
 
     [Fact]
-    public void Constructor_NullSourceDocument_Throws()
+    public void Constructor_NullDocument_Throws()
     {
         var exception =
             Assert.Throws<ArgumentNullException>(
@@ -32,7 +33,7 @@ public sealed class YamlParserCursorTests
                     null!));
 
         Assert.Equal(
-            "sourceDocument",
+            "document",
             exception.ParamName);
     }
 
@@ -65,7 +66,7 @@ public sealed class YamlParserCursorTests
     }
 
     [Fact]
-    public void Create_NullSourceDocument_Throws()
+    public void Create_NullDocument_Throws()
     {
         var exception =
             Assert.Throws<ArgumentNullException>(
@@ -74,14 +75,14 @@ public sealed class YamlParserCursorTests
                     null!));
 
         Assert.Equal(
-            "sourceDocument",
+            "document",
             exception.ParamName);
     }
 
     [Fact]
     public void Read_ExpectedEvent_ReturnsEvent()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var result = context.Cursor.Read<StreamStart>();
 
@@ -91,7 +92,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Read_UnexpectedEvent_Throws()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var exception =
             Assert.Throws<YamlException>(
@@ -105,7 +106,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Is_CurrentEventMatches_ReturnsTrue()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         Assert.True(context.Cursor.Is<StreamStart>());
     }
@@ -113,7 +114,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Is_CurrentEventDoesNotMatch_ReturnsFalse()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         Assert.False(context.Cursor.Is<MappingStart>());
     }
@@ -173,7 +174,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CreateSpan_WithNullYamlException_Throws()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var exception =
             Assert.Throws<ArgumentNullException>(
@@ -188,7 +189,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CreateSpan_WithYamlException_ReturnsSpan()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var exception =
             new YamlException(
@@ -213,12 +214,14 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CreateSpan_WithMarks_ReturnsSpan()
     {
+        var document = new SourceDocument("test.yaml");
+
+        var context = TestParsingContextFactory.CreateEmpty(document);
+
         var expectedSpan = new SourceSpan(
-            new SourceDocument("test.yaml"),
+            document,
             new SourcePosition(2, 3),
             new SourcePosition(5, 6));
-
-        var context = TestParserFactory.CreateDummyContext();
 
         var result =
             context.Cursor.CreateSpan(
@@ -233,7 +236,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CurrentSpan_AtEnd_ReturnsUnknown()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         _ = context.Cursor.Read<StreamStart>();
         _ = context.Cursor.Read<DocumentStart>();
@@ -248,7 +251,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CurrentSpan_WhenCurrentEventExists_ReturnsKnownPosition()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         _ = context.Cursor.Read<StreamStart>();
 
@@ -258,7 +261,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CreateException_ReturnsYamlException()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var exception =
             context.Cursor.CreateException(
@@ -272,10 +275,11 @@ public sealed class YamlParserCursorTests
     private static (ParsingContext Context, MappingStart Start, MappingEnd End) CreateMappingContext()
     {
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 key: value
-                """);
+                """,
+                TestSourceDocument.Default);
 
         _ = context.Cursor.Read<StreamStart>();
         _ = context.Cursor.Read<DocumentStart>();

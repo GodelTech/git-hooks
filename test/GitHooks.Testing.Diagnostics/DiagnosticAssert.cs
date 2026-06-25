@@ -1,4 +1,6 @@
 using GitHooks.Diagnostics;
+using GitHooks.Domain.Common;
+using GitHooks.Testing.Common;
 
 namespace GitHooks.Testing.Diagnostics;
 
@@ -23,6 +25,7 @@ public static class DiagnosticAssert
     public static Diagnostic Single(
         DiagnosticBag diagnostics,
         DiagnosticDescriptor descriptor,
+        SourceSpan span,
         params object?[] arguments)
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
@@ -30,12 +33,14 @@ public static class DiagnosticAssert
         return Single(
             diagnostics.Diagnostics,
             descriptor,
+            span,
             arguments);
     }
 
     public static Diagnostic Single(
         IReadOnlyList<Diagnostic> diagnostics,
         DiagnosticDescriptor descriptor,
+        SourceSpan span,
         params object?[] arguments)
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
@@ -46,6 +51,7 @@ public static class DiagnosticAssert
         Matches(
             diagnostic,
             descriptor,
+            span,
             arguments);
 
         return diagnostic;
@@ -54,6 +60,7 @@ public static class DiagnosticAssert
     public static Diagnostic SingleWithRelatedLocations(
         DiagnosticBag diagnostics,
         DiagnosticDescriptor descriptor,
+        SourceSpan span,
         params object?[] arguments)
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
@@ -61,12 +68,14 @@ public static class DiagnosticAssert
         return SingleWithRelatedLocations(
             diagnostics.Diagnostics,
             descriptor,
+            span,
             arguments);
     }
 
     public static Diagnostic SingleWithRelatedLocations(
         IReadOnlyList<Diagnostic> diagnostics,
         DiagnosticDescriptor descriptor,
+        SourceSpan span,
         params object?[] arguments)
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
@@ -77,6 +86,7 @@ public static class DiagnosticAssert
         MatchesWithRelatedLocations(
             diagnostic,
             descriptor,
+            span,
             arguments);
 
         return diagnostic;
@@ -85,6 +95,7 @@ public static class DiagnosticAssert
     public static void Matches(
         Diagnostic diagnostic,
         DiagnosticDescriptor descriptor,
+        SourceSpan span,
         params object?[] arguments)
     {
         ArgumentNullException.ThrowIfNull(diagnostic);
@@ -93,6 +104,7 @@ public static class DiagnosticAssert
         MatchesCore(
             diagnostic,
             descriptor,
+            span,
             arguments);
 
         Assert.Empty(diagnostic.RelatedLocations);
@@ -101,6 +113,7 @@ public static class DiagnosticAssert
     public static void MatchesWithRelatedLocations(
         Diagnostic diagnostic,
         DiagnosticDescriptor descriptor,
+        SourceSpan span,
         params object?[] arguments)
     {
         ArgumentNullException.ThrowIfNull(diagnostic);
@@ -109,6 +122,7 @@ public static class DiagnosticAssert
         MatchesCore(
             diagnostic,
             descriptor,
+            span,
             arguments);
 
         Assert.NotEmpty(diagnostic.RelatedLocations);
@@ -116,7 +130,8 @@ public static class DiagnosticAssert
 
     public static DiagnosticLocation SingleRelatedLocation(
         Diagnostic diagnostic,
-        string message)
+        string message,
+        SourceSpan span)
     {
         ArgumentNullException.ThrowIfNull(diagnostic);
 
@@ -126,17 +141,26 @@ public static class DiagnosticAssert
             message,
             relatedLocation.Message);
 
+        SourceSpanAssert.Equal(
+            span,
+            relatedLocation.Span);
+
         return relatedLocation;
     }
 
     private static void MatchesCore(
         Diagnostic diagnostic,
         DiagnosticDescriptor descriptor,
+        SourceSpan span,
         params object?[] arguments)
     {
         Assert.Equal(
             descriptor,
             diagnostic.Descriptor);
+
+        SourceSpanAssert.Equal(
+            span,
+            diagnostic.Span);
 
         Assert.Equal(
             arguments,

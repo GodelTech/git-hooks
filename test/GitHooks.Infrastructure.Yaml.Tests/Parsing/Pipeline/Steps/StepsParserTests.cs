@@ -1,6 +1,7 @@
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Common;
 
 using YamlDotNet.Core;
 
@@ -26,8 +27,9 @@ public sealed class StepsParserTests
     public void Parse_EmptySequence_ReturnsEmptyCollection()
     {
         var context =
-            TestParserFactory.CreateContext(
-                "[]");
+            TestParsingContextFactory.Create(
+                "[]",
+                TestSourceDocument.Default);
 
         context.Cursor.StartDocument();
 
@@ -42,13 +44,14 @@ public sealed class StepsParserTests
     public void Parse_MultipleSteps_ReturnsSteps()
     {
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 - script: dotnet test
                   displayName: Test
 
                 - template: build.yml
-                """);
+                """,
+                TestSourceDocument.Default);
 
         context.Cursor.StartDocument();
 
@@ -66,11 +69,12 @@ public sealed class StepsParserTests
     public void Parse_NotSequence_Throws()
     {
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 script: dotnet test
                 displayName: Test
-                """);
+                """,
+                TestSourceDocument.Default);
 
         context.Cursor.StartDocument();
 

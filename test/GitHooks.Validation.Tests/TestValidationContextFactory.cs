@@ -2,9 +2,9 @@ using GitHooks.Diagnostics;
 
 namespace GitHooks.Validation.Tests;
 
-internal static class TestValidationFactory
+internal static class TestValidationContextFactory
 {
-    public static ValidationContext CreateContext(
+    public static ValidationContext Create(
         out DiagnosticBag diagnostics)
     {
         diagnostics = new DiagnosticBag();

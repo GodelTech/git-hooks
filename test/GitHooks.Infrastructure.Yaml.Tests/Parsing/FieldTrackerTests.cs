@@ -3,6 +3,7 @@ using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Values;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 
 using YamlDotNet.Core.Events;
@@ -29,18 +30,24 @@ public sealed class FieldTrackerTests
     [Fact]
     public void ReadFirst_DuplicateField_ReportsDiagnosticAndKeepsCurrentValue()
     {
-        var context = TestParserFactory.CreateDummyContext();
+        var document = TestSourceDocument.Default;
 
-        var key = new Scalar("steps");
+        var context = TestParsingContextFactory.CreateEmpty(document);
+
+        var firstSpan = TestSourceSpan.Create(document, 1, 2, 3, 4);
+        var secondSpan = TestSourceSpan.Create(document, 5, 6, 7, 8);
+
+        var firstKey = TestScalar.Create("steps", firstSpan);
+        var secondKey = TestScalar.Create("steps", secondSpan);
 
         var firstResult = _fieldTracker.ReadFirst(
-            key,
+            firstKey,
             context,
             "current",
             static _ => "first");
 
         var secondResult = _fieldTracker.ReadFirst(
-            key,
+            secondKey,
             context,
             firstResult,
             static _ => "second");
@@ -56,11 +63,13 @@ public sealed class FieldTrackerTests
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
+            secondSpan,
             "steps");
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.");
+            "First declaration is here.",
+            firstSpan);
     }
 
     [Fact]
@@ -73,14 +82,17 @@ public sealed class FieldTrackerTests
     [Fact]
     public void AddUnknownField_AddsField()
     {
+        var key = TestScalar.Create("custom");
+
         var context =
-            TestParserFactory.CreateContext(
-                "value");
+            TestParsingContextFactory.Create(
+                "value",
+                TestSourceDocument.Default);
 
         context.Cursor.StartDocument();
 
         _fieldTracker.AddUnknownField(
-            new Scalar("custom"),
+            key,
             context);
 
         var fields = _fieldTracker.GetUnknownFields();
@@ -98,11 +110,12 @@ public sealed class FieldTrackerTests
     public void AddUnknownField_WithComplexKey_AddsField()
     {
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 ? [1, 2]
                 : value
-                """);
+                """,
+                TestSourceDocument.Default);
 
         context.Cursor.StartDocument();
 

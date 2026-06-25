@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 
 using GitHooks.Infrastructure.Yaml.Parsing.Fields;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Common;
 
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -20,7 +21,8 @@ public sealed class FieldValueParserTests
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseStringKeyField(
                     null!,
-                    TestParserFactory.CreateDummyContext()));
+                    TestParsingContextFactory.CreateEmpty(
+                        TestSourceDocument.Default)));
 
         Assert.Equal(
             "key",
@@ -30,7 +32,7 @@ public sealed class FieldValueParserTests
     [Fact]
     public void ParseStringKeyField_WithNullContext_Throws()
     {
-        var key = new Scalar("test");
+        var key = TestScalar.Create("test");
 
         var exception =
             Assert.Throws<ArgumentNullException>(
@@ -120,10 +122,11 @@ public sealed class FieldValueParserTests
     public void ParseComplexKeyField_WithUnsupportedNode_Throws()
     {
         var context =
-            TestParserFactory.CreateContext(
+            TestParsingContextFactory.Create(
                 """
                 test
-                """);
+                """,
+                TestSourceDocument.Default);
 
         context.Cursor.StartDocument();
 
@@ -143,7 +146,7 @@ public sealed class FieldValueParserTests
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
-        var key = new Scalar("test");
+        var key = TestScalar.Create("test");
 
         await ParserSnapshotVerifier.VerifyAstAsync(
             yaml,

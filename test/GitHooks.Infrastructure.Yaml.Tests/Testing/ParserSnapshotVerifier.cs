@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using GitHooks.Domain.Ast;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
+using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 using GitHooks.Testing.Diagnostics.Ast;
 
@@ -67,7 +68,9 @@ internal static class ParserSnapshotVerifier
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentNullException.ThrowIfNull(parseFunc);
 
-        var context = TestParserFactory.CreateContext(yaml);
+        var context = TestParsingContextFactory.Create(
+            yaml,
+            TestSourceDocument.Default);
 
         context.Cursor.StartDocument();
 
