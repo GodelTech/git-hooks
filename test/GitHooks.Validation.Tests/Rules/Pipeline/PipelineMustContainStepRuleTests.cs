@@ -1,5 +1,5 @@
 using GitHooks.Diagnostics;
-using GitHooks.Testing.Ast.Builders;
+using GitHooks.Testing.Ast.Builders.Mappings;
 using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 using GitHooks.Validation.Rules.Pipeline;
@@ -38,7 +38,8 @@ public sealed class PipelineMustContainStepRuleTests
         var context = TestValidationContextFactory.Create(out var diagnostics);
 
         var pipeline = new PipelineNodeBuilder()
-            .WithScriptStep()
+            .WithScriptStep(x => x
+                .WithScript("dotnet test"))
             .Build();
 
         _rule.Validate(pipeline, context);

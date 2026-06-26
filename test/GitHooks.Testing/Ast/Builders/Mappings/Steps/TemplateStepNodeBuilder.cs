@@ -2,66 +2,50 @@ using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Common;
+using GitHooks.Testing.Ast.Builders.Fields;
 
-namespace GitHooks.Testing.Ast.Builders;
+namespace GitHooks.Testing.Ast.Builders.Mappings.Steps;
 
 public sealed class TemplateStepNodeBuilder
-    : MappingNodeBuilder<TemplateStepNodeBuilder>
+    : StepNodeBuilder<TemplateStepNodeBuilder, TemplateStepNode>
 {
     private readonly List<StringKeyFieldNode<ExpressionNode>> _parameters = [];
 
     private StringKeyFieldNode<ExpressionNode>? _template;
 
-    public TemplateStepNodeBuilder()
+    public TemplateStepNodeBuilder WithTemplate(
+        Action<StringKeyFieldNodeBuilder> configure)
     {
-        WithTemplate("build.yml");
+        _template = Configure(configure).Build();
+
+        return Self;
     }
 
     public TemplateStepNodeBuilder WithTemplate(
-        string template = "build.yml")
+        string template)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(template);
-
-        _template = TestFields.StringKey(
-            "template",
-            template);
-
-        return this;
+        return WithTemplate(x => x
+            .WithKey("template")
+            .WithStringValue(v => v.WithValue(template)));
     }
 
     public TemplateStepNodeBuilder WithParameter(
-        string name,
-        ExpressionNode value)
+        Action<StringKeyFieldNodeBuilder> configure)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        ArgumentNullException.ThrowIfNull(value);
-
-        _parameters.Add(
-            new StringKeyFieldNode<ExpressionNode>
-            {
-                Key = name,
-                Value = value,
-                Span = SourceSpan.Unknown
-            });
-
-        return this;
+        return WithParameter(
+            Configure(configure).Build());
     }
 
     public TemplateStepNodeBuilder WithParameter(
-        string name,
+        string key,
         string value)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        ArgumentException.ThrowIfNullOrWhiteSpace(value);
-
-        WithParameter(
-            name,
-            TestExpressions.String(value));
-
-        return this;
+        return WithParameter(x => x
+            .WithKey(key)
+            .WithStringValue(v => v.WithValue(value)));
     }
 
-    public TemplateStepNode Build()
+    public override TemplateStepNode Build()
     {
         if (_template is null)
         {
@@ -83,5 +67,13 @@ public sealed class TemplateStepNodeBuilder
             UnknownFields = [.. UnknownFields],
             Span = Span
         };
+    }
+
+    private TemplateStepNodeBuilder WithParameter(
+        StringKeyFieldNode<ExpressionNode> parameter)
+    {
+        _parameters.Add(parameter);
+
+        return Self;
     }
 }

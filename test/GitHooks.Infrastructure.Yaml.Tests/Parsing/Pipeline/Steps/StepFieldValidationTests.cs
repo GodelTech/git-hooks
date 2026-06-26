@@ -1,7 +1,7 @@
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Syntax;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
-using GitHooks.Testing.Ast;
+using GitHooks.Testing.Ast.Builders.Fields;
 using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 
@@ -16,14 +16,17 @@ public sealed class StepFieldValidationTests
 
         var step = new StepFields
         {
-            Script = TestFields.StringKey("script"),
-            DisplayName = TestFields.StringKey("displayName"),
-            Condition = TestFields.StringKey("condition"),
-            TimeoutInMinutes = TestFields.StringKey("timeoutInMinutes"),
-            WorkingDirectory = TestFields.StringKey("workingDirectory"),
-            Env = TestFields.Mapping(
-                "env",
-                TestFields.StringKey("KEY"))
+            Script = StringKeyFieldNodeBuilder.Create("script"),
+            DisplayName = StringKeyFieldNodeBuilder.Create("displayName"),
+            Condition = StringKeyFieldNodeBuilder.Create("condition"),
+            TimeoutInMinutes = StringKeyFieldNodeBuilder.Create("timeoutInMinutes"),
+            WorkingDirectory = StringKeyFieldNodeBuilder.Create("workingDirectory"),
+            Env = new MappingFieldNodeBuilder()
+                .WithKey("env")
+                .WithStringKeyField(x => x
+                    .WithKey("KEY")
+                    .WithValue("test"))
+                .Build()
         };
 
         StepFieldValidation.ValidateScriptStep(
@@ -45,7 +48,7 @@ public sealed class StepFieldValidationTests
 
         var step = new StepFields
         {
-            Script = TestFields.StringKey("script")
+            Script = StringKeyFieldNodeBuilder.Create("script")
         };
 
         SetField(step, field);
@@ -71,11 +74,14 @@ public sealed class StepFieldValidationTests
 
         var step = new StepFields
         {
-            Script = TestFields.StringKey("script"),
-            Template = TestFields.StringKey("template"),
-            Parameters = TestFields.Mapping(
-                "parameters",
-                TestFields.StringKey("Configuration"))
+            Script = StringKeyFieldNodeBuilder.Create("script"),
+            Template = StringKeyFieldNodeBuilder.Create("template"),
+            Parameters = new MappingFieldNodeBuilder()
+                .WithKey("parameters")
+                .WithStringKeyField(x => x
+                    .WithKey("Configuration")
+                    .WithValue("test"))
+                .Build()
         };
 
         StepFieldValidation.ValidateScriptStep(
@@ -108,10 +114,13 @@ public sealed class StepFieldValidationTests
 
         var step = new StepFields
         {
-            Template = TestFields.StringKey("template"),
-            Parameters = TestFields.Mapping(
-                "parameters",
-                TestFields.StringKey("Configuration"))
+            Template = StringKeyFieldNodeBuilder.Create("template"),
+            Parameters = new MappingFieldNodeBuilder()
+                .WithKey("parameters")
+                .WithStringKeyField(x => x
+                    .WithKey("Configuration")
+                    .WithValue("test"))
+                .Build()
         };
 
         StepFieldValidation.ValidateTemplateStep(
@@ -137,7 +146,7 @@ public sealed class StepFieldValidationTests
 
         var step = new StepFields
         {
-            Template = TestFields.StringKey("template")
+            Template = StringKeyFieldNodeBuilder.Create("template")
         };
 
         SetField(step, field);
@@ -163,11 +172,14 @@ public sealed class StepFieldValidationTests
 
         var step = new StepFields
         {
-            Template = TestFields.StringKey("template"),
-            DisplayName = TestFields.StringKey("displayName"),
-            Env = TestFields.Mapping(
-                "env",
-                TestFields.StringKey("KEY"))
+            Template = StringKeyFieldNodeBuilder.Create("template"),
+            DisplayName = StringKeyFieldNodeBuilder.Create("displayName"),
+            Env = new MappingFieldNodeBuilder()
+                .WithKey("env")
+                .WithStringKeyField(x => x
+                    .WithKey("KEY")
+                    .WithValue("test"))
+                .Build()
         };
 
         StepFieldValidation.ValidateTemplateStep(
@@ -200,39 +212,45 @@ public sealed class StepFieldValidationTests
         switch (field)
         {
             case StepFieldNames.Script:
-                step.Script = TestFields.StringKey("script");
+                step.Script = StringKeyFieldNodeBuilder.Create("script");
                 break;
 
             case StepFieldNames.Template:
-                step.Template = TestFields.StringKey("template");
+                step.Template = StringKeyFieldNodeBuilder.Create("template");
                 break;
 
             case StepFieldNames.DisplayName:
-                step.DisplayName = TestFields.StringKey("displayName");
+                step.DisplayName = StringKeyFieldNodeBuilder.Create("displayName");
                 break;
 
             case StepFieldNames.Condition:
-                step.Condition = TestFields.StringKey("condition");
+                step.Condition = StringKeyFieldNodeBuilder.Create("condition");
                 break;
 
             case StepFieldNames.TimeoutInMinutes:
-                step.TimeoutInMinutes = TestFields.StringKey("timeoutInMinutes");
+                step.TimeoutInMinutes = StringKeyFieldNodeBuilder.Create("timeoutInMinutes");
                 break;
 
             case StepFieldNames.WorkingDirectory:
-                step.WorkingDirectory = TestFields.StringKey("workingDirectory");
+                step.WorkingDirectory = StringKeyFieldNodeBuilder.Create("workingDirectory");
                 break;
 
             case StepFieldNames.Env:
-                step.Env = TestFields.Mapping(
-                    "env",
-                    TestFields.StringKey("KEY"));
+                step.Env = new MappingFieldNodeBuilder()
+                    .WithKey("env")
+                    .WithStringKeyField(x => x
+                        .WithKey("KEY")
+                        .WithValue("test"))
+                    .Build();
                 break;
 
             case StepFieldNames.Parameters:
-                step.Parameters = TestFields.Mapping(
-                    "parameters",
-                    TestFields.StringKey("Configuration"));
+                step.Parameters = new MappingFieldNodeBuilder()
+                    .WithKey("parameters")
+                    .WithStringKeyField(x => x
+                        .WithKey("Configuration")
+                        .WithValue("test"))
+                    .Build();
                 break;
 
             default:

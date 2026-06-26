@@ -1,12 +1,10 @@
-using System.Runtime.CompilerServices;
-
 using GitHooks.Diagnostics.Ast.Printing;
-using GitHooks.Domain.Ast;
-using GitHooks.Domain.Ast.Mappings.Steps;
-using GitHooks.Domain.Common;
-using GitHooks.Testing.Ast;
-using GitHooks.Testing.Ast.Builders;
+using GitHooks.Testing.Ast.Builders.Expressions;
+using GitHooks.Testing.Ast.Builders.Mappings;
+using GitHooks.Testing.Ast.Builders.Mappings.Steps;
 using GitHooks.Testing.Common;
+
+using static GitHooks.Diagnostics.Tests.Ast.Printing.AstPrinterTestHelper;
 
 namespace GitHooks.Diagnostics.Tests.Ast.Printing;
 
@@ -33,9 +31,8 @@ public sealed class AstPrinterTests
             .WithParameter(x => x
                 .WithName("configuration")
                 .WithDisplayName("Build Configuration")
-                .WithValues(
-                    "Debug",
-                    "Release"))
+                .WithValue("Debug")
+                .WithValue("Release"))
             .WithScriptStep(x => x
                 .WithScript("dotnet test")
                 .WithDisplayName("Run Tests")
@@ -47,19 +44,12 @@ public sealed class AstPrinterTests
                 .WithTemplate("build.yml")
                 .WithParameter("configuration", "Release"))
             .WithUnknownField("simple", "value")
-            .WithUnknownField(
-                TestFields.ComplexKey(
-                    key: "key",
-                    value: TestValues.Sequence(
-                        [
-                            TestValues.Scalar("item1"),
-                            TestValues.Mapping(
-                                [
-                                    TestFields.StringKey(
-                                        key: "nested",
-                                        value: "value")
-                                ])
-                        ])))
+            .WithUnknownComplexKeyField(x => x
+                .WithKey("key")
+                .WithSequenceValue(s => s
+                    .WithItem("item1")
+                    .WithMappingItem(i => i
+                        .WithField("nested", "value"))))
             .Build();
 
         await VerifyAstAsync(pipeline);
@@ -78,22 +68,10 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_InvalidStep()
     {
-        var step = new InvalidStepNode
-        {
-            Fields =
-            [
-                TestFields.StringKey(
-                "displayName",
-                "Test")
-            ],
-            UnknownFields =
-            [
-                TestFields.StringKey(
-                "custom",
-                "value")
-            ],
-            Span = SourceSpan.Unknown
-        };
+        var step = new InvalidStepNodeBuilder()
+            .WithField("displayName", "Test")
+            .WithUnknownField("custom", "value")
+            .Build();
 
         await VerifyAstAsync(step);
     }
@@ -115,10 +93,7 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_IncludeSourceSpans()
     {
-        var span = new SourceSpan(
-            new SourceDocument("pipeline.yaml"),
-            new SourcePosition(1, 1),
-            new SourcePosition(1, 10));
+        var span = TestSourceSpan.Create("pipeline.yaml", 1, 1, 1, 10);
 
         var pipeline = new PipelineNodeBuilder()
             .WithSpan(span)
@@ -167,10 +142,7 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_PartiallyKnownSourceSpan()
     {
-        var span = new SourceSpan(
-            new SourceDocument("pipeline.yaml"),
-            new SourcePosition(1, -1),
-            new SourcePosition(-1, -1));
+        var span = TestSourceSpan.Create("pipeline.yaml", 1, -1, -1, -1);
 
         var pipeline = new PipelineNodeBuilder()
             .WithSpan(span)
@@ -187,7 +159,9 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_BooleanLiteral()
     {
-        var expression = TestExpressions.Boolean(true);
+        var expression = new BooleanLiteralExpressionNodeBuilder()
+            .WithValue(true)
+            .Build();
 
         await VerifyAstAsync(expression);
     }
@@ -195,24 +169,11 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_InterpolatedString()
     {
-        var expression =
-            TestExpressions.InterpolatedString(
-                TestExpressions.String("/src/"),
-                TestExpressions.Variable("parameters.project"));
+        var expression = new InterpolatedStringExpressionNodeBuilder()
+            .WithPart("/src/")
+            .WithVariablePart("parameters.project")
+            .Build();
 
         await VerifyAstAsync(expression);
-    }
-
-    private static async Task VerifyAstAsync(
-        AstNode node,
-        AstPrinterOptions? options = null,
-        [CallerMemberName] string memberName = "",
-        [CallerFilePath] string sourceFilePath = "")
-    {
-        await AstPrinterTestHelper.VerifyAstAsync(
-            node,
-            options,
-            memberName,
-            sourceFilePath);
     }
 }

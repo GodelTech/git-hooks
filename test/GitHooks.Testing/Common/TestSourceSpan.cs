@@ -24,6 +24,25 @@ public static class TestSourceSpan
                 endColumn));
     }
 
+    public static SourceSpan Create(
+        string documentName,
+        long startLine,
+        long startColumn,
+        long endLine,
+        long endColumn)
+    {
+        var document = new SourceDocument(documentName);
+
+        return new SourceSpan(
+            document,
+            new SourcePosition(
+                startLine,
+                startColumn),
+            new SourcePosition(
+                endLine,
+                endColumn));
+    }
+
     // todo: remove this as it is temp method
     public static SourceSpan Create(
         SourceDocument document)

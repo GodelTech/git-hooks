@@ -9,11 +9,11 @@ public static class SourceSpanAssert
         SourceSpan actual)
     {
         Assert.False(
-            expected == SourceSpan.Unknown,
+            expected == TestSourceSpan.Unknown,
             "Expected span must be specified explicitly.");
 
         Assert.False(
-            actual == SourceSpan.Unknown,
+            actual == TestSourceSpan.Unknown,
             "Actual span should not be Unknown.");
 
         Assert.Equal(

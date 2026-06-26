@@ -1,5 +1,4 @@
 using GitHooks.Domain.Common;
-using GitHooks.Testing.Common;
 
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -11,9 +10,7 @@ internal static class TestScalar
     public static Scalar Create(
         string value)
     {
-        return Create(
-            value,
-            TestSourceSpan.Unknown);
+        return new Scalar(value);
     }
 
     public static Scalar Create(
