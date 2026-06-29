@@ -93,7 +93,9 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_IncludeSourceSpans()
     {
-        var span = TestSourceSpan.Create("pipeline.yaml", 1, 1, 1, 10);
+        var document = TestSourceDocument.Default;
+
+        var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
 
         var pipeline = new PipelineNodeBuilder()
             .WithSpan(span)
@@ -142,7 +144,9 @@ public sealed class AstPrinterTests
     [Fact]
     public async Task Print_PartiallyKnownSourceSpan()
     {
-        var span = TestSourceSpan.Create("pipeline.yaml", 1, -1, -1, -1);
+        var document = TestSourceDocument.Default;
+
+        var span = TestSourceSpan.Create(document, 1, -1, -1, -1);
 
         var pipeline = new PipelineNodeBuilder()
             .WithSpan(span)

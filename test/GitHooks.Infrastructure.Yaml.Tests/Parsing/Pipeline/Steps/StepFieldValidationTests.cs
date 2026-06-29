@@ -1,4 +1,5 @@
 using GitHooks.Diagnostics;
+using GitHooks.Domain.Common;
 using GitHooks.Domain.Syntax;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Steps;
 using GitHooks.Testing.Ast.Builders.Fields;
@@ -51,7 +52,9 @@ public sealed class StepFieldValidationTests
             Script = StringKeyFieldNodeBuilder.Create("script")
         };
 
-        SetField(step, field);
+        var fieldSpan = TestSourceSpan.Create(document, 1, 1, 1, 10);
+
+        SetField(step, field, fieldSpan);
 
         StepFieldValidation.ValidateScriptStep(
             step,
@@ -60,7 +63,7 @@ public sealed class StepFieldValidationTests
         DiagnosticAssert.Single(
             context.Diagnostics,
             DiagnosticDescriptors.InvalidStepField,
-            TestSourceSpan.Create(document),
+            fieldSpan,
             field,
             "script");
     }
@@ -72,15 +75,23 @@ public sealed class StepFieldValidationTests
 
         var context = TestParsingContextFactory.CreateEmpty(document);
 
+        var templateSpan = TestSourceSpan.Create(document, 1, 1, 1, 10);
+        var parametersSpan = TestSourceSpan.Create(document, 2, 1, 2, 20);
+
         var step = new StepFields
         {
             Script = StringKeyFieldNodeBuilder.Create("script"),
-            Template = StringKeyFieldNodeBuilder.Create("template"),
+            Template = new StringKeyFieldNodeBuilder()
+                .WithKey("template")
+                .WithValue("template.yml")
+                .WithSpan(templateSpan)
+                .Build(),
             Parameters = new MappingFieldNodeBuilder()
                 .WithKey("parameters")
                 .WithStringKeyField(x => x
                     .WithKey("Configuration")
                     .WithValue("test"))
+                .WithSpan(parametersSpan)
                 .Build()
         };
 
@@ -95,14 +106,14 @@ public sealed class StepFieldValidationTests
         DiagnosticAssert.Matches(
             context.Diagnostics[0],
             DiagnosticDescriptors.InvalidStepField,
-            TestSourceSpan.Create(document),
+            templateSpan,
             "template",
             "script");
 
         DiagnosticAssert.Matches(
             context.Diagnostics[1],
             DiagnosticDescriptors.InvalidStepField,
-            TestSourceSpan.Create(document),
+            parametersSpan,
             "parameters",
             "script");
     }
@@ -149,7 +160,9 @@ public sealed class StepFieldValidationTests
             Template = StringKeyFieldNodeBuilder.Create("template")
         };
 
-        SetField(step, field);
+        var fieldSpan = TestSourceSpan.Create(document, 1, 1, 1, 10);
+
+        SetField(step, field, fieldSpan);
 
         StepFieldValidation.ValidateTemplateStep(
             step,
@@ -158,7 +171,7 @@ public sealed class StepFieldValidationTests
         DiagnosticAssert.Single(
             context.Diagnostics,
             DiagnosticDescriptors.InvalidStepField,
-            TestSourceSpan.Create(document),
+            fieldSpan,
             field,
             "template");
     }
@@ -170,15 +183,23 @@ public sealed class StepFieldValidationTests
 
         var context = TestParsingContextFactory.CreateEmpty(document);
 
+        var displayNameSpan = TestSourceSpan.Create(document, 1, 1, 1, 10);
+        var envSpan = TestSourceSpan.Create(document, 2, 1, 2, 20);
+
         var step = new StepFields
         {
             Template = StringKeyFieldNodeBuilder.Create("template"),
-            DisplayName = StringKeyFieldNodeBuilder.Create("displayName"),
+            DisplayName = new StringKeyFieldNodeBuilder()
+                .WithKey("displayName")
+                .WithValue("Test Display Name")
+                .WithSpan(displayNameSpan)
+                .Build(),
             Env = new MappingFieldNodeBuilder()
                 .WithKey("env")
                 .WithStringKeyField(x => x
                     .WithKey("KEY")
                     .WithValue("test"))
+                .WithSpan(envSpan)
                 .Build()
         };
 
@@ -193,46 +214,71 @@ public sealed class StepFieldValidationTests
         DiagnosticAssert.Matches(
             context.Diagnostics[0],
             DiagnosticDescriptors.InvalidStepField,
-            TestSourceSpan.Create(document),
+            displayNameSpan,
             "displayName",
             "template");
 
         DiagnosticAssert.Matches(
             context.Diagnostics[1],
             DiagnosticDescriptors.InvalidStepField,
-            TestSourceSpan.Create(document),
+            envSpan,
             "env",
             "template");
     }
 
     private static void SetField(
         StepFields step,
-        string field)
+        string field,
+        SourceSpan span)
     {
         switch (field)
         {
             case StepFieldNames.Script:
-                step.Script = StringKeyFieldNodeBuilder.Create("script");
+                step.Script = new StringKeyFieldNodeBuilder()
+                    .WithKey("script")
+                    .WithValue("echo Hello World")
+                    .WithSpan(span)
+                    .Build();
                 break;
 
             case StepFieldNames.Template:
-                step.Template = StringKeyFieldNodeBuilder.Create("template");
+                step.Template = new StringKeyFieldNodeBuilder()
+                    .WithKey("template")
+                    .WithValue("template.yml")
+                    .WithSpan(span)
+                    .Build();
                 break;
 
             case StepFieldNames.DisplayName:
-                step.DisplayName = StringKeyFieldNodeBuilder.Create("displayName");
+                step.DisplayName = new StringKeyFieldNodeBuilder()
+                    .WithKey("displayName")
+                    .WithValue("Test Display Name")
+                    .WithSpan(span)
+                    .Build();
                 break;
 
             case StepFieldNames.Condition:
-                step.Condition = StringKeyFieldNodeBuilder.Create("condition");
+                step.Condition = new StringKeyFieldNodeBuilder()
+                    .WithKey("condition")
+                    .WithValue("succeeded()")
+                    .WithSpan(span)
+                    .Build();
                 break;
 
             case StepFieldNames.TimeoutInMinutes:
-                step.TimeoutInMinutes = StringKeyFieldNodeBuilder.Create("timeoutInMinutes");
+                step.TimeoutInMinutes = new StringKeyFieldNodeBuilder()
+                    .WithKey("timeoutInMinutes")
+                    .WithValue("30")
+                    .WithSpan(span)
+                    .Build();
                 break;
 
             case StepFieldNames.WorkingDirectory:
-                step.WorkingDirectory = StringKeyFieldNodeBuilder.Create("workingDirectory");
+                step.WorkingDirectory = new StringKeyFieldNodeBuilder()
+                    .WithKey("workingDirectory")
+                    .WithValue("src/")
+                    .WithSpan(span)
+                    .Build();
                 break;
 
             case StepFieldNames.Env:
@@ -241,6 +287,7 @@ public sealed class StepFieldValidationTests
                     .WithStringKeyField(x => x
                         .WithKey("KEY")
                         .WithValue("test"))
+                    .WithSpan(span)
                     .Build();
                 break;
 
@@ -250,6 +297,7 @@ public sealed class StepFieldValidationTests
                     .WithStringKeyField(x => x
                         .WithKey("Configuration")
                         .WithValue("test"))
+                    .WithSpan(span)
                     .Build();
                 break;
 
