@@ -1,6 +1,6 @@
 using GitHooks.Domain.Ast;
 
-namespace GitHooks.Validation;
+namespace GitHooks.Validation.Rules;
 
 internal interface IValidationRule<in TNode>
     where TNode : AstNode

@@ -6,152 +6,168 @@ using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Ast.Values;
 using GitHooks.Domain.Ast.Visitors;
+using GitHooks.Validation.Rules;
 
 namespace GitHooks.Validation;
 
 internal sealed class ValidationVisitor(
-    ValidationRuleSet rules,
+    ValidationRuleRegistry rules,
     ValidationContext context)
-    : IAstCommandVisitor
+    : AstWalker
 {
-    private readonly ValidationRuleSet _rules = rules;
+    private readonly ValidationRuleRegistry _rules = rules;
     private readonly ValidationContext _context = context;
 
-    public void Visit(
+    public void Validate(
+        AstNode root)
+    {
+        Walk(root);
+    }
+
+    public override void Visit(
         PipelineNode node)
     {
-        foreach (var rule in _rules.PipelineRules)
-        {
-            rule.Validate(node, _context);
-        }
+        ApplyRules(node);
 
-        foreach (var parameter in node.Parameters)
-        {
-            parameter.Accept(this);
-        }
-
-        foreach (var step in node.Steps)
-        {
-            step.Accept(this);
-        }
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         ParameterNode node)
     {
-        foreach (var rule in _rules.ParameterRules)
-        {
-            rule.Validate(node, _context);
-        }
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         ScriptStepNode node)
     {
-        foreach (var rule in _rules.ScriptStepRules)
-        {
-            rule.Validate(node, _context);
-        }
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         TemplateStepNode node)
     {
-        foreach (var rule in _rules.TemplateStepRules)
-        {
-            rule.Validate(node, _context);
-        }
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         InvalidStepNode node)
     {
-        foreach (var rule in _rules.InvalidStepRules)
-        {
-            rule.Validate(node, _context);
-        }
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
     // Fields
-    public void Visit<TValue>(
+    public override void Visit<TValue>(
         StringKeyFieldNode<TValue> node)
-        where TValue : AstNode
     {
-        throw new NotImplementedException();
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit<TValue>(
+    public override void Visit<TValue>(
         ComplexKeyFieldNode<TValue> node)
-        where TValue : AstNode
     {
-        throw new NotImplementedException();
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit<TValue>(
+    public override void Visit<TValue>(
         SequenceFieldNode<TValue> node)
-        where TValue : AstNode
     {
-        throw new NotImplementedException();
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit<TField>(
+    public override void Visit<TField>(
         MappingFieldNode<TField> node)
-        where TField : FieldNode
     {
-        throw new NotImplementedException();
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
     // Values
-    public void Visit(
+    public override void Visit(
         ScalarNode node)
     {
-        throw new NotImplementedException();
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         SequenceNode node)
     {
-        throw new NotImplementedException();
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         MappingNode node)
     {
-        throw new NotImplementedException();
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
     // Expressions
-    public void Visit(
+    public override void Visit(
         BooleanLiteralExpressionNode node)
     {
-        // No validation rules for boolean literals yet.
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         IntegerLiteralExpressionNode node)
     {
-        // No validation rules for integer literals yet.
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         StringLiteralExpressionNode node)
     {
-        // No validation rules for plain string literals yet.
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         InterpolatedStringExpressionNode node)
     {
-        foreach (var part in node.Parts)
-        {
-            part.Accept(this);
-        }
+        ApplyRules(node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         VariableExpressionNode node)
     {
-        foreach (var rule in _rules.VariableRules)
+        ApplyRules(node);
+
+        base.Visit(node);
+    }
+
+    private void ApplyRules<TNode>(
+        TNode node)
+        where TNode : AstNode
+    {
+        foreach (var rule in _rules.GetRules<TNode>())
         {
             rule.Validate(node, _context);
         }

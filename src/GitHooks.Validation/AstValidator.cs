@@ -1,11 +1,14 @@
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast;
+using GitHooks.Validation.Rules;
+using GitHooks.Validation.Symbols;
 
 namespace GitHooks.Validation;
 
 public sealed class AstValidator
 {
-    private readonly ValidationRuleSet _rules = new();
+    private readonly ValidationRuleRegistry _rules
+        = new();
 
     public void Validate(
         AstNode root,
@@ -16,10 +19,14 @@ public sealed class AstValidator
 
         var context = new ValidationContext(diagnostics);
 
-        var visitor = new ValidationVisitor(
+        var collector = new SymbolCollector(context);
+
+        collector.Collect(root);
+
+        var validator = new ValidationVisitor(
             _rules,
             context);
 
-        root.Accept(visitor);
+        validator.Validate(root);
     }
 }

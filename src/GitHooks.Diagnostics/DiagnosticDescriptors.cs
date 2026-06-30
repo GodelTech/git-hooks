@@ -160,7 +160,7 @@ public static class DiagnosticDescriptors
         };
 
     // GH5000-GH5999 Variables
-    public static readonly DiagnosticDescriptor ParameterVariableMustBeResolvable =
+    public static readonly DiagnosticDescriptor VariableMustBeResolvableParameter =
         new()
         {
             Code = DiagnosticCode.Create(5001),

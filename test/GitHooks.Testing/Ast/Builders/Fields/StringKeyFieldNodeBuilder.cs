@@ -27,6 +27,13 @@ public sealed class StringKeyFieldNodeBuilder
         return Self;
     }
 
+    public StringKeyFieldNodeBuilder WithBooleanValue(
+        Action<BooleanLiteralExpressionNodeBuilder> configure)
+    {
+        return WithValue(
+            Configure(configure).Build());
+    }
+
     public StringKeyFieldNodeBuilder WithIntegerValue(
         Action<IntegerLiteralExpressionNodeBuilder> configure)
     {

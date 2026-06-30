@@ -11,7 +11,7 @@ using GitHooks.Domain.Ast.Visitors;
 namespace GitHooks.Diagnostics.Ast.Printing;
 
 public sealed class AstPrinter
-    : IAstCommandVisitor
+    : AstWalker
 {
     private readonly AstPrinterStringBuilder _builder;
     private readonly AstPrinterOptions _options;
@@ -30,12 +30,12 @@ public sealed class AstPrinter
 
         _builder.Clear();
 
-        VisitNode(node);
+        Walk(node);
 
         return _builder.ToString();
     }
 
-    public void Visit(
+    public override void Visit(
         PipelineNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -46,36 +46,26 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            VisitNodes(node.Parameters);
-
-            VisitNodes(node.Steps);
-
-            AppendUnknownFields(node);
+            base.Visit(node);
         }
     }
 
-    public void Visit(
+    public override void Visit(
         ParameterNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
         AppendNodeHeader(
-            $"Parameter",
+            "Parameter",
             node);
 
         using (_builder.Indent())
         {
-            VisitNode(node.Name);
-            VisitNode(node.DisplayName);
-            VisitNode(node.Type);
-            VisitNode(node.DefaultValue);
-            VisitNode(node.Values);
-
-            AppendUnknownFields(node);
+            base.Visit(node);
         }
     }
 
-    public void Visit(
+    public override void Visit(
         ScriptStepNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -86,19 +76,11 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            VisitNode(node.Script);
-            VisitNode(node.DisplayName);
-            VisitNode(node.Condition);
-            VisitNode(node.TimeoutInMinutes);
-            VisitNode(node.WorkingDirectory);
-
-            VisitNode(node.Env);
-
-            AppendUnknownFields(node);
+            base.Visit(node);
         }
     }
 
-    public void Visit(
+    public override void Visit(
         TemplateStepNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -109,15 +91,11 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            VisitNode(node.Template);
-
-            VisitNode(node.Parameters);
-
-            AppendUnknownFields(node);
+            base.Visit(node);
         }
     }
 
-    public void Visit(
+    public override void Visit(
         InvalidStepNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -128,16 +106,13 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            VisitNodes(node.Fields);
-
-            AppendUnknownFields(node);
+            base.Visit(node);
         }
     }
 
     // Fields
-    public void Visit<TValue>(
+    public override void Visit<TValue>(
         StringKeyFieldNode<TValue> node)
-        where TValue : AstNode
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -147,13 +122,12 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            VisitNode(node.Value);
+            base.Visit(node);
         }
     }
 
-    public void Visit<TValue>(
+    public override void Visit<TValue>(
         ComplexKeyFieldNode<TValue> node)
-        where TValue : AstNode
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -163,25 +137,12 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            _builder.AppendLine("Key:");
-
-            using (_builder.Indent())
-            {
-                VisitNode(node.Key);
-            }
-
-            _builder.AppendLine("Value:");
-
-            using (_builder.Indent())
-            {
-                VisitNode(node.Value);
-            }
+            base.Visit(node);
         }
     }
 
-    public void Visit<TValue>(
+    public override void Visit<TValue>(
         SequenceFieldNode<TValue> node)
-        where TValue : AstNode
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -191,13 +152,12 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            VisitNodes(node.Items);
+            base.Visit(node);
         }
     }
 
-    public void Visit<TField>(
+    public override void Visit<TField>(
         MappingFieldNode<TField> node)
-        where TField : FieldNode
     {
         ArgumentNullException.ThrowIfNull(node);
 
@@ -207,12 +167,12 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            VisitNodes(node.Fields);
+            base.Visit(node);
         }
     }
 
     // Values
-    public void Visit(
+    public override void Visit(
         ScalarNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -220,9 +180,11 @@ public sealed class AstPrinter
         AppendNodeHeader(
             $"Scalar({StringRenderer.RenderQuoted(node.Value)})",
             node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         SequenceNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -233,11 +195,11 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            VisitNodes(node.Items);
+            base.Visit(node);
         }
     }
 
-    public void Visit(
+    public override void Visit(
         MappingNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -248,12 +210,12 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            VisitNodes(node.Fields);
+            base.Visit(node);
         }
     }
 
     // Expressions
-    public void Visit(
+    public override void Visit(
         BooleanLiteralExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -261,9 +223,11 @@ public sealed class AstPrinter
         AppendNodeHeader(
             $"Boolean({node.Value})",
             node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         IntegerLiteralExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -271,9 +235,11 @@ public sealed class AstPrinter
         AppendNodeHeader(
             $"Integer({node.Value})",
             node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         StringLiteralExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -281,9 +247,11 @@ public sealed class AstPrinter
         AppendNodeHeader(
             $"String({StringRenderer.RenderQuoted(node.Value)})",
             node);
+
+        base.Visit(node);
     }
 
-    public void Visit(
+    public override void Visit(
         InterpolatedStringExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -294,11 +262,11 @@ public sealed class AstPrinter
 
         using (_builder.Indent())
         {
-            VisitNodes(node.Parts);
+            base.Visit(node);
         }
     }
 
-    public void Visit(
+    public override void Visit(
         VariableExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
@@ -306,6 +274,52 @@ public sealed class AstPrinter
         AppendNodeHeader(
             $"Variable({node.Path})",
             node);
+
+        base.Visit(node);
+    }
+
+    protected override void WalkUnknownFields(
+        PipelineNodeBase node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        if (node.UnknownFields.Count is 0)
+        {
+            return;
+        }
+
+        _builder.AppendLine("UnknownFields:");
+
+        using (_builder.Indent())
+        {
+            base.WalkUnknownFields(node);
+        }
+    }
+
+    protected override void WalkComplexFieldKey<T>(
+        ComplexKeyFieldNode<T> node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        _builder.AppendLine("Key:");
+
+        using (_builder.Indent())
+        {
+            base.WalkComplexFieldKey(node);
+        }
+    }
+
+    protected override void WalkComplexFieldValue<T>(
+        ComplexKeyFieldNode<T> node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        _builder.AppendLine("Value:");
+
+        using (_builder.Indent())
+        {
+            base.WalkComplexFieldValue(node);
+        }
     }
 
     private void AppendNodeHeader(
@@ -325,41 +339,5 @@ public sealed class AstPrinter
         }
 
         _builder.AppendLine(output);
-    }
-
-    private void AppendUnknownFields(
-        PipelineNodeBase node)
-    {
-        if (node.UnknownFields.Count is 0)
-        {
-            return;
-        }
-
-        _builder.AppendLine($"UnknownFields:");
-
-        using (_builder.Indent())
-        {
-            VisitNodes(node.UnknownFields);
-        }
-    }
-
-    private void VisitNode(
-        AstNode? node)
-    {
-        if (node is null)
-        {
-            return;
-        }
-
-        node.Accept(this);
-    }
-
-    private void VisitNodes(
-        IEnumerable<AstNode> nodes)
-    {
-        foreach (var node in nodes)
-        {
-            VisitNode(node);
-        }
     }
 }

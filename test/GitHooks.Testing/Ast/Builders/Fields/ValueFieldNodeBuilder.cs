@@ -9,7 +9,7 @@ public abstract class ValueFieldNodeBuilder<TBuilder, TNode, TValue>
     where TNode : ValueFieldNode<TValue>
     where TValue : AstNode
 {
-    protected TValue? Value { get; set; }
+    protected TValue? Value { get; private set; }
 
     protected TBuilder WithValue(
         TValue value)

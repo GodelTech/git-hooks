@@ -21,6 +21,7 @@ internal sealed partial class VariableSyntaxMustBeValidRule
         }
     }
 
+    // todo: when we create VariableReference only second part of regex will stay same as in ParameterNameMustBeValidIdentifierRule
     [GeneratedRegex(@"^parameters\.[a-zA-Z_][a-zA-Z0-9_]*$")]
     private static partial Regex ParameterVariablePattern();
 }

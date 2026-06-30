@@ -16,7 +16,7 @@ public sealed class AstNodeVisitorDispatchTests
     {
         foreach (var (node, _, expectedVisit) in TestAstFactory.NodeCases)
         {
-            var visitor = new TrackingCommandVisitor();
+            var visitor = new TestCommandVisitor();
 
             node.Accept(visitor);
 
@@ -29,7 +29,7 @@ public sealed class AstNodeVisitorDispatchTests
     {
         foreach (var (node, _, expectedVisit) in TestAstFactory.NodeCases)
         {
-            var visitor = new TrackingQueryVisitor();
+            var visitor = new TestQueryVisitor();
 
             var result = node.Accept(visitor);
 
@@ -37,7 +37,7 @@ public sealed class AstNodeVisitorDispatchTests
         }
     }
 
-    private sealed class TrackingCommandVisitor
+    private sealed class TestCommandVisitor
         : IAstCommandVisitor
     {
         public string LastVisited { get; private set; } = string.Empty;
@@ -152,7 +152,7 @@ public sealed class AstNodeVisitorDispatchTests
         }
     }
 
-    private sealed class TrackingQueryVisitor
+    private sealed class TestQueryVisitor
         : IAstQueryVisitor<string>
     {
         public string Visit(

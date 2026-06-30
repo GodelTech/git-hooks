@@ -57,6 +57,14 @@ public sealed class ParameterNodeBuilder
         return Self;
     }
 
+    public ParameterNodeBuilder WithType(
+        string type)
+    {
+        return WithType(x => x
+            .WithKey("type")
+            .WithStringValue(v => v.WithValue(type)));
+    }
+
     public ParameterNodeBuilder WithDefaultValue(
         Action<StringKeyFieldNodeBuilder> configure)
     {
