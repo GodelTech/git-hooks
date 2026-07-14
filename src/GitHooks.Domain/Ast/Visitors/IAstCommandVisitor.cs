@@ -39,7 +39,6 @@ public interface IAstCommandVisitor
 
     public void Visit(MappingNode node);
 
-    // TODO: Split expression visitors when expressions gain independent processing.
     // Expressions
     public void Visit(BooleanLiteralExpressionNode node);
 

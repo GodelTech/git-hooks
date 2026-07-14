@@ -19,8 +19,7 @@ public sealed class InvalidVariableExpressionNodeBuilder
     {
         if (_text is null)
         {
-            throw new InvalidOperationException(
-                "Text is required to build an InvalidVariableExpressionNode.");
+            throw CreateRequiredPropertyException("Text");
         }
 
         return new InvalidVariableExpressionNode()

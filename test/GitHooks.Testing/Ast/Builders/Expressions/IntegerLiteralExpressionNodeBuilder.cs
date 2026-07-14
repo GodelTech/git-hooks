@@ -20,8 +20,7 @@ public sealed class IntegerLiteralExpressionNodeBuilder
         if (_value is null ||
             !_value.HasValue)
         {
-            throw new InvalidOperationException(
-                "Value is required to build an IntegerLiteralExpressionNode.");
+            throw CreateRequiredPropertyException("Value");
         }
 
         return new IntegerLiteralExpressionNode()

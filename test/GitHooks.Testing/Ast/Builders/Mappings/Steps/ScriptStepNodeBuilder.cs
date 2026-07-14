@@ -117,8 +117,7 @@ public sealed class ScriptStepNodeBuilder
     {
         if (_script is null)
         {
-            throw new InvalidOperationException(
-                "Script is required to build a ScriptStepNode.");
+            throw CreateRequiredPropertyException("Script");
         }
 
         return new ScriptStepNode

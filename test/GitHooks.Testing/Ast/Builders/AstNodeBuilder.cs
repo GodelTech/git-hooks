@@ -37,14 +37,10 @@ public abstract class AstNodeBuilder<TBuilder, TNode>
         return builder;
     }
 
-    // todo: start using method below instead of throwing exceptions in builders
-    protected static T Require<T>(
-        T? value,
-        string name)
-        where T : class
+    protected static InvalidOperationException CreateRequiredPropertyException(
+        string parameterName)
     {
-        return value
-            ?? throw new InvalidOperationException(
-                $"{name} is required.");
+        return new InvalidOperationException(
+                $"'{parameterName}' is required to build {typeof(TNode).Name}.");
     }
 }

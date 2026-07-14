@@ -20,8 +20,7 @@ public sealed class BooleanLiteralExpressionNodeBuilder
         if (_value is null ||
             !_value.HasValue)
         {
-            throw new InvalidOperationException(
-                "Value is required to build a BooleanLiteralExpressionNode.");
+            throw CreateRequiredPropertyException("Value");
         }
 
         return new BooleanLiteralExpressionNode()

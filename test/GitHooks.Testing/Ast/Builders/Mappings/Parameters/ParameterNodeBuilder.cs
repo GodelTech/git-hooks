@@ -99,8 +99,7 @@ public sealed class ParameterNodeBuilder
     {
         if (_name is null)
         {
-            throw new InvalidOperationException(
-                "Name is required to build a ParameterNode.");
+            throw CreateRequiredPropertyException("Name");
         }
 
         return new ParameterNode

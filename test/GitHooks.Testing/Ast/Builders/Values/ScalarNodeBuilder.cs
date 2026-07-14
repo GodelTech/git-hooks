@@ -19,8 +19,7 @@ public sealed class ScalarNodeBuilder
     {
         if (_value is null)
         {
-            throw new InvalidOperationException(
-                "Value is required to build a ScalarNode.");
+            throw CreateRequiredPropertyException("Value");
         }
 
         return new ScalarNode()

@@ -29,8 +29,7 @@ public sealed class MappingFieldNodeBuilder
     {
         if (_key is null)
         {
-            throw new InvalidOperationException(
-                "Key is required to build a MappingFieldNode.");
+            throw CreateRequiredPropertyException("Key");
         }
 
         return new MappingFieldNode<StringKeyFieldNode<ExpressionNode>>

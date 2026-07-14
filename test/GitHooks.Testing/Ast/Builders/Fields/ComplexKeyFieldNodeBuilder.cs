@@ -41,14 +41,12 @@ public sealed class ComplexKeyFieldNodeBuilder
     {
         if (_key is null)
         {
-            throw new InvalidOperationException(
-                "Key is required to build a ComplexKeyFieldNode.");
+            throw CreateRequiredPropertyException("Key");
         }
 
         if (Value is null)
         {
-            throw new InvalidOperationException(
-                "Value is required to build a ComplexKeyFieldNode.");
+            throw CreateRequiredPropertyException("Value");
         }
 
         return new ComplexKeyFieldNode<AstNode>

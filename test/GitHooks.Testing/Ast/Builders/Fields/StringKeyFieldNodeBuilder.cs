@@ -65,14 +65,12 @@ public sealed class StringKeyFieldNodeBuilder
     {
         if (_key is null)
         {
-            throw new InvalidOperationException(
-                "Key is required to build a StringKeyFieldNode.");
+            throw CreateRequiredPropertyException("Key");
         }
 
         if (Value is null)
         {
-            throw new InvalidOperationException(
-                "Value is required to build a StringKeyFieldNode.");
+            throw CreateRequiredPropertyException("Value");
         }
 
         return new StringKeyFieldNode<ExpressionNode>

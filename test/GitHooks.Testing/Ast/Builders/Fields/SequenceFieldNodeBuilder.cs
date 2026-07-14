@@ -30,8 +30,7 @@ public sealed class SequenceFieldNodeBuilder
     {
         if (_key is null)
         {
-            throw new InvalidOperationException(
-                "Key is required to build a SequenceFieldNode.");
+            throw CreateRequiredPropertyException("Key");
         }
 
         return new SequenceFieldNode<ExpressionNode>

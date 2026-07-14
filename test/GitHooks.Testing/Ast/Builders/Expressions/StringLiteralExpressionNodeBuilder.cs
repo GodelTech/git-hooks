@@ -19,8 +19,7 @@ public sealed class StringLiteralExpressionNodeBuilder
     {
         if (_value is null)
         {
-            throw new InvalidOperationException(
-                "Value is required to build a StringLiteralExpressionNode.");
+            throw CreateRequiredPropertyException("Value");
         }
 
         return new StringLiteralExpressionNode()

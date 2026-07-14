@@ -19,8 +19,7 @@ public sealed class ParameterVariableExpressionNodeBuilder
     {
         if (_name is null)
         {
-            throw new InvalidOperationException(
-                "Name is required to build a ParameterVariableExpressionNode.");
+            throw CreateRequiredPropertyException("Name");
         }
 
         return new ParameterVariableExpressionNode()

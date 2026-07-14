@@ -39,7 +39,6 @@ public interface IAstQueryVisitor<out TResult>
 
     public TResult Visit(MappingNode node);
 
-    // TODO: Split expression visitors when expressions gain independent processing.
     // Expressions
     public TResult Visit(BooleanLiteralExpressionNode node);
 
