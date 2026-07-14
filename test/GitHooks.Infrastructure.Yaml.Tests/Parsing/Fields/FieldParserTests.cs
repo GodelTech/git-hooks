@@ -160,7 +160,7 @@ public sealed class FieldParserTests
     public async Task ParseStringKeyField_WithInterpolatedString()
     {
         await VerifyStringKeyFieldAsync(
-            "${{ variables.configuration }}");
+            "${{ parameters.configuration }}");
     }
 
     [Fact]
@@ -210,9 +210,6 @@ public sealed class FieldParserTests
 
         var key = TestScalar.Create("parameters");
 
-        var firstSpan = TestSourceSpan.Create(document, 1, 1, 1, 14);
-        var secondSpan = TestSourceSpan.Create(document, 2, 1, 2, 14);
-
         var context =
             TestParsingContextFactory.Create(
                 """
@@ -220,6 +217,11 @@ public sealed class FieldParserTests
                 configuration: Release
                 """,
                 document);
+
+        var firstKeySpan = TestSourceSpan.Create(document, 1, 1, 1, 14);
+        var secondKeySpan = TestSourceSpan.Create(document, 2, 1, 2, 14);
+        var configurationFieldSpan = TestSourceSpan.Create(document, 1, 1, 1, 21);
+        var configurationFieldValueSpan = TestSourceSpan.Create(document, 1, 16, 1, 21);
 
         context.Cursor.StartDocument();
 
@@ -231,28 +233,28 @@ public sealed class FieldParserTests
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
             DiagnosticDescriptors.DuplicateField,
-            secondSpan,
+            secondKeySpan,
             "configuration");
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
             "First declaration is here.",
-            firstSpan);
+            firstKeySpan);
 
         var field = Assert.Single(result.Fields);
 
-        AstAssert.HasStringField(
+        FieldAssert.IsStringKeyField(
             field,
             "configuration",
-            "Debug");
+            configurationFieldSpan,
+            "Debug",
+            configurationFieldValueSpan);
     }
 
     [Fact]
     public void ParseMappingField_WithComplexKey_ReportsDiagnostic()
     {
         var document = TestSourceDocument.Default;
-
-        var expectedSpan = TestSourceSpan.Create(document, 1, 3, 2, 8);
 
         var context =
             TestParsingContextFactory.Create(
@@ -263,6 +265,10 @@ public sealed class FieldParserTests
                 configuration: Release
                 """,
                 document);
+
+        var complexKeySpan = TestSourceSpan.Create(document, 1, 3, 2, 8);
+        var configurationFieldSpan = TestSourceSpan.Create(document, 4, 1, 4, 23);
+        var configurationFieldValueSpan = TestSourceSpan.Create(document, 4, 16, 4, 23);
 
         context.Cursor.StartDocument();
 
@@ -276,15 +282,17 @@ public sealed class FieldParserTests
         DiagnosticAssert.Single(
             context.Diagnostics,
             DiagnosticDescriptors.MappingKeyMustBeScalar,
-            expectedSpan,
+            complexKeySpan,
             key.Value);
 
         var field = Assert.Single(result.Fields);
 
-        AstAssert.HasStringField(
+        FieldAssert.IsStringKeyField(
             field,
             "configuration",
-            "Release");
+            configurationFieldSpan,
+            "Release",
+            configurationFieldValueSpan);
     }
 
     private async Task VerifyStringKeyFieldAsync(

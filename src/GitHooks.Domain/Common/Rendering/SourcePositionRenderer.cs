@@ -1,8 +1,6 @@
 using System.Globalization;
 
-using GitHooks.Domain.Common;
-
-namespace GitHooks.Diagnostics.Rendering;
+namespace GitHooks.Domain.Common.Rendering;
 
 public static class SourcePositionRenderer
 {

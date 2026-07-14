@@ -1,4 +1,5 @@
-using GitHooks.Domain.Common;
+using GitHooks.Testing.Common;
+using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Diagnostics.Tests;
 
@@ -10,25 +11,24 @@ public sealed class DiagnosticBagTests
     [Fact]
     public void Diagnostics_IsEmptyByDefault()
     {
-        Assert.Empty(_diagnosticBag.Diagnostics);
+        DiagnosticAssert.Empty(_diagnosticBag);
     }
 
     [Fact]
     public void Report_AddsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
+
         _diagnosticBag.Report(
             Diagnostic.Create(
                 DiagnosticDescriptors.InvalidYaml,
-                SourceSpan.Unknown));
+                span));
 
-        var result = Assert.Single(_diagnosticBag.Diagnostics);
-
-        Assert.Same(
+        DiagnosticAssert.Single(
+            _diagnosticBag,
             DiagnosticDescriptors.InvalidYaml,
-            result.Descriptor);
-
-        Assert.Equal(
-            SourceSpan.Unknown,
-            result.Span);
+            span);
     }
 }

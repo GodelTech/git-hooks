@@ -38,7 +38,12 @@ public sealed class AstPrinterTests
                 .WithDisplayName("Run Tests")
                 .WithCondition("succeeded()")
                 .WithTimeoutInMinutes(30)
-                .WithWorkingDirectory("/src")
+                .WithWorkingDirectory(d => d
+                    .WithKey("workingDirectory")
+                    .WithInterpolatedStringValue(v => v
+                        .WithPart("/src/")
+                        .WithParameterVariablePart("configuration")
+                        .WithInvalidVariablePart("foo.bar")))
                 .WithEnvironmentVariable("CONFIGURATION", "Release"))
             .WithTemplateStep(x => x
                 .WithTemplate("build.yml")
@@ -175,7 +180,18 @@ public sealed class AstPrinterTests
     {
         var expression = new InterpolatedStringExpressionNodeBuilder()
             .WithPart("/src/")
-            .WithVariablePart("parameters.project")
+            .WithParameterVariablePart("project")
+            .Build();
+
+        await VerifyAstAsync(expression);
+    }
+
+    [Fact]
+    public async Task Print_InterpolatedString_WithInvalidVariable()
+    {
+        var expression = new InterpolatedStringExpressionNodeBuilder()
+            .WithPart("/src/")
+            .WithInvalidVariablePart("foo.bar")
             .Build();
 
         await VerifyAstAsync(expression);

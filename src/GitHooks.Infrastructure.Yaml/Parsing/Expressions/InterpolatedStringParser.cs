@@ -21,7 +21,8 @@ internal sealed partial class InterpolatedStringParser(
 
     public ExpressionNode Parse(
         string value,
-        SourceSpan span)
+        SourceSpan span,
+        ParsingContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(value);
 
@@ -32,8 +33,9 @@ internal sealed partial class InterpolatedStringParser(
             matches[0].Length == value.Length)
         {
             return _variableExpressionParser.Parse(
-                matches[0].Groups["expression"].Value,
-                span);
+                matches[0].Groups["expression"].Value.Trim(),
+                span,
+                context);
         }
 
         var parts = new List<ExpressionNode>();
@@ -54,8 +56,9 @@ internal sealed partial class InterpolatedStringParser(
 
             parts.Add(
                 _variableExpressionParser.Parse(
-                    match.Groups["expression"].Value,
-                    span));
+                    match.Groups["expression"].Value.Trim(),
+                    span,
+                    context));
 
             currentIndex = match.Index + match.Length;
         }

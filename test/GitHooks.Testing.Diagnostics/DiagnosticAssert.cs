@@ -9,7 +9,7 @@ public static class DiagnosticAssert
     public static void Empty(
         DiagnosticBag diagnostics)
     {
-        ArgumentNullException.ThrowIfNull(diagnostics);
+        Assert.NotNull(diagnostics);
 
         Empty(diagnostics.Diagnostics);
     }
@@ -17,7 +17,7 @@ public static class DiagnosticAssert
     public static void Empty(
         IReadOnlyList<Diagnostic> diagnostics)
     {
-        ArgumentNullException.ThrowIfNull(diagnostics);
+        Assert.NotNull(diagnostics);
 
         Assert.Empty(diagnostics);
     }
@@ -28,7 +28,7 @@ public static class DiagnosticAssert
         SourceSpan span,
         params object?[] arguments)
     {
-        ArgumentNullException.ThrowIfNull(diagnostics);
+        Assert.NotNull(diagnostics);
 
         return Single(
             diagnostics.Diagnostics,
@@ -43,8 +43,8 @@ public static class DiagnosticAssert
         SourceSpan span,
         params object?[] arguments)
     {
-        ArgumentNullException.ThrowIfNull(diagnostics);
-        ArgumentNullException.ThrowIfNull(descriptor);
+        Assert.NotNull(diagnostics);
+        Assert.NotNull(descriptor);
 
         var diagnostic = Assert.Single(diagnostics);
 
@@ -63,7 +63,7 @@ public static class DiagnosticAssert
         SourceSpan span,
         params object?[] arguments)
     {
-        ArgumentNullException.ThrowIfNull(diagnostics);
+        Assert.NotNull(diagnostics);
 
         return SingleWithRelatedLocations(
             diagnostics.Diagnostics,
@@ -78,8 +78,8 @@ public static class DiagnosticAssert
         SourceSpan span,
         params object?[] arguments)
     {
-        ArgumentNullException.ThrowIfNull(diagnostics);
-        ArgumentNullException.ThrowIfNull(descriptor);
+        Assert.NotNull(diagnostics);
+        Assert.NotNull(descriptor);
 
         var diagnostic = Assert.Single(diagnostics);
 
@@ -98,8 +98,8 @@ public static class DiagnosticAssert
         SourceSpan span,
         params object?[] arguments)
     {
-        ArgumentNullException.ThrowIfNull(diagnostic);
-        ArgumentNullException.ThrowIfNull(descriptor);
+        Assert.NotNull(diagnostic);
+        Assert.NotNull(descriptor);
 
         MatchesCore(
             diagnostic,
@@ -116,8 +116,8 @@ public static class DiagnosticAssert
         SourceSpan span,
         params object?[] arguments)
     {
-        ArgumentNullException.ThrowIfNull(diagnostic);
-        ArgumentNullException.ThrowIfNull(descriptor);
+        Assert.NotNull(diagnostic);
+        Assert.NotNull(descriptor);
 
         MatchesCore(
             diagnostic,
@@ -133,7 +133,7 @@ public static class DiagnosticAssert
         string message,
         SourceSpan span)
     {
-        ArgumentNullException.ThrowIfNull(diagnostic);
+        Assert.NotNull(diagnostic);
 
         var relatedLocation = Assert.Single(diagnostic.RelatedLocations);
 

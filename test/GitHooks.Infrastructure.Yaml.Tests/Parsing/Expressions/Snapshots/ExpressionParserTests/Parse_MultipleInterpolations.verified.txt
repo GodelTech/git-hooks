@@ -1,4 +1,4 @@
 ﻿InterpolatedString
-  Variable(parameters.os)
+  ParameterVariable(os)
   String("-")
-  Variable(parameters.configuration)
+  ParameterVariable(configuration)

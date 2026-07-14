@@ -1,5 +1,9 @@
+using GitHooks.Diagnostics;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing.Expressions;
+using GitHooks.Testing.Ast;
+using GitHooks.Testing.Common;
+using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Infrastructure.Yaml.Tests.Parsing.Expressions;
 
@@ -9,20 +13,57 @@ public sealed class VariableExpressionParserTests
         = TestParserFactory.CreateVariableExpressionParser();
 
     [Fact]
-    public void Parse_ExpressionProvided_ReturnsVariableExpression()
+    public void Parse_ExpressionProvided_ReturnsParameterVariableExpression()
     {
+        var document = TestSourceDocument.Default;
+
+        var context = TestParsingContextFactory.CreateEmpty(document);
+
+        var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
+
         var result =
             _parser.Parse(
-                " parameters.configuration ",
-                SourceSpan.Unknown);
+                "parameters.configuration",
+                span,
+                context);
 
-        Assert.Equal(
-            "parameters.configuration",
-            result.Path);
+        DiagnosticAssert.Empty(context.Diagnostics);
 
-        Assert.Equal(
-            SourceSpan.Unknown,
-            result.Span);
+        ExpressionAssert.IsParameterVariableExpression(
+            result,
+            "configuration",
+            span);
+    }
+
+    [Theory]
+    [InlineData(" parameters.configuration ")]
+    [InlineData(" parameters.configuration")]
+    [InlineData("parameters.configuration ")]
+    public void Parse_ExpressionIsNotNormalized_ReturnsInvalidVariableExpression(
+        string expression)
+    {
+        var document = TestSourceDocument.Default;
+
+        var context = TestParsingContextFactory.CreateEmpty(document);
+
+        var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
+
+        var result =
+            _parser.Parse(
+                expression,
+                span,
+                context);
+
+        DiagnosticAssert.Single(
+            context.Diagnostics,
+            DiagnosticDescriptors.InvalidVariableExpression,
+            span,
+            expression);
+
+        ExpressionAssert.IsInvalidVariableExpression(
+            result,
+            expression,
+            span);
     }
 
     [Theory]
@@ -31,9 +72,12 @@ public sealed class VariableExpressionParserTests
     public void Parse_InvalidExpression_Throws(
         string expression)
     {
+        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+
         Assert.Throws<ArgumentException>(
             () => _parser.Parse(
                 expression,
-                SourceSpan.Unknown));
+                SourceSpan.Unknown,
+                context));
     }
 }

@@ -3,4 +3,4 @@
     String("build.yml")
   MappingField(parameters)
     Field(configuration)
-      Variable(parameters.configuration)
+      ParameterVariable(configuration)

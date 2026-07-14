@@ -49,5 +49,7 @@ public interface IAstQueryVisitor<out TResult>
 
     public TResult Visit(InterpolatedStringExpressionNode node);
 
-    public TResult Visit(VariableExpressionNode node);
+    public TResult Visit(ParameterVariableExpressionNode node);
+
+    public TResult Visit(InvalidVariableExpressionNode node);
 }

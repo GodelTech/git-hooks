@@ -48,6 +48,13 @@ public sealed class StringKeyFieldNodeBuilder
             Configure(configure).Build());
     }
 
+    public StringKeyFieldNodeBuilder WithInterpolatedStringValue(
+        Action<InterpolatedStringExpressionNodeBuilder> configure)
+    {
+        return WithValue(
+            Configure(configure).Build());
+    }
+
     public StringKeyFieldNodeBuilder WithValue(
         string value)
     {

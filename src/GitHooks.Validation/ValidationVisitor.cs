@@ -156,7 +156,15 @@ internal sealed class ValidationVisitor(
     }
 
     public override void Visit(
-        VariableExpressionNode node)
+        ParameterVariableExpressionNode node)
+    {
+        ApplyRules(node);
+
+        base.Visit(node);
+    }
+
+    public override void Visit(
+        InvalidVariableExpressionNode node)
     {
         ApplyRules(node);
 

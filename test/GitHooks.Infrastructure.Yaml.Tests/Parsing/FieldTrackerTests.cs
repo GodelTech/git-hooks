@@ -1,8 +1,7 @@
 using GitHooks.Diagnostics;
-using GitHooks.Domain.Ast.Fields;
-using GitHooks.Domain.Ast.Values;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Ast;
 using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 
@@ -82,12 +81,17 @@ public sealed class FieldTrackerTests
     [Fact]
     public void AddUnknownField_AddsField()
     {
+        var document = TestSourceDocument.Default;
+
         var key = TestScalar.Create("custom");
 
         var context =
             TestParsingContextFactory.Create(
                 "value",
-                TestSourceDocument.Default);
+                document);
+
+        var fieldSpan = TestSourceSpan.Create(document, 1, 1, 1, 6);
+        var fieldValueSpan = TestSourceSpan.Create(document, 1, 1, 1, 6);
 
         context.Cursor.StartDocument();
 
@@ -99,23 +103,32 @@ public sealed class FieldTrackerTests
 
         var field = Assert.Single(fields);
 
-        var simpleField = Assert.IsType<StringKeyFieldNode<ValueNode>>(field);
-
-        Assert.Equal(
+        FieldAssert.IsStringKeyField(
+            field,
             "custom",
-            simpleField.Key);
+            fieldSpan,
+            "value",
+            fieldValueSpan);
     }
 
     [Fact]
     public void AddUnknownField_WithComplexKey_AddsField()
     {
+        var document = TestSourceDocument.Default;
+
         var context =
             TestParsingContextFactory.Create(
                 """
                 ? [1, 2]
                 : value
                 """,
-                TestSourceDocument.Default);
+                document);
+
+        var fieldSpan = TestSourceSpan.Create(document, 1, 3, 2, 8);
+        var fieldKeySpan = TestSourceSpan.Create(document, 1, 3, 1, 8);
+        var fieldKeyFirstItemSpan = TestSourceSpan.Create(document, 1, 4, 1, 5);
+        var fieldKeySecondItemSpan = TestSourceSpan.Create(document, 1, 7, 1, 8);
+        var fieldValueSpan = TestSourceSpan.Create(document, 2, 3, 2, 8);
 
         context.Cursor.StartDocument();
 
@@ -125,10 +138,23 @@ public sealed class FieldTrackerTests
 
         _ = context.Cursor.Read<MappingEnd>();
 
-        var field =
-            Assert.Single(
-                _fieldTracker.GetUnknownFields());
+        var fields = _fieldTracker.GetUnknownFields();
 
-        Assert.IsType<ComplexKeyFieldNode<ValueNode>>(field);
+        var field = Assert.Single(fields);
+
+        var complexField = FieldAssert.IsComplexKeyField(
+            field,
+            fieldSpan,
+            "value",
+            fieldValueSpan);
+
+        var complexFieldKey = ValueAssert.IsSequenceWithItems(
+            complexField.Key,
+            fieldKeySpan);
+
+        Assert.Collection(
+            complexFieldKey.Items,
+            item => ValueAssert.IsScalar(item, "1", fieldKeyFirstItemSpan),
+            item => ValueAssert.IsScalar(item, "2", fieldKeySecondItemSpan));
     }
 }

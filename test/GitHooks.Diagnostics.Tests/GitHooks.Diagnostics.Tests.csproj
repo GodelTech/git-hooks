@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GitHooks.Diagnostics\GitHooks.Diagnostics.csproj" />
-    <ProjectReference Include="..\GitHooks.Testing\GitHooks.Testing.csproj" />
+    <ProjectReference Include="..\GitHooks.Testing.Diagnostics\GitHooks.Testing.Diagnostics.csproj" />
   </ItemGroup>
 
 </Project>

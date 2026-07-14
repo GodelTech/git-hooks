@@ -39,10 +39,9 @@ internal static class ValidationRuleCatalog
             new InvalidStepRule()
         ];
 
-    public static RuleCollection<VariableExpressionNode> Variable { get; } =
+    public static RuleCollection<ParameterVariableExpressionNode> ParameterVariable { get; } =
         [
-            new VariableSyntaxMustBeValidRule(),
-            new VariableMustBeResolvableParameterRule()
+            new ParameterVariableMustBeResolvableRule()
         ];
 
     public static void RegisterBuiltInRules(this ValidationRuleRegistry registry)
@@ -54,6 +53,6 @@ internal static class ValidationRuleCatalog
         registry.Register(ScriptStep);
         registry.Register(TemplateStep);
         registry.Register(InvalidStep);
-        registry.Register(Variable);
+        registry.Register(ParameterVariable);
     }
 }

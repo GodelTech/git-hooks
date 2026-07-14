@@ -1,0 +1,3 @@
+﻿ScriptStep
+  Field(script)
+    String("dotnet test")

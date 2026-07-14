@@ -1,2 +1,2 @@
-﻿Field(test)
-  Variable(variables.configuration)
+Field(test)
+  ParameterVariable(configuration)

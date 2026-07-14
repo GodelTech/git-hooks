@@ -54,10 +54,27 @@ public sealed class ExpressionNodeExtensionsTests
     }
 
     [Fact]
-    public void TryGetStringValue_VariableExpression_ReturnsFalse()
+    public void TryGetStringValue_ParameterVariableExpression_ReturnsFalse()
     {
-        var expression = new VariableExpressionNodeBuilder()
-            .WithPath("parameters.configuration")
+        var expression = new ParameterVariableExpressionNodeBuilder()
+            .WithName("configuration")
+            .Build();
+
+        var result = expression.TryGetStringValue(
+            out var value);
+
+        Assert.False(result);
+
+        Assert.Equal(
+            string.Empty,
+            value);
+    }
+
+    [Fact]
+    public void TryGetStringValue_InvalidVariableExpression_ReturnsFalse()
+    {
+        var expression = new InvalidVariableExpressionNodeBuilder()
+            .WithText("foo.bar")
             .Build();
 
         var result = expression.TryGetStringValue(

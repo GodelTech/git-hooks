@@ -267,7 +267,8 @@ public sealed class AstWalkerTests
     {
         var expression = new InterpolatedStringExpressionNodeBuilder()
             .WithPart("Hello ")
-            .WithVariablePart("parameters.configuration")
+            .WithParameterVariablePart("configuration")
+            .WithInvalidVariablePart("foo.bar")
             .Build();
 
         var walker = new TestAstWalker();
@@ -278,7 +279,8 @@ public sealed class AstWalkerTests
             [
                 "InterpolatedString",
                 "String(Hello )",
-                "Variable(parameters.configuration)"
+                "ParameterVariable(configuration)",
+                "InvalidVariable(foo.bar)"
             ],
             walker.Visited);
     }
@@ -409,9 +411,16 @@ public sealed class AstWalkerTests
         }
 
         public override void Visit(
-            VariableExpressionNode node)
+            ParameterVariableExpressionNode node)
         {
-            Visited.Add($"Variable({node.Path})");
+            Visited.Add($"ParameterVariable({node.Name})");
+            base.Visit(node);
+        }
+
+        public override void Visit(
+            InvalidVariableExpressionNode node)
+        {
+            Visited.Add($"InvalidVariable({node.Text})");
             base.Visit(node);
         }
 

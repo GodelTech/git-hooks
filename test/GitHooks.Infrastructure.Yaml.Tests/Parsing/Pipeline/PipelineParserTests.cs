@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using GitHooks.Diagnostics;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Ast;
 using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 
@@ -111,9 +112,6 @@ public sealed class PipelineParserTests
     {
         var document = TestSourceDocument.Default;
 
-        var firstSpan = TestSourceSpan.Create(document, 1, 1, 1, 11);
-        var secondSpan = TestSourceSpan.Create(document, 2, 1, 2, 11);
-
         var context =
             TestParsingContextFactory.Create(
                 """
@@ -124,9 +122,14 @@ public sealed class PipelineParserTests
                 """,
                 document);
 
+        var firstSpan = TestSourceSpan.Create(document, 1, 1, 1, 11);
+        var secondSpan = TestSourceSpan.Create(document, 2, 1, 2, 11);
+        var pipelineSpan = TestSourceSpan.Create(document, 1, 1, 5, 1);
+        var stepSpan = TestSourceSpan.Create(document, 4, 5, 5, 1);
+
         context.Cursor.StartDocument();
 
-        _ = _parser.Parse(context);
+        var result = _parser.Parse(context);
 
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
@@ -138,15 +141,22 @@ public sealed class PipelineParserTests
             diagnostic,
             "First declaration is here.",
             firstSpan);
+
+        PipelineAssert.IsPipeline(
+            result,
+            0,
+            1,
+            pipelineSpan);
+
+        PipelineAssert.SingleScriptStep(
+            result,
+            stepSpan);
     }
 
     [Fact]
     public void Parse_DuplicateStepsField_ReportsDiagnostic()
     {
         var document = TestSourceDocument.Default;
-
-        var firstSpan = TestSourceSpan.Create(document, 1, 1, 1, 6);
-        var secondSpan = TestSourceSpan.Create(document, 4, 1, 4, 6);
 
         var context =
             TestParsingContextFactory.Create(
@@ -159,9 +169,14 @@ public sealed class PipelineParserTests
                 """,
                 document);
 
+        var firstSpan = TestSourceSpan.Create(document, 1, 1, 1, 6);
+        var secondSpan = TestSourceSpan.Create(document, 4, 1, 4, 6);
+        var pipelineSpan = TestSourceSpan.Create(document, 1, 1, 6, 1);
+        var stepSpan = TestSourceSpan.Create(document, 2, 5, 4, 1);
+
         context.Cursor.StartDocument();
 
-        _ = _parser.Parse(context);
+        var result = _parser.Parse(context);
 
         var diagnostic = DiagnosticAssert.SingleWithRelatedLocations(
             context.Diagnostics,
@@ -173,6 +188,16 @@ public sealed class PipelineParserTests
             diagnostic,
             "First declaration is here.",
             firstSpan);
+
+        PipelineAssert.IsPipeline(
+            result,
+            0,
+            1,
+            pipelineSpan);
+
+        PipelineAssert.SingleScriptStep(
+            result,
+            stepSpan);
     }
 
     private async Task VerifyAstAsync(

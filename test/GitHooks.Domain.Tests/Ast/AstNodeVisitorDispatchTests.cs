@@ -146,9 +146,15 @@ public sealed class AstNodeVisitorDispatchTests
         }
 
         public void Visit(
-            VariableExpressionNode node)
+            ParameterVariableExpressionNode node)
         {
-            LastVisited = nameof(VariableExpressionNode);
+            LastVisited = nameof(ParameterVariableExpressionNode);
+        }
+
+        public void Visit(
+            InvalidVariableExpressionNode node)
+        {
+            LastVisited = nameof(InvalidVariableExpressionNode);
         }
     }
 
@@ -259,9 +265,15 @@ public sealed class AstNodeVisitorDispatchTests
         }
 
         public string Visit(
-            VariableExpressionNode node)
+            ParameterVariableExpressionNode node)
         {
-            return nameof(VariableExpressionNode);
+            return nameof(ParameterVariableExpressionNode);
+        }
+
+        public string Visit(
+            InvalidVariableExpressionNode node)
+        {
+            return nameof(InvalidVariableExpressionNode);
         }
     }
 }

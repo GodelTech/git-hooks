@@ -228,10 +228,10 @@ public sealed class StepFieldValidationTests
 
     private static void SetField(
         StepFields step,
-        string field,
+        string fieldName,
         SourceSpan span)
     {
-        switch (field)
+        switch (fieldName)
         {
             case StepFieldNames.Script:
                 step.Script = new StringKeyFieldNodeBuilder()
@@ -302,8 +302,10 @@ public sealed class StepFieldValidationTests
                 break;
 
             default:
-                throw new InvalidOperationException(
-                    $"Test helper does not support field '{field}'.");
+                throw new ArgumentOutOfRangeException(
+                    nameof(fieldName),
+                    fieldName,
+                    "Test helper does not support field.");
         }
     }
 }

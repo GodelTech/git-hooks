@@ -25,7 +25,8 @@ internal sealed class ExpressionParser(
         {
             return _interpolatedStringParser.Parse(
                 scalar.Value,
-                span);
+                span,
+                context);
         }
 
         if (bool.TryParse(scalar.Value, out var boolean))

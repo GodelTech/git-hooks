@@ -160,20 +160,20 @@ public static class DiagnosticDescriptors
         };
 
     // GH5000-GH5999 Variables
-    public static readonly DiagnosticDescriptor VariableMustBeResolvableParameter =
+    public static readonly DiagnosticDescriptor InvalidVariableExpression =
         new()
         {
             Code = DiagnosticCode.Create(5001),
             Severity = DiagnosticSeverity.Error,
-            MessageFormat = "Parameter '{0}' referenced but not defined."
+            MessageFormat = "Invalid variable expression '{0}'."
         };
 
-    public static readonly DiagnosticDescriptor VariableSyntaxMustBeValid =
+    public static readonly DiagnosticDescriptor ParameterVariableMustBeResolvable =
         new()
         {
             Code = DiagnosticCode.Create(5002),
             Severity = DiagnosticSeverity.Error,
-            MessageFormat = "Invalid variable syntax '{0}'. Expected format: parameters.<name>."
+            MessageFormat = "Parameter '{0}' referenced but not defined."
         };
 
     // GH9000-GH9999 Internal

@@ -1,4 +1,4 @@
 ﻿InterpolatedString
   String("prefix-")
-  Variable(parameters.name)
+  ParameterVariable(name)
   String("-suffix")

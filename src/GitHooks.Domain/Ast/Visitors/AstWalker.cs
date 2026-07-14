@@ -160,7 +160,13 @@ public abstract class AstWalker
     }
 
     public virtual void Visit(
-        VariableExpressionNode node)
+        ParameterVariableExpressionNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+    }
+
+    public virtual void Visit(
+        InvalidVariableExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
     }

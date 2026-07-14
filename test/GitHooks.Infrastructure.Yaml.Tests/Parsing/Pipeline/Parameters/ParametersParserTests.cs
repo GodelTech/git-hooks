@@ -2,6 +2,7 @@ using GitHooks.Infrastructure.Yaml.Parsing.Pipeline.Parameters;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
 using GitHooks.Testing.Ast;
 using GitHooks.Testing.Common;
+using GitHooks.Testing.Diagnostics;
 
 using YamlDotNet.Core;
 
@@ -37,12 +38,16 @@ public sealed class ParametersParserTests
 
         context.Cursor.EndDocument();
 
+        DiagnosticAssert.Empty(context.Diagnostics);
+
         Assert.Empty(result);
     }
 
     [Fact]
     public void Parse_MultipleParameters_ReturnsParameters()
     {
+        var document = TestSourceDocument.Default;
+
         var context =
             TestParsingContextFactory.Create(
                 """
@@ -52,7 +57,12 @@ public sealed class ParametersParserTests
                 - name: framework
                   type: string
                 """,
-                TestSourceDocument.Default);
+                document);
+
+        var firstNameFieldSpan = TestSourceSpan.Create(document, 1, 3, 1, 22);
+        var firstNameFieldValueSpan = TestSourceSpan.Create(document, 1, 9, 1, 22);
+        var secondNameFieldSpan = TestSourceSpan.Create(document, 4, 3, 4, 18);
+        var secondNameFieldValueSpan = TestSourceSpan.Create(document, 4, 9, 4, 18);
 
         context.Cursor.StartDocument();
 
@@ -60,19 +70,25 @@ public sealed class ParametersParserTests
 
         context.Cursor.EndDocument();
 
+        DiagnosticAssert.Empty(context.Diagnostics);
+
         Assert.Equal(
             2,
             result.Count);
 
-        AstAssert.HasStringField(
+        FieldAssert.IsStringKeyField(
             result[0].Name,
             "name",
-            "configuration");
+            firstNameFieldSpan,
+            "configuration",
+            firstNameFieldValueSpan);
 
-        AstAssert.HasStringField(
+        FieldAssert.IsStringKeyField(
             result[1].Name,
             "name",
-            "framework");
+            secondNameFieldSpan,
+            "framework",
+            secondNameFieldValueSpan);
     }
 
     [Fact]

@@ -5,7 +5,12 @@ using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Ast.Values;
-using GitHooks.Domain.Common;
+using GitHooks.Testing.Ast.Builders.Expressions;
+using GitHooks.Testing.Ast.Builders.Fields;
+using GitHooks.Testing.Ast.Builders.Mappings;
+using GitHooks.Testing.Ast.Builders.Mappings.Parameters;
+using GitHooks.Testing.Ast.Builders.Mappings.Steps;
+using GitHooks.Testing.Ast.Builders.Values;
 
 namespace GitHooks.Domain.Tests.Ast;
 
@@ -35,174 +40,145 @@ internal static class TestAstFactory
             (CreateIntegerNode(), AstNodeKind.IntegerLiteralExpression, nameof(IntegerLiteralExpressionNode)),
             (CreateStringNode(), AstNodeKind.StringLiteralExpression, nameof(StringLiteralExpressionNode)),
             (CreateInterpolatedNode(), AstNodeKind.InterpolatedStringExpression, nameof(InterpolatedStringExpressionNode)),
-            (CreateVariableNode(), AstNodeKind.VariableExpression, nameof(VariableExpressionNode))
+            (CreateParameterVariableNode(), AstNodeKind.ParameterVariableExpression, nameof(ParameterVariableExpressionNode)),
+            (CreateInvalidVariableNode(), AstNodeKind.InvalidVariableExpression, nameof(InvalidVariableExpressionNode))
         ];
 
-    // todo: use ParameterNodeBuilder to create ParameterNode
-    // same for other nodes, use builders to create nodes in tests instead of this factory
     public static ParameterNode CreateParameterNode()
     {
-        return new ParameterNode
-        {
-            Name = CreateStringKeyFieldNode(),
-            UnknownFields = [],
-            Span = SourceSpan.Unknown
-        };
+        return new ParameterNodeBuilder()
+            .WithName("configuration")
+            .Build();
     }
 
     public static ScriptStepNode CreateScriptStepNode()
     {
-        return new ScriptStepNode
-        {
-            Script = CreateStringKeyFieldNode(),
-            UnknownFields = [],
-            Span = SourceSpan.Unknown
-        };
+        return new ScriptStepNodeBuilder()
+            .WithScript("dotnet test")
+            .Build();
     }
 
     public static TemplateStepNode CreateTemplateStepNode()
     {
-        return new TemplateStepNode
-        {
-            Template = CreateStringKeyFieldNode(),
-            UnknownFields = [],
-            Span = SourceSpan.Unknown
-        };
+        return new TemplateStepNodeBuilder()
+            .WithTemplate("build.yml")
+            .Build();
     }
 
     public static InvalidStepNode CreateInvalidStepNode()
     {
-        return new InvalidStepNode
-        {
-            Fields = [],
-            UnknownFields = [],
-            Span = SourceSpan.Unknown
-        };
+        return new InvalidStepNodeBuilder()
+            .WithField("custom", "value")
+            .Build();
     }
 
     private static PipelineNode CreatePipelineNode()
     {
-        return new PipelineNode
-        {
-            Parameters = [],
-            Steps = [],
-            UnknownFields = [],
-            Span = SourceSpan.Unknown
-        };
+        return new PipelineNodeBuilder()
+            .WithParameter(x => x.WithName("configuration"))
+            .WithScriptStep(x => x.WithScript("dotnet test"))
+            .Build();
     }
 
     // Fields
     private static StringKeyFieldNode<ExpressionNode> CreateStringKeyFieldNode()
     {
-        return new StringKeyFieldNode<ExpressionNode>
-        {
-            Key = "field",
-            Value = CreateStringNode(),
-            Span = SourceSpan.Unknown
-        };
+        return new StringKeyFieldNodeBuilder()
+            .WithKey("field")
+            .WithValue("value")
+            .Build();
     }
 
-    private static ComplexKeyFieldNode<ExpressionNode> CreateComplexKeyFieldNode()
+    private static ComplexKeyFieldNode<AstNode> CreateComplexKeyFieldNode()
     {
-        return new ComplexKeyFieldNode<ExpressionNode>
-        {
-            Key = CreateScalarNode(),
-            Value = CreateStringNode(),
-            Span = SourceSpan.Unknown
-        };
+        return new ComplexKeyFieldNodeBuilder()
+            .WithKey("complexKey")
+            .WithScalarValue(x => x.WithValue("value"))
+            .Build();
     }
 
     private static SequenceFieldNode<ExpressionNode> CreateSequenceFieldNode()
     {
-        return new SequenceFieldNode<ExpressionNode>
-        {
-            Key = "field",
-            Items = [],
-            Span = SourceSpan.Unknown
-        };
+        return new SequenceFieldNodeBuilder()
+            .WithKey("complexKey")
+            .WithStringLiteralExpressionItem(x => x.WithValue("value"))
+            .Build();
     }
 
     private static MappingFieldNode<StringKeyFieldNode<ExpressionNode>> CreateMappingFieldNode()
     {
-        return new MappingFieldNode<StringKeyFieldNode<ExpressionNode>>
-        {
-            Key = "field",
-            Fields = [],
-            Span = SourceSpan.Unknown
-        };
+        return new MappingFieldNodeBuilder()
+            .WithKey("field")
+            .WithStringKeyField(x => x
+                .WithKey("key")
+                .WithValue("value"))
+            .Build();
     }
 
     // Values
     private static ScalarNode CreateScalarNode()
     {
-        return new ScalarNode
-        {
-            Value = "raw",
-            Span = SourceSpan.Unknown
-        };
+        return new ScalarNodeBuilder()
+            .WithValue("raw")
+            .Build();
     }
 
     private static SequenceNode CreateSequenceNode()
     {
-        return new SequenceNode
-        {
-            Items = [CreateScalarNode()],
-            Span = SourceSpan.Unknown
-        };
+        return new SequenceNodeBuilder()
+            .WithScalarItem(x => x.WithValue("item"))
+            .Build();
     }
 
     private static MappingNode CreateMappingNode()
     {
-        return new MappingNode
-        {
-            Fields = [CreateStringKeyFieldNode()],
-            Span = SourceSpan.Unknown
-        };
+        return new MappingNodeBuilder()
+            .WithStringKeyField(x => x
+                .WithKey("key")
+                .WithValue("value"))
+            .Build();
     }
 
     // Expressions
     private static BooleanLiteralExpressionNode CreateBooleanNode()
     {
-        return new BooleanLiteralExpressionNode
-        {
-            Value = true,
-            Span = SourceSpan.Unknown
-        };
+        return new BooleanLiteralExpressionNodeBuilder()
+            .WithValue(true)
+            .Build();
     }
 
     private static IntegerLiteralExpressionNode CreateIntegerNode()
     {
-        return new IntegerLiteralExpressionNode
-        {
-            Value = 10,
-            Span = SourceSpan.Unknown
-        };
+        return new IntegerLiteralExpressionNodeBuilder()
+            .WithValue(10)
+            .Build();
     }
 
     private static StringLiteralExpressionNode CreateStringNode()
     {
-        return new StringLiteralExpressionNode
-        {
-            Value = "value",
-            Span = SourceSpan.Unknown
-        };
+        return new StringLiteralExpressionNodeBuilder()
+            .WithValue("value")
+            .Build();
     }
 
     private static InterpolatedStringExpressionNode CreateInterpolatedNode()
     {
-        return new InterpolatedStringExpressionNode
-        {
-            Parts = [CreateStringNode(), CreateVariableNode()],
-            Span = SourceSpan.Unknown
-        };
+        return new InterpolatedStringExpressionNodeBuilder()
+            .WithStringPart(x => x.WithValue("value"))
+            .Build();
     }
 
-    private static VariableExpressionNode CreateVariableNode()
+    private static ParameterVariableExpressionNode CreateParameterVariableNode()
     {
-        return new VariableExpressionNode
-        {
-            Path = "parameters.configuration",
-            Span = SourceSpan.Unknown
-        };
+        return new ParameterVariableExpressionNodeBuilder()
+            .WithName("configuration")
+            .Build();
+    }
+
+    private static InvalidVariableExpressionNode CreateInvalidVariableNode()
+    {
+        return new InvalidVariableExpressionNodeBuilder()
+            .WithText("foo.bar")
+            .Build();
     }
 }

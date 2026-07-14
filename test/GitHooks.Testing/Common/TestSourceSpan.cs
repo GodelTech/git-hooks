@@ -23,4 +23,45 @@ public static class TestSourceSpan
                 endLine,
                 endColumn));
     }
+
+    public static SourceSpan CreateFieldKeySpan(
+        SourceDocument document,
+        int line,
+        string fieldName)
+    {
+        return Create(
+            document,
+            line,
+            1,
+            line,
+            $"{fieldName}".Length + 1);
+    }
+
+    public static SourceSpan CreateFieldSpan(
+        SourceDocument document,
+        int line,
+        string fieldName,
+        string fieldValue)
+    {
+        return Create(
+            document,
+            line,
+            1,
+            line,
+            $"{fieldName}: {fieldValue}".Length + 1);
+    }
+
+    public static SourceSpan CreateFieldValueSpan(
+        SourceDocument document,
+        int line,
+        string fieldName,
+        string fieldValue)
+    {
+        return Create(
+            document,
+            line,
+            $"{fieldName}: ".Length + 1,
+            line,
+            $"{fieldName}: {fieldValue}".Length + 1);
+    }
 }

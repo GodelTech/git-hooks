@@ -8,6 +8,21 @@ namespace GitHooks.Diagnostics.Tests.Printing;
 internal static class DiagnosticPrinterTestHelper
 {
     public static Task VerifyDiagnosticAsync(
+        Diagnostic diagnostic,
+        DiagnosticPrinterOptions? options = null,
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string sourceFilePath = "")
+    {
+        ArgumentNullException.ThrowIfNull(diagnostic);
+
+        return VerifyDiagnosticAsync(
+            [diagnostic],
+            options,
+            memberName,
+            sourceFilePath);
+    }
+
+    public static Task VerifyDiagnosticAsync(
         IReadOnlyList<Diagnostic> diagnostics,
         DiagnosticPrinterOptions? options = null,
         [CallerMemberName] string memberName = "",

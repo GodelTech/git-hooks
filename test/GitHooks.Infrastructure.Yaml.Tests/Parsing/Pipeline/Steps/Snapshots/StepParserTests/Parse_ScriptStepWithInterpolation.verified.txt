@@ -4,4 +4,4 @@
   Field(workingDirectory)
     InterpolatedString
       String("/src/")
-      Variable(parameters.project)
+      ParameterVariable(project)

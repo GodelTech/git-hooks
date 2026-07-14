@@ -25,6 +25,7 @@ public enum AstNodeKind
     BooleanLiteralExpression,
     IntegerLiteralExpression,
     StringLiteralExpression,
-    VariableExpression,
-    InterpolatedStringExpression
+    InterpolatedStringExpression,
+    ParameterVariableExpression,
+    InvalidVariableExpression
 }

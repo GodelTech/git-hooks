@@ -1,6 +1,6 @@
-using GitHooks.Diagnostics.Rendering;
+using GitHooks.Domain.Common.Rendering;
 
-namespace GitHooks.Diagnostics.Tests.Rendering;
+namespace GitHooks.Domain.Tests.Common.Rendering;
 
 public sealed class StringRendererTests
 {

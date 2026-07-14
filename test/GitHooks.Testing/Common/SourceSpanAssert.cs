@@ -1,4 +1,5 @@
 using GitHooks.Domain.Common;
+using GitHooks.Domain.Common.Rendering;
 
 namespace GitHooks.Testing.Common;
 
@@ -8,24 +9,25 @@ public static class SourceSpanAssert
         SourceSpan expected,
         SourceSpan actual)
     {
-        Assert.False(
-            expected == TestSourceSpan.Unknown,
-            "Expected span must be specified explicitly.");
+        if (expected == TestSourceSpan.Unknown)
+        {
+            Assert.Fail("Expected SourceSpan must not be Unknown.");
+        }
 
-        Assert.False(
-            actual == TestSourceSpan.Unknown,
-            "Actual span should not be Unknown.");
+        if (actual == TestSourceSpan.Unknown)
+        {
+            Assert.Fail("Actual SourceSpan must not be Unknown.");
+        }
 
-        Assert.Equal(
-            expected.Document,
-            actual.Document);
+        if (expected != actual)
+        {
+            Assert.Fail(
+                $"""
+                SourceSpan mismatch.
 
-        Assert.Equal(
-            expected.Start,
-            actual.Start);
-
-        Assert.Equal(
-            expected.End,
-            actual.End);
+                Expected: {SourceSpanRenderer.Render(expected)}
+                Actual:   {SourceSpanRenderer.Render(actual)}
+                """);
+        }
     }
 }

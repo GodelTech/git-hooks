@@ -1,4 +1,6 @@
 using GitHooks.Domain.Common;
+using GitHooks.Testing.Common;
+using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Diagnostics.Tests;
 
@@ -7,35 +9,37 @@ public sealed class DiagnosticTests
     [Fact]
     public void Create_WithoutArguments_ReturnsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
+
         var result = Diagnostic.Create(
             DiagnosticDescriptors.InvalidYaml,
-            SourceSpan.Unknown);
+            span);
 
-        Assert.Equal(
+        DiagnosticAssert.Matches(
+            result,
             DiagnosticDescriptors.InvalidYaml,
-            result.Descriptor);
-
-        Assert.Equal(
-            SourceSpan.Unknown,
-            result.Span);
-
-        Assert.Empty(result.Arguments);
-        Assert.Empty(result.RelatedLocations);
+            span);
     }
 
     [Fact]
     public void Create_WithArguments_ReturnsDiagnostic()
     {
+        var document = TestSourceDocument.Default;
+
+        var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
+
         var result = Diagnostic.Create(
             DiagnosticDescriptors.DuplicateField,
-            SourceSpan.Unknown,
+            span,
             "configuration");
 
-        Assert.Single(result.Arguments);
-
-        Assert.Equal(
-            "configuration",
-            result.Arguments[0]);
+        DiagnosticAssert.Matches(
+            result,
+            DiagnosticDescriptors.DuplicateField,
+            span,
+            "configuration");
     }
 
     [Fact]
@@ -47,19 +51,6 @@ public sealed class DiagnosticTests
 
         Assert.Equal(
             DiagnosticDescriptors.InvalidYaml.MessageFormat,
-            diagnostic.Message);
-    }
-
-    [Fact]
-    public void Message_WithArguments_ReturnsFormattedMessage()
-    {
-        var diagnostic = Diagnostic.Create(
-            DiagnosticDescriptors.DuplicateField,
-            SourceSpan.Unknown,
-            "configuration");
-
-        Assert.Equal(
-            "Duplicate 'configuration' field.",
             diagnostic.Message);
     }
 
@@ -85,6 +76,19 @@ public sealed class DiagnosticTests
         Assert.Equal(
             DiagnosticDescriptors.InvalidYaml.Severity,
             diagnostic.Severity);
+    }
+
+    [Fact]
+    public void Message_WithArguments_ReturnsFormattedMessage()
+    {
+        var diagnostic = Diagnostic.Create(
+            DiagnosticDescriptors.DuplicateField,
+            SourceSpan.Unknown,
+            "configuration");
+
+        Assert.Equal(
+            "Duplicate 'configuration' field.",
+            diagnostic.Message);
     }
 
     [Fact]

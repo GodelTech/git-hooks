@@ -14,17 +14,30 @@ public sealed class InterpolatedStringExpressionNodeBuilder
             Configure(configure).Build());
     }
 
-    public InterpolatedStringExpressionNodeBuilder WithVariablePart(
-        Action<VariableExpressionNodeBuilder> configure)
+    public InterpolatedStringExpressionNodeBuilder WithParameterVariablePart(
+        Action<ParameterVariableExpressionNodeBuilder> configure)
     {
         return WithPart(
             Configure(configure).Build());
     }
 
-    public InterpolatedStringExpressionNodeBuilder WithVariablePart(
-        string path)
+    public InterpolatedStringExpressionNodeBuilder WithParameterVariablePart(
+        string name)
     {
-        return WithVariablePart(x => x.WithPath(path));
+        return WithParameterVariablePart(x => x.WithName(name));
+    }
+
+    public InterpolatedStringExpressionNodeBuilder WithInvalidVariablePart(
+        Action<InvalidVariableExpressionNodeBuilder> configure)
+    {
+        return WithPart(
+            Configure(configure).Build());
+    }
+
+    public InterpolatedStringExpressionNodeBuilder WithInvalidVariablePart(
+        string text)
+    {
+        return WithInvalidVariablePart(x => x.WithText(text));
     }
 
     public InterpolatedStringExpressionNodeBuilder WithPart(

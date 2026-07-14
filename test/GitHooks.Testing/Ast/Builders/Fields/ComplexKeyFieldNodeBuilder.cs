@@ -23,6 +23,13 @@ public sealed class ComplexKeyFieldNodeBuilder
         return WithScalarKey(x => x.WithValue(key));
     }
 
+    public ComplexKeyFieldNodeBuilder WithScalarValue(
+        Action<ScalarNodeBuilder> configure)
+    {
+        return WithValue(
+            Configure(configure).Build());
+    }
+
     public ComplexKeyFieldNodeBuilder WithSequenceValue(
         Action<SequenceNodeBuilder> configure)
     {

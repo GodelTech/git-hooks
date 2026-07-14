@@ -1,1 +1,1 @@
-﻿Variable(parameters.project)
+﻿ParameterVariable(project)

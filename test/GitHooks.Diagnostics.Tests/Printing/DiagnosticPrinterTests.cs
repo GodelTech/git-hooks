@@ -1,8 +1,8 @@
-using System.Runtime.CompilerServices;
-
 using GitHooks.Diagnostics.Printing;
 
 using GitHooks.Domain.Common;
+
+using static GitHooks.Diagnostics.Tests.Printing.DiagnosticPrinterTestHelper;
 
 namespace GitHooks.Diagnostics.Tests.Printing;
 
@@ -147,31 +147,5 @@ public sealed class DiagnosticPrinterTests
         Assert.Equal(
             string.Empty,
             result);
-    }
-
-    private static async Task VerifyDiagnosticAsync(
-        Diagnostic diagnostic,
-        DiagnosticPrinterOptions? options = null,
-        [CallerMemberName] string memberName = "",
-        [CallerFilePath] string sourceFilePath = "")
-    {
-        await VerifyDiagnosticAsync(
-            [diagnostic],
-            options,
-            memberName,
-            sourceFilePath);
-    }
-
-    private static async Task VerifyDiagnosticAsync(
-        IReadOnlyList<Diagnostic> diagnostics,
-        DiagnosticPrinterOptions? options = null,
-        [CallerMemberName] string memberName = "",
-        [CallerFilePath] string sourceFilePath = "")
-    {
-        await DiagnosticPrinterTestHelper.VerifyDiagnosticAsync(
-            diagnostics,
-            options,
-            memberName,
-            sourceFilePath);
     }
 }

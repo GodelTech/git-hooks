@@ -1,4 +1,3 @@
-using GitHooks.Diagnostics.Rendering;
 using GitHooks.Domain.Ast;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Fields;
@@ -7,6 +6,7 @@ using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Ast.Values;
 using GitHooks.Domain.Ast.Visitors;
+using GitHooks.Domain.Common.Rendering;
 
 namespace GitHooks.Diagnostics.Ast.Printing;
 
@@ -267,12 +267,24 @@ public sealed class AstPrinter
     }
 
     public override void Visit(
-        VariableExpressionNode node)
+        ParameterVariableExpressionNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
 
         AppendNodeHeader(
-            $"Variable({node.Path})",
+            $"ParameterVariable({node.Name})",
+            node);
+
+        base.Visit(node);
+    }
+
+    public override void Visit(
+        InvalidVariableExpressionNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        AppendNodeHeader(
+            $"InvalidVariable({node.Text})",
             node);
 
         base.Visit(node);

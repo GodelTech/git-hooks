@@ -49,5 +49,7 @@ public interface IAstCommandVisitor
 
     public void Visit(InterpolatedStringExpressionNode node);
 
-    public void Visit(VariableExpressionNode node);
+    public void Visit(ParameterVariableExpressionNode node);
+
+    public void Visit(InvalidVariableExpressionNode node);
 }
