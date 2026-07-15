@@ -238,7 +238,7 @@ public sealed class FieldParserTests
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.",
+            DiagnosticLocationMessages.PreviousDeclaration,
             firstKeySpan);
 
         var field = Assert.Single(result.Fields);

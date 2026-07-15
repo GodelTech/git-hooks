@@ -28,8 +28,9 @@ internal sealed class ParameterDisplayNameMustNotBeEmptyRule
         }
 
         context.Report(
-            DiagnosticDescriptors.ParameterDisplayNameMustNotBeEmpty,
-            node.DisplayName.Span,
-            node.GetNameForDiagnostic());
+            Diagnostic.Create(
+                DiagnosticDescriptors.ParameterDisplayNameMustNotBeEmpty,
+                node.DisplayName.Span,
+                node.GetNameForDiagnostic()));
     }
 }

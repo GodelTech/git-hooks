@@ -13,9 +13,10 @@ internal sealed partial class ParameterVariableMustBeResolvableRule
         if (!context.Symbols.ContainsParameter(node.Name))
         {
             context.Report(
-                DiagnosticDescriptors.ParameterVariableMustBeResolvable,
-                node.Span,
-                node.Name);
+                Diagnostic.Create(
+                    DiagnosticDescriptors.ParameterVariableMustBeResolvable,
+                    node.Span,
+                    node.Name));
         }
     }
 }

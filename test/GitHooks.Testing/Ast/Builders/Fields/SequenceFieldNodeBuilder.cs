@@ -26,6 +26,19 @@ public sealed class SequenceFieldNodeBuilder
             Configure(configure).Build());
     }
 
+    public SequenceFieldNodeBuilder WithItems(
+        IReadOnlyList<ExpressionNode> items)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+
+        foreach (var item in items)
+        {
+            WithItem(item);
+        }
+
+        return Self;
+    }
+
     public override SequenceFieldNode<ExpressionNode> Build()
     {
         if (_key is null)

@@ -22,7 +22,8 @@ internal sealed class ScriptFieldMustNotBeEmptyRule
         }
 
         context.Report(
-            DiagnosticDescriptors.ScriptFieldMustNotBeEmpty,
-            node.Script.Span);
+            Diagnostic.Create(
+                DiagnosticDescriptors.ScriptFieldMustNotBeEmpty,
+                node.Script.Span));
     }
 }

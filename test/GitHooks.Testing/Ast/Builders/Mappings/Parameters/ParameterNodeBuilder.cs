@@ -1,7 +1,6 @@
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Fields;
 using GitHooks.Domain.Ast.Mappings.Parameters;
-using GitHooks.Domain.Common;
 using GitHooks.Testing.Ast.Builders.Expressions;
 using GitHooks.Testing.Ast.Builders.Fields;
 
@@ -10,12 +9,11 @@ namespace GitHooks.Testing.Ast.Builders.Mappings.Parameters;
 public sealed class ParameterNodeBuilder
     : PipelineNodeBuilderBase<ParameterNodeBuilder, ParameterNode>
 {
-    private readonly List<ExpressionNode> _values = [];
-
     private StringKeyFieldNode<ExpressionNode>? _name;
     private StringKeyFieldNode<ExpressionNode>? _displayName;
     private StringKeyFieldNode<ExpressionNode>? _type;
     private StringKeyFieldNode<ExpressionNode>? _defaultValue;
+    private SequenceFieldNode<ExpressionNode>? _values;
 
     public ParameterNodeBuilder WithName(
         Action<StringKeyFieldNodeBuilder> configure)
@@ -81,11 +79,31 @@ public sealed class ParameterNodeBuilder
             .WithStringValue(v => v.WithValue(defaultValue)));
     }
 
+    public ParameterNodeBuilder WithValues(
+        Action<SequenceFieldNodeBuilder> configure)
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = new SequenceFieldNodeBuilder()
+            .WithKey("values");
+
+        if (_values is not null)
+        {
+            builder.WithItems(_values.Items);
+        }
+
+        configure.Invoke(builder);
+
+        _values = builder.Build();
+
+        return Self;
+    }
+
     public ParameterNodeBuilder WithStringValue(
         Action<StringLiteralExpressionNodeBuilder> configure)
     {
-        return WithValue(
-            Configure(configure).Build());
+        return WithValues(x => x
+            .WithStringLiteralExpressionItem(configure));
     }
 
     public ParameterNodeBuilder WithValue(
@@ -108,24 +126,9 @@ public sealed class ParameterNodeBuilder
             DisplayName = _displayName,
             Type = _type,
             DefaultValue = _defaultValue,
-            Values = _values.Count == 0
-                ? null
-                : new SequenceFieldNode<ExpressionNode>
-                {
-                    Key = "values",
-                    Items = [.. _values],
-                    Span = SourceSpan.Unknown
-                },
+            Values = _values,
             UnknownFields = [.. UnknownFields],
             Span = Span
         };
-    }
-
-    private ParameterNodeBuilder WithValue(
-        ExpressionNode value)
-    {
-        _values.Add(value);
-
-        return Self;
     }
 }

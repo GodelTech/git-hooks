@@ -139,7 +139,7 @@ public sealed class PipelineParserTests
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.",
+            DiagnosticLocationMessages.PreviousDeclaration,
             firstSpan);
 
         PipelineAssert.IsPipeline(
@@ -186,7 +186,7 @@ public sealed class PipelineParserTests
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.",
+            DiagnosticLocationMessages.PreviousDeclaration,
             firstSpan);
 
         PipelineAssert.IsPipeline(

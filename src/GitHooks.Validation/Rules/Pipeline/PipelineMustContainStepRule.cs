@@ -13,8 +13,9 @@ internal sealed class PipelineMustContainStepRule
         if (node.Steps.Count == 0)
         {
             context.Report(
-                DiagnosticDescriptors.PipelineMustContainStep,
-                node.Span);
+                Diagnostic.Create(
+                    DiagnosticDescriptors.PipelineMustContainStep,
+                    node.Span));
         }
     }
 }

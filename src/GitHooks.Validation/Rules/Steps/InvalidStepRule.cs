@@ -11,7 +11,8 @@ internal sealed class InvalidStepRule
         ValidationContext context)
     {
         context.Report(
-            DiagnosticDescriptors.InvalidStep,
-            node.Span);
+            Diagnostic.Create(
+                DiagnosticDescriptors.InvalidStep,
+                node.Span));
     }
 }

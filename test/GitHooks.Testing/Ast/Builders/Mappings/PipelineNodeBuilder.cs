@@ -19,6 +19,13 @@ public sealed class PipelineNodeBuilder
             Configure(configure).Build());
     }
 
+    public PipelineNodeBuilder WithoutParameters()
+    {
+        _parameters.Clear();
+
+        return Self;
+    }
+
     public PipelineNodeBuilder WithScriptStep(
         Action<ScriptStepNodeBuilder> configure)
     {

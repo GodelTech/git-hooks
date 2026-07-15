@@ -86,7 +86,7 @@ public static class DiagnosticDescriptors
             MessageFormat = "Parameter name '{0}' must start with a letter or underscore and contain only alphanumeric characters and underscores."
         };
 
-    public static readonly DiagnosticDescriptor ParameterNamesMustBeUnique =
+    public static readonly DiagnosticDescriptor ParameterNameMustBeUnique =
         new()
         {
             Code = DiagnosticCode.Create(3007),

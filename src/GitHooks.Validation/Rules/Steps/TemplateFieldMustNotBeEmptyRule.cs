@@ -22,7 +22,8 @@ internal sealed class TemplateFieldMustNotBeEmptyRule
         }
 
         context.Report(
-            DiagnosticDescriptors.TemplateFieldMustNotBeEmpty,
-            node.Template.Span);
+            Diagnostic.Create(
+                DiagnosticDescriptors.TemplateFieldMustNotBeEmpty,
+                node.Template.Span));
     }
 }

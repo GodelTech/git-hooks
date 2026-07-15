@@ -45,7 +45,7 @@ internal sealed class FieldTracker(
                     [
                         DiagnosticLocation.Create(
                             firstSpan,
-                            "First declaration is here.")
+                            DiagnosticLocationMessages.PreviousDeclaration)
                     ],
                     fieldName));
 

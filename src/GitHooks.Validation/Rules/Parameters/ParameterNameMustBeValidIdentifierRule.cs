@@ -26,9 +26,10 @@ internal sealed partial class ParameterNameMustBeValidIdentifierRule
         if (!IdentifierPattern().IsMatch(value))
         {
             context.Report(
-                DiagnosticDescriptors.ParameterNameMustBeValidIdentifier,
-                node.Span,
-                value);
+                Diagnostic.Create(
+                    DiagnosticDescriptors.ParameterNameMustBeValidIdentifier,
+                    node.Span,
+                    value));
         }
     }
 

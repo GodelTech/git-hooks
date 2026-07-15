@@ -67,7 +67,7 @@ public sealed class FieldTrackerTests
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.",
+            DiagnosticLocationMessages.PreviousDeclaration,
             firstSpan);
     }
 

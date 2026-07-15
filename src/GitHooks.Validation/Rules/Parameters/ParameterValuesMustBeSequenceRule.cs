@@ -19,9 +19,10 @@ internal sealed class ParameterValuesMustBeSequenceRule
         if (node.Values.Items.Count == 0)
         {
             context.Report(
-                DiagnosticDescriptors.ParameterValuesMustBeSequence,
-                node.Values.Span,
-                node.GetNameForDiagnostic());
+                Diagnostic.Create(
+                    DiagnosticDescriptors.ParameterValuesMustBeSequence,
+                    node.Values.Span,
+                    node.GetNameForDiagnostic()));
         }
     }
 }

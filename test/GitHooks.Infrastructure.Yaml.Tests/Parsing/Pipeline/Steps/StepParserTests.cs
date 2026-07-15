@@ -237,7 +237,7 @@ public sealed class StepParserTests
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.",
+            DiagnosticLocationMessages.PreviousDeclaration,
             firstKeySpan);
 
         FieldAssert.IsStringKeyField(
@@ -283,7 +283,7 @@ public sealed class StepParserTests
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.",
+            DiagnosticLocationMessages.PreviousDeclaration,
             firstKeySpan);
 
         var scriptStep = StepAssert.IsScriptStep(
@@ -336,7 +336,7 @@ public sealed class StepParserTests
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.",
+            DiagnosticLocationMessages.PreviousDeclaration,
             firstKeySpan);
 
         var templateStep = StepAssert.IsTemplateStep(

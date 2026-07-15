@@ -130,7 +130,7 @@ public sealed class ParameterParserTests
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.",
+            DiagnosticLocationMessages.PreviousDeclaration,
             firstKeySpan);
 
         FieldAssert.IsStringKeyField(
@@ -175,7 +175,7 @@ public sealed class ParameterParserTests
 
         DiagnosticAssert.SingleRelatedLocation(
             diagnostic,
-            "First declaration is here.",
+            DiagnosticLocationMessages.PreviousDeclaration,
             firstKeySpan);
 
         FieldAssert.IsSequenceFieldWithItems(

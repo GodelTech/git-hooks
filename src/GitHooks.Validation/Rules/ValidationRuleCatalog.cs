@@ -20,6 +20,7 @@ internal static class ValidationRuleCatalog
         [
             new ParameterNameIsRequiredRule(),
             new ParameterNameMustBeValidIdentifierRule(),
+            new ParameterNameMustBeUniqueRule(),
             new ParameterValuesMustBeSequenceRule(),
             new ParameterDisplayNameMustNotBeEmptyRule()
         ];

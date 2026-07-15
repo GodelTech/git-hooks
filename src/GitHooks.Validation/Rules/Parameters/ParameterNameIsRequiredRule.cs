@@ -15,8 +15,9 @@ internal sealed class ParameterNameIsRequiredRule
             string.IsNullOrWhiteSpace(value))
         {
             context.Report(
-                DiagnosticDescriptors.ParameterNameIsRequired,
-                node.Span);
+                Diagnostic.Create(
+                    DiagnosticDescriptors.ParameterNameIsRequired,
+                    node.Span));
         }
     }
 }

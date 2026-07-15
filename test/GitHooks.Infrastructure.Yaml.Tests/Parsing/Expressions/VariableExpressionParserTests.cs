@@ -38,7 +38,11 @@ public sealed class VariableExpressionParserTests
     [Theory]
     [InlineData(" parameters.configuration ")]
     [InlineData(" parameters.configuration")]
+    [InlineData("parameters. configuration")]
     [InlineData("parameters.configuration ")]
+    [InlineData("parameters. configuration ")]
+    [InlineData("parameters.")]
+    [InlineData("parameters. ")]
     public void Parse_ExpressionIsNotNormalized_ReturnsInvalidVariableExpression(
         string expression)
     {
