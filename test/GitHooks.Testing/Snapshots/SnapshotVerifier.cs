@@ -19,13 +19,14 @@ public static class SnapshotVerifier
             throw new InvalidOperationException("Source file path is invalid.");
         }
 
-        return Verify(output)
+        var snapshot = output + "\n";
+
+        return Verify(snapshot)
             .UseDirectory(
                 Path.Combine(
                     testDirectory,
                     "Snapshots",
                     testClass))
-            .UseFileName(
-                memberName);
+            .UseFileName(memberName);
     }
 }

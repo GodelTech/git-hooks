@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Moq" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GitHooks.Compilation\GitHooks.Compilation.csproj" />
+    <ProjectReference Include="..\GitHooks.Testing.Diagnostics\GitHooks.Testing.Diagnostics.csproj" />
+  </ItemGroup>
+
+</Project>
