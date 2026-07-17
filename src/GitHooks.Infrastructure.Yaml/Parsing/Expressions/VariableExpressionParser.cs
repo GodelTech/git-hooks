@@ -12,7 +12,7 @@ internal sealed class VariableExpressionParser
     public VariableExpressionNode Parse(
         string expression,
         SourceSpan span,
-        ParsingContext context)
+        YamlParserContext context)
 #pragma warning restore CA1822 // Mark members as static
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(expression);
@@ -36,7 +36,7 @@ internal sealed class VariableExpressionParser
     private static VariableExpressionNode ParseParameter(
         string expression,
         SourceSpan span,
-        ParsingContext context)
+        YamlParserContext context)
     {
         var name = expression[ParametersPrefix.Length..];
 
@@ -59,9 +59,9 @@ internal sealed class VariableExpressionParser
     private static InvalidVariableExpressionNode ReportInvalid(
         string expression,
         SourceSpan span,
-        ParsingContext context)
+        YamlParserContext context)
     {
-        context.Report(
+        context.Diagnostics.Report(
             Diagnostic.Create(
                 DiagnosticDescriptors.InvalidVariableExpression,
                 span,

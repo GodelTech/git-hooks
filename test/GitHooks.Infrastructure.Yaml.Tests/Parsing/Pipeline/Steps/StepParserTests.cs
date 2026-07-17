@@ -107,7 +107,7 @@ public sealed class StepParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 script: dotnet test
 
@@ -211,7 +211,7 @@ public sealed class StepParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 $$"""
                 {{CreateRequiredStepTypeField(fieldName)}}
 
@@ -255,7 +255,7 @@ public sealed class StepParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 script: dotnet test
 
@@ -308,7 +308,7 @@ public sealed class StepParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 template: build.yml
 
@@ -361,7 +361,7 @@ public sealed class StepParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 script: dotnet test
                 template: build.yml
@@ -392,7 +392,7 @@ public sealed class StepParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 script: dotnet test
                 parameters:
@@ -427,7 +427,7 @@ public sealed class StepParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 template: build.yml
                 displayName: Build
@@ -461,7 +461,7 @@ public sealed class StepParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 displayName: Test
                 """,

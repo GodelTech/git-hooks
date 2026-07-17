@@ -22,7 +22,7 @@ internal sealed partial class InterpolatedStringParser(
     public ExpressionNode Parse(
         string value,
         SourceSpan span,
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(value);
 

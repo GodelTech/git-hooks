@@ -19,7 +19,7 @@ internal sealed class FieldParser(
 
     public StringKeyFieldNode<ExpressionNode> ParseStringKeyField(
         Scalar key,
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(context);
@@ -38,7 +38,7 @@ internal sealed class FieldParser(
 
     public SequenceFieldNode<ExpressionNode> ParseSequenceField(
         Scalar key,
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(context);
@@ -67,7 +67,7 @@ internal sealed class FieldParser(
 
     public MappingFieldNode<StringKeyFieldNode<ExpressionNode>> ParseMappingField(
         Scalar key,
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(context);
@@ -84,7 +84,7 @@ internal sealed class FieldParser(
             {
                 var unsupportedField = fieldTracker.AddUnknownField(context);
 
-                context.Report(
+                context.Diagnostics.Report(
                     Diagnostic.Create(
                         DiagnosticDescriptors.MappingKeyMustBeScalar,
                         unsupportedField.Span,

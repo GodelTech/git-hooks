@@ -49,7 +49,7 @@ public sealed class FieldParserTests
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseStringKeyField(
                     null!,
-                    TestParsingContextFactory.CreateEmpty(
+                    TestYamlParserContextFactory.CreateEmpty(
                         TestSourceDocument.Default)));
 
         Assert.Equal(
@@ -80,7 +80,7 @@ public sealed class FieldParserTests
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseSequenceField(
                     null!,
-                    TestParsingContextFactory.CreateEmpty(
+                    TestYamlParserContextFactory.CreateEmpty(
                         TestSourceDocument.Default)));
 
         Assert.Equal(
@@ -111,7 +111,7 @@ public sealed class FieldParserTests
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseMappingField(
                     null!,
-                    TestParsingContextFactory.CreateEmpty(
+                    TestYamlParserContextFactory.CreateEmpty(
                         TestSourceDocument.Default)));
 
         Assert.Equal(
@@ -211,7 +211,7 @@ public sealed class FieldParserTests
         var key = TestScalar.Create("parameters");
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 configuration: Debug
                 configuration: Release
@@ -257,7 +257,7 @@ public sealed class FieldParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 ? [1, 2]
                 : value

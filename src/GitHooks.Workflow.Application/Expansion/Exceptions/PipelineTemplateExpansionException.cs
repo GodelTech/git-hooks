@@ -15,10 +15,12 @@ public sealed class PipelineTemplateExpansionException(
     /// <summary>
     /// Gets the source span associated with the expansion failure.
     /// </summary>
-    public SourceSpan Span { get; } = span;
+    public SourceSpan Span { get; }
+        = span;
 
     /// <summary>
     /// Gets the include chain used to reach the failed template, if available.
     /// </summary>
-    public IReadOnlyList<PipelineSource> IncludeChain { get; } = includeChain ?? [];
+    public IReadOnlyList<PipelineSource> IncludeChain { get; }
+        = includeChain ?? [];
 }

@@ -1,6 +1,9 @@
 using System.Runtime.CompilerServices;
 
+using GitHooks.Compilation.Parsing;
+using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast;
+using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Testing.Common;
@@ -13,38 +16,39 @@ internal static class ParserSnapshotVerifier
 {
     public static async Task VerifyAstAsync(
         string yaml,
-        Func<string, SourceDocument, YamlParserResult> parseFunc,
+        Func<ParsingContext, PipelineNode> parseFunc,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentNullException.ThrowIfNull(parseFunc);
 
-        var result = parseFunc(
+        var context = new ParsingContext(
             yaml,
-            new SourceDocument("test.yaml"));
+            new SourceDocument("test.yaml"),
+            new DiagnosticBag());
 
-        if (result.Root is null)
+        var result = parseFunc(context);
+
+        if (context.Diagnostics.Count > 0)
         {
             await DiagnosticSnapshotVerifier.VerifyAsync(
-                result.Diagnostics,
+                context.Diagnostics,
                 memberName,
                 sourceFilePath);
 
             return;
         }
 
-        Assert.Empty(result.Diagnostics);
-
         await VerifyAstAsync(
-            result.Root,
+            result,
             memberName,
             sourceFilePath);
     }
 
     public static async Task VerifyAstAsync(
         string yaml,
-        Func<ParsingContext, AstNode> parseFunc,
+        Func<YamlParserContext, AstNode> parseFunc,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
@@ -59,16 +63,16 @@ internal static class ParserSnapshotVerifier
 
     public static async Task VerifyAstAsync(
         string yaml,
-        Func<ParsingContext, AstNode> parseFunc,
-        Action<ParsingContext>? beforeParse = null,
-        Action<ParsingContext>? afterParse = null,
+        Func<YamlParserContext, AstNode> parseFunc,
+        Action<YamlParserContext>? beforeParse = null,
+        Action<YamlParserContext>? afterParse = null,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
         ArgumentNullException.ThrowIfNull(parseFunc);
 
-        var context = TestParsingContextFactory.Create(
+        var context = TestYamlParserContextFactory.Create(
             yaml,
             TestSourceDocument.Default);
 
@@ -82,7 +86,7 @@ internal static class ParserSnapshotVerifier
 
         context.Cursor.EndDocument();
 
-        Assert.Empty(context.Diagnostics);
+        Assert.Empty(context.Diagnostics.Diagnostics);
 
         await VerifyAstAsync(
             result,

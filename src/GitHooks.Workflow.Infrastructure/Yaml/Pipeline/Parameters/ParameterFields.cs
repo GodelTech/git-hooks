@@ -8,9 +8,11 @@ internal sealed record ParameterFields
 
     public string? DisplayName { get; init; }
 
-    public ParameterType Type { get; init; } = ParameterType.Text;
+    public ParameterType Type { get; init; }
+        = ParameterType.Text;
 
     public string? DefaultValue { get; init; }
 
-    public IReadOnlyList<string> Values { get; init; } = [];
+    public IReadOnlyList<string> Values { get; init; }
+        = [];
 }

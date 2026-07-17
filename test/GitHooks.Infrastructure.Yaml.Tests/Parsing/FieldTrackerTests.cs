@@ -31,7 +31,7 @@ public sealed class FieldTrackerTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var firstSpan = TestSourceSpan.Create(document, 1, 2, 3, 4);
         var secondSpan = TestSourceSpan.Create(document, 5, 6, 7, 8);
@@ -86,7 +86,7 @@ public sealed class FieldTrackerTests
         var key = TestScalar.Create("custom");
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 "value",
                 document);
 
@@ -117,7 +117,7 @@ public sealed class FieldTrackerTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 ? [1, 2]
                 : value

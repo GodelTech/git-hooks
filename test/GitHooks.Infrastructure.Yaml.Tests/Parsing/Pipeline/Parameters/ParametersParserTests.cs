@@ -28,7 +28,7 @@ public sealed class ParametersParserTests
     public void Parse_EmptySequence_ReturnsEmptyCollection()
     {
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 "[]",
                 TestSourceDocument.Default);
 
@@ -49,7 +49,7 @@ public sealed class ParametersParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 - name: configuration
                   type: string
@@ -95,7 +95,7 @@ public sealed class ParametersParserTests
     public void Parse_NotSequence_Throws()
     {
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 name: configuration
                 type: string

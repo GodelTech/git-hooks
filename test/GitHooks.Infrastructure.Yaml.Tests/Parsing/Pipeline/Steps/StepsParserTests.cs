@@ -27,7 +27,7 @@ public sealed class StepsParserTests
     public void Parse_EmptySequence_ReturnsEmptyCollection()
     {
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 "[]",
                 TestSourceDocument.Default);
 
@@ -44,7 +44,7 @@ public sealed class StepsParserTests
     public void Parse_MultipleSteps_ReturnsSteps()
     {
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 - script: dotnet test
                   displayName: Test
@@ -69,7 +69,7 @@ public sealed class StepsParserTests
     public void Parse_NotSequence_Throws()
     {
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 script: dotnet test
                 displayName: Test

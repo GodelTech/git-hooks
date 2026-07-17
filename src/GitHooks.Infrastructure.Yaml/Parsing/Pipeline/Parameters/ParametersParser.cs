@@ -11,7 +11,7 @@ internal sealed class ParametersParser(
         = parameterParser ?? throw new ArgumentNullException(nameof(parameterParser));
 
     public IReadOnlyList<ParameterNode> Parse(
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

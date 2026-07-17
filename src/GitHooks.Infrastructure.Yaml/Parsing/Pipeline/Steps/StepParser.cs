@@ -19,7 +19,7 @@ internal sealed class StepParser(
         = fieldValueParser ?? throw new ArgumentNullException(nameof(fieldValueParser));
 
     public StepNode Parse(
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -127,12 +127,12 @@ internal sealed class StepParser(
         StepFields step,
         IReadOnlyList<FieldNode> unknownFields,
         SourceSpan span,
-        ParsingContext context)
+        YamlParserContext context)
     {
         if (step.Script is not null &&
             step.Template is not null)
         {
-            context.Report(
+            context.Diagnostics.Report(
                 Diagnostic.Create(
                     DiagnosticDescriptors.MultipleStepTypes,
                     span));
@@ -170,7 +170,7 @@ internal sealed class StepParser(
             };
         }
 
-        context.Report(
+        context.Diagnostics.Report(
             Diagnostic.Create(
                 DiagnosticDescriptors.MissingStepType,
                 span));

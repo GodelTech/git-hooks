@@ -9,13 +9,13 @@ namespace GitHooks.Testing.Diagnostics;
 public static class DiagnosticSnapshotVerifier
 {
     public static async Task VerifyAsync(
-        IReadOnlyList<Diagnostic> diagnostics,
+        DiagnosticBag diagnostics,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
 
-        var output = new DiagnosticPrinter().Print(diagnostics);
+        var output = new DiagnosticPrinter().Print(diagnostics.Diagnostics);
 
         await SnapshotVerifier.VerifyAsync(
             output,

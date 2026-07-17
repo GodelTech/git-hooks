@@ -9,5 +9,6 @@ public sealed class AstPrinterOptions
 
     public bool IncludeSourceSpans { get; init; }
 
-    public int IndentSize { get; init; } = 2;
+    public int IndentSize { get; init; }
+        = 2;
 }

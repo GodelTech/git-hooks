@@ -203,11 +203,14 @@ public sealed class RunHandlerTests : IDisposable
 
     private sealed class FakeGitCommandLine : IGitCommandLine
     {
-        public bool IsAvailable { get; init; } = true;
+        public bool IsAvailable { get; init; }
+            = true;
 
-        public bool IsInsideRepository { get; init; } = true;
+        public bool IsInsideRepository { get; init; }
+            = true;
 
-        public CommandLineResult RepositoryRootPathResult { get; init; } = CommandLineResult.FromProcess("C:/repo", string.Empty, 0);
+        public CommandLineResult RepositoryRootPathResult { get; init; }
+            = CommandLineResult.FromProcess("C:/repo", string.Empty, 0);
 
         public Task<bool> IsAvailableAsync(CancellationToken cancellationToken = default)
         {

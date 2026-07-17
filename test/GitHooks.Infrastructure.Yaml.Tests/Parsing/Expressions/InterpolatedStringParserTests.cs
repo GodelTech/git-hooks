@@ -62,7 +62,7 @@ public sealed class InterpolatedStringParserTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
 
@@ -86,7 +86,7 @@ public sealed class InterpolatedStringParserTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
 
@@ -114,7 +114,7 @@ public sealed class InterpolatedStringParserTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
 
@@ -147,7 +147,7 @@ public sealed class InterpolatedStringParserTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
 
@@ -174,7 +174,7 @@ public sealed class InterpolatedStringParserTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
 
@@ -208,7 +208,7 @@ public sealed class InterpolatedStringParserTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
 
@@ -242,7 +242,7 @@ public sealed class InterpolatedStringParserTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
 
@@ -281,7 +281,7 @@ public sealed class InterpolatedStringParserTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
 

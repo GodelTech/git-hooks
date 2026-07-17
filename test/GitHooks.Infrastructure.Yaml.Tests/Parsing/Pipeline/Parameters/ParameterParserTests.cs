@@ -104,7 +104,7 @@ public sealed class ParameterParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 $$"""
                 {{CreateRequiredNameField(fieldName)}}
 
@@ -147,7 +147,7 @@ public sealed class ParameterParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 name: configuration
                 values:
@@ -195,7 +195,7 @@ public sealed class ParameterParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 type: string
                 """,

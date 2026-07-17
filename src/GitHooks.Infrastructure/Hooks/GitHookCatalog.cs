@@ -50,7 +50,8 @@ public sealed class GitHookCatalog
     /// <summary>
     /// Gets a shared singleton instance for use outside of dependency injection containers.
     /// </summary>
-    public static IGitHookCatalog Default { get; } = new GitHookCatalog();
+    public static IGitHookCatalog Default { get; }
+        = new GitHookCatalog();
 
     /// <inheritdoc/>
     public IReadOnlyCollection<GitHook> GetAllHooks()

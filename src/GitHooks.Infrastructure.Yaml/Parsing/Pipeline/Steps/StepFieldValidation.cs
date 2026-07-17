@@ -7,7 +7,7 @@ internal static class StepFieldValidation
 {
     public static void ValidateScriptStep(
         StepFields step,
-        ParsingContext context)
+        YamlParserContext context)
     {
         ValidateAllowedFields(
             "script",
@@ -18,7 +18,7 @@ internal static class StepFieldValidation
 
     public static void ValidateTemplateStep(
         StepFields step,
-        ParsingContext context)
+        YamlParserContext context)
     {
         ValidateAllowedFields(
             "template",
@@ -30,7 +30,7 @@ internal static class StepFieldValidation
     private static void ValidateAllowedFields(
         string stepType,
         StepFields step,
-        ParsingContext context,
+        YamlParserContext context,
         IReadOnlySet<string> allowedFields)
     {
         var violations = step
@@ -40,7 +40,7 @@ internal static class StepFieldValidation
 
         foreach (var (name, field) in violations)
         {
-            context.Report(
+            context.Diagnostics.Report(
                 Diagnostic.Create(
                     DiagnosticDescriptors.InvalidStepField,
                     field.Span,

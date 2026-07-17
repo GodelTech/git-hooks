@@ -113,7 +113,7 @@ public sealed class PipelineParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 parameters: []
                 parameters: []
@@ -159,7 +159,7 @@ public sealed class PipelineParserTests
         var document = TestSourceDocument.Default;
 
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 steps:
                   - script: dotnet test

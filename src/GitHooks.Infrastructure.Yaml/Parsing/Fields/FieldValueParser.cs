@@ -10,7 +10,7 @@ internal sealed class FieldValueParser
 {
     public StringKeyFieldNode<ValueNode> ParseStringKeyField(
         Scalar key,
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(context);
@@ -28,7 +28,7 @@ internal sealed class FieldValueParser
     }
 
     public ComplexKeyFieldNode<ValueNode> ParseComplexKeyField(
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -46,7 +46,7 @@ internal sealed class FieldValueParser
     }
 
     private ValueNode ParseValue(
-        ParsingContext context)
+        YamlParserContext context)
     {
         if (context.Cursor.Is<Scalar>())
         {
@@ -69,7 +69,7 @@ internal sealed class FieldValueParser
 
 #pragma warning disable CA1822 // Mark members as static
     private ScalarNode ParseScalar(
-        ParsingContext context)
+        YamlParserContext context)
 #pragma warning restore CA1822 // Mark members as static
     {
         var scalar = context.Cursor.Read<Scalar>();
@@ -84,7 +84,7 @@ internal sealed class FieldValueParser
     }
 
     private SequenceNode ParseSequence(
-        ParsingContext context)
+        YamlParserContext context)
     {
         var start = context.Cursor.Read<SequenceStart>();
 
@@ -108,7 +108,7 @@ internal sealed class FieldValueParser
     }
 
     private MappingNode ParseMapping(
-        ParsingContext context)
+        YamlParserContext context)
     {
         var start = context.Cursor.Read<MappingStart>();
 

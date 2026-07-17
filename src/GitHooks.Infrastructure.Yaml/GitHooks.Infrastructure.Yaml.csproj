@@ -5,6 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GitHooks.Compilation\GitHooks.Compilation.csproj" />
     <ProjectReference Include="..\GitHooks.Diagnostics\GitHooks.Diagnostics.csproj" />
   </ItemGroup>
 

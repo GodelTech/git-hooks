@@ -11,7 +11,7 @@ internal sealed class StepsParser(
         = stepParser ?? throw new ArgumentNullException(nameof(stepParser));
 
     public IReadOnlyList<StepNode> Parse(
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

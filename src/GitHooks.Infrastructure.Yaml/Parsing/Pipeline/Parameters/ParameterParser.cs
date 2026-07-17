@@ -19,7 +19,7 @@ internal sealed class ParameterParser(
         = fieldValueParser ?? throw new ArgumentNullException(nameof(fieldValueParser));
 
     public ParameterNode Parse(
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -98,7 +98,7 @@ internal sealed class ParameterParser(
 
         if (name is null)
         {
-            context.Report(
+            context.Diagnostics.Report(
                 Diagnostic.Create(
                     DiagnosticDescriptors.ParameterNameIsRequired,
                     span));

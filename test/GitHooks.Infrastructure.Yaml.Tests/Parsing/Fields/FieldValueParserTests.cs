@@ -21,7 +21,7 @@ public sealed class FieldValueParserTests
             Assert.Throws<ArgumentNullException>(
                 () => _parser.ParseStringKeyField(
                     null!,
-                    TestParsingContextFactory.CreateEmpty(
+                    TestYamlParserContextFactory.CreateEmpty(
                         TestSourceDocument.Default)));
 
         Assert.Equal(
@@ -122,7 +122,7 @@ public sealed class FieldValueParserTests
     public void ParseComplexKeyField_WithUnsupportedNode_Throws()
     {
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 test
                 """,

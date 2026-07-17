@@ -1,8 +1,10 @@
 using System.Runtime.CompilerServices;
 
+using GitHooks.Compilation.Parsing;
 using GitHooks.Diagnostics;
 using GitHooks.Infrastructure.Yaml.Parsing;
 using GitHooks.Infrastructure.Yaml.Tests.Testing;
+using GitHooks.Testing.Ast;
 using GitHooks.Testing.Common;
 using GitHooks.Testing.Diagnostics;
 
@@ -98,22 +100,26 @@ public sealed class YamlPipelineParserTests
 
         var expectedSpan = TestSourceSpan.Create(document, 4, 1, 4, 1);
 
-        var result =
-            _parser.Parse(
-                """
-                steps:
-                  - script: test
-                    invalid: [
-                """,
-                document);
+        var context = new ParsingContext(
+            """
+            steps:
+              - script: test
+                invalid: [
+            """,
+            document,
+            new DiagnosticBag());
 
-        Assert.Null(result.Root);
+        var result = _parser.Parse(context);
 
         DiagnosticAssert.Single(
-            result.Diagnostics,
+            context.Diagnostics,
             DiagnosticDescriptors.InvalidYaml,
             expectedSpan,
             "While parsing a node, did not find expected node content.");
+
+        PipelineAssert.IsEmptyPipeline(
+            result,
+            expectedSpan);
     }
 
     private async Task VerifyAstAsync(

@@ -27,6 +27,20 @@ public static class PipelineAssert
             span);
     }
 
+    public static PipelineNode IsEmptyPipeline(
+        PipelineNode pipeline,
+        SourceSpan span)
+    {
+        Assert.NotNull(pipeline);
+
+        Assert.Empty(pipeline.Parameters);
+        Assert.Empty(pipeline.Steps);
+
+        return IsValidPipeline(
+            pipeline,
+            span);
+    }
+
     public static ScriptStepNode SingleScriptStep(
         PipelineNode pipeline,
         SourceSpan span)

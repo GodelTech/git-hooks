@@ -1,5 +1,6 @@
+using GitHooks.Compilation.Parsing;
 using GitHooks.Diagnostics;
-using GitHooks.Domain.Common;
+using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Infrastructure.Yaml.Parsing.Pipeline;
 
 using YamlDotNet.Core;
@@ -9,50 +10,41 @@ namespace GitHooks.Infrastructure.Yaml.Parsing;
 
 internal sealed class YamlPipelineParser(
     PipelineParser pipelineParser)
+    : IPipelineParser
 {
     private readonly PipelineParser _pipelineParser
         = pipelineParser ?? throw new ArgumentNullException(nameof(pipelineParser));
 
-    public YamlParserResult Parse(
-        string yaml,
-        SourceDocument document)
+    public PipelineNode Parse(
+        ParsingContext context)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(yaml);
-        ArgumentNullException.ThrowIfNull(document);
+        ArgumentNullException.ThrowIfNull(context);
 
-        var context = new ParsingContext(
-            yaml,
-            document);
+        var parserContext = new YamlParserContext(context);
 
         try
         {
-            _ = context.Cursor.Read<StreamStart>();
-            _ = context.Cursor.Read<DocumentStart>();
+            _ = parserContext.Cursor.Read<StreamStart>();
+            _ = parserContext.Cursor.Read<DocumentStart>();
 
-            var pipeline = _pipelineParser.Parse(context);
+            var pipeline = _pipelineParser.Parse(parserContext);
 
-            _ = context.Cursor.Read<DocumentEnd>();
-            _ = context.Cursor.Read<StreamEnd>();
+            _ = parserContext.Cursor.Read<DocumentEnd>();
+            _ = parserContext.Cursor.Read<StreamEnd>();
 
-            return new YamlParserResult
-            {
-                Root = pipeline,
-                Diagnostics = context.Diagnostics
-            };
+            return pipeline;
         }
         catch (YamlException exception)
         {
-            context.Report(
+            var span = parserContext.Cursor.CreateSpan(exception);
+
+            parserContext.Diagnostics.Report(
                 Diagnostic.Create(
                     DiagnosticDescriptors.InvalidYaml,
-                    context.Cursor.CreateSpan(exception),
+                    span,
                     exception.Message));
 
-            return new YamlParserResult
-            {
-                Root = null,
-                Diagnostics = context.Diagnostics
-            };
+            return PipelineNode.Empty(span);
         }
     }
 }

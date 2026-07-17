@@ -82,7 +82,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Read_ExpectedEvent_ReturnsEvent()
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var result = context.Cursor.Read<StreamStart>();
 
@@ -92,7 +92,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Read_UnexpectedEvent_Throws()
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var exception =
             Assert.Throws<YamlException>(
@@ -106,7 +106,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Is_CurrentEventMatches_ReturnsTrue()
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         Assert.True(context.Cursor.Is<StreamStart>());
     }
@@ -114,7 +114,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Is_CurrentEventDoesNotMatch_ReturnsFalse()
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         Assert.False(context.Cursor.Is<MappingStart>());
     }
@@ -174,7 +174,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CreateSpan_WithNullYamlException_Throws()
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var exception =
             Assert.Throws<ArgumentNullException>(
@@ -189,7 +189,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CreateSpan_WithYamlException_ReturnsSpan()
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var exception =
             new YamlException(
@@ -216,7 +216,7 @@ public sealed class YamlParserCursorTests
     {
         var document = new SourceDocument("test.yaml");
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var expectedSpan = new SourceSpan(
             document,
@@ -236,7 +236,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CurrentSpan_AtEnd_ReturnsUnknown()
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         _ = context.Cursor.Read<StreamStart>();
         _ = context.Cursor.Read<DocumentStart>();
@@ -251,7 +251,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CurrentSpan_WhenCurrentEventExists_ReturnsKnownPosition()
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         _ = context.Cursor.Read<StreamStart>();
 
@@ -261,7 +261,7 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void CreateException_ReturnsYamlException()
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var exception =
             context.Cursor.CreateException(
@@ -272,10 +272,10 @@ public sealed class YamlParserCursorTests
             exception.Message);
     }
 
-    private static (ParsingContext Context, MappingStart Start, MappingEnd End) CreateMappingContext()
+    private static (YamlParserContext Context, MappingStart Start, MappingEnd End) CreateMappingContext()
     {
         var context =
-            TestParsingContextFactory.Create(
+            TestYamlParserContextFactory.Create(
                 """
                 key: value
                 """,

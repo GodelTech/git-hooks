@@ -22,9 +22,9 @@ internal sealed class FieldTracker(
 
     public T ReadFirst<T>(
         Scalar key,
-        ParsingContext context,
+        YamlParserContext context,
         T currentValue,
-        Func<ParsingContext, T> readValue)
+        Func<YamlParserContext, T> readValue)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(context);
@@ -38,7 +38,7 @@ internal sealed class FieldTracker(
 
         if (_fields.TryGetValue(fieldName, out var firstSpan))
         {
-            context.Report(
+            context.Diagnostics.Report(
                 Diagnostic.Create(
                     DiagnosticDescriptors.DuplicateField,
                     fieldSpan,
@@ -69,7 +69,7 @@ internal sealed class FieldTracker(
 
     public void AddUnknownField(
         Scalar key,
-        ParsingContext context)
+        YamlParserContext context)
     {
         _unknownFields.Add(
             _fieldValueParser.ParseStringKeyField(
@@ -78,7 +78,7 @@ internal sealed class FieldTracker(
     }
 
     public ComplexKeyFieldNode<ValueNode> AddUnknownField(
-        ParsingContext context)
+        YamlParserContext context)
     {
         var field = _fieldValueParser.ParseComplexKeyField(context);
 

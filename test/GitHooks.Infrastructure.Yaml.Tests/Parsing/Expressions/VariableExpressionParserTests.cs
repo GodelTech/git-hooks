@@ -17,7 +17,7 @@ public sealed class VariableExpressionParserTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
 
@@ -48,7 +48,7 @@ public sealed class VariableExpressionParserTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var span = TestSourceSpan.Create(document, 1, 1, 1, 10);
 
@@ -76,7 +76,7 @@ public sealed class VariableExpressionParserTests
     public void Parse_InvalidExpression_Throws(
         string expression)
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         Assert.Throws<ArgumentException>(
             () => _parser.Parse(

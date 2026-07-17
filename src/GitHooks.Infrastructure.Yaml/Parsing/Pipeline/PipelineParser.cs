@@ -24,7 +24,7 @@ internal sealed class PipelineParser(
         = fieldValueParser ?? throw new ArgumentNullException(nameof(fieldValueParser));
 
     public PipelineNode Parse(
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

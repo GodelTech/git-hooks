@@ -11,5 +11,6 @@ public sealed class PipelineParameterBindingException(string message, SourceSpan
     /// <summary>
     /// Gets the source span associated with the semantic error.
     /// </summary>
-    public SourceSpan Span { get; } = span;
+    public SourceSpan Span { get; }
+        = span;
 }

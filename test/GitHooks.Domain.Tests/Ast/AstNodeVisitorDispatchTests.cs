@@ -40,7 +40,8 @@ public sealed class AstNodeVisitorDispatchTests
     private sealed class TestCommandVisitor
         : IAstCommandVisitor
     {
-        public string LastVisited { get; private set; } = string.Empty;
+        public string LastVisited { get; private set; }
+            = string.Empty;
 
         public void Visit(
             PipelineNode node)

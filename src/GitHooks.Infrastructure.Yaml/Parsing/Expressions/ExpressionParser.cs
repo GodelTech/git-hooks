@@ -13,7 +13,7 @@ internal sealed class ExpressionParser(
         = interpolatedStringParser ?? throw new ArgumentNullException(nameof(interpolatedStringParser));
 
     public ExpressionNode Parse(
-        ParsingContext context)
+        YamlParserContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

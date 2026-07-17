@@ -287,7 +287,8 @@ public sealed class AstWalkerTests
 
     private sealed class TestAstWalker : AstWalker
     {
-        public List<string> Visited { get; } = [];
+        public List<string> Visited { get; }
+            = [];
 
         public void ExposedWalk(
             AstNode node)

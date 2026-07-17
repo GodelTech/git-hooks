@@ -13,7 +13,7 @@ public sealed class StepFieldValidationTests
     [Fact]
     public void ValidateScriptStep_ValidFields_DoesNotReportDiagnostic()
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var step = new StepFields
         {
@@ -45,7 +45,7 @@ public sealed class StepFieldValidationTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var step = new StepFields
         {
@@ -73,7 +73,7 @@ public sealed class StepFieldValidationTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var templateSpan = TestSourceSpan.Create(document, 1, 1, 1, 10);
         var parametersSpan = TestSourceSpan.Create(document, 2, 1, 2, 20);
@@ -121,7 +121,7 @@ public sealed class StepFieldValidationTests
     [Fact]
     public void ValidateTemplateStep_ValidFields_DoesNotReportDiagnostic()
     {
-        var context = TestParsingContextFactory.CreateEmpty(TestSourceDocument.Default);
+        var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
         var step = new StepFields
         {
@@ -153,7 +153,7 @@ public sealed class StepFieldValidationTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var step = new StepFields
         {
@@ -181,7 +181,7 @@ public sealed class StepFieldValidationTests
     {
         var document = TestSourceDocument.Default;
 
-        var context = TestParsingContextFactory.CreateEmpty(document);
+        var context = TestYamlParserContextFactory.CreateEmpty(document);
 
         var displayNameSpan = TestSourceSpan.Create(document, 1, 1, 1, 10);
         var envSpan = TestSourceSpan.Create(document, 2, 1, 2, 20);
