@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\GitHooks.Diagnostics\GitHooks.Diagnostics.csproj" />
+    <ProjectReference Include="..\GitHooks.Compilation\GitHooks.Compilation.csproj" />
   </ItemGroup>
 </Project>

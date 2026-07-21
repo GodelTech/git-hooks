@@ -1,4 +1,5 @@
 using GitHooks.Compilation.Parsing;
+using GitHooks.Compilation.Validation;
 using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Domain.Common;
 using GitHooks.Testing.Common;
@@ -9,17 +10,39 @@ namespace GitHooks.Compilation.Tests;
 
 public sealed class PipelineCompilerTests
 {
+    private readonly Mock<IPipelineParser> _mockParser;
+    private readonly Mock<IPipelineValidator> _mockValidator;
+
+    public PipelineCompilerTests()
+    {
+        _mockParser = new Mock<IPipelineParser>();
+        _mockValidator = new Mock<IPipelineValidator>();
+    }
+
     [Fact]
     public void Constructor_NullParser_Throws()
     {
         Assert.Throws<ArgumentNullException>(
-            () => new PipelineCompiler(null!));
+            () => new PipelineCompiler(
+                null!,
+                _mockValidator.Object));
+    }
+
+    [Fact]
+    public void Constructor_NullValidator_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(
+            () => new PipelineCompiler(
+                _mockParser.Object,
+                null!));
     }
 
     [Fact]
     public void Compile_NullText_Throws()
     {
-        var compiler = new PipelineCompiler(Mock.Of<IPipelineParser>());
+        var compiler = new PipelineCompiler(
+            _mockParser.Object,
+            _mockValidator.Object);
 
         Assert.Throws<ArgumentNullException>(
             () => compiler.Compile(
@@ -33,7 +56,9 @@ public sealed class PipelineCompilerTests
     public void Compile_EmptyOrWhitespaceText_Throws(
         string text)
     {
-        var compiler = new PipelineCompiler(Mock.Of<IPipelineParser>());
+        var compiler = new PipelineCompiler(
+            _mockParser.Object,
+            _mockValidator.Object);
 
         Assert.Throws<ArgumentException>(
             () => compiler.Compile(
@@ -45,7 +70,8 @@ public sealed class PipelineCompilerTests
     public void Compile_NullDocument_Throws()
     {
         var compiler = new PipelineCompiler(
-            Mock.Of<IPipelineParser>());
+            _mockParser.Object,
+            _mockValidator.Object);
 
         Assert.Throws<ArgumentNullException>(
             () => compiler.Compile(
@@ -56,20 +82,19 @@ public sealed class PipelineCompilerTests
     [Fact]
     public void Compile_CallsParser()
     {
-        var parser = new Mock<IPipelineParser>();
-
-        parser
+        _mockParser
             .Setup(x => x.Parse(It.IsAny<ParsingContext>()))
             .Returns(PipelineNode.Empty(SourceSpan.Unknown));
 
         var compiler = new PipelineCompiler(
-            parser.Object);
+            _mockParser.Object,
+            _mockValidator.Object);
 
         compiler.Compile(
             "test",
             TestSourceDocument.Default);
 
-        parser.Verify(
+        _mockParser.Verify(
             x => x.Parse(It.IsAny<ParsingContext>()),
             Times.Once);
     }
@@ -77,17 +102,16 @@ public sealed class PipelineCompilerTests
     [Fact]
     public void Compile_PassesParsingContextToParser()
     {
-        var parser = new Mock<IPipelineParser>();
-
         ParsingContext? parsingContext = null;
 
-        parser
+        _mockParser
             .Setup(x => x.Parse(It.IsAny<ParsingContext>()))
             .Callback<ParsingContext>(context => parsingContext = context)
             .Returns(PipelineNode.Empty(SourceSpan.Unknown));
 
         var compiler = new PipelineCompiler(
-            parser.Object);
+            _mockParser.Object,
+            _mockValidator.Object);
 
         var document = TestSourceDocument.Default;
 
@@ -99,7 +123,7 @@ public sealed class PipelineCompilerTests
 
         Assert.Equal(
             "test",
-            parsingContext!.Text);
+            parsingContext.Text);
 
         Assert.Same(
             document,
@@ -112,11 +136,9 @@ public sealed class PipelineCompilerTests
     [Fact]
     public void Compile_UsesCompilationContextDiagnostics()
     {
-        var parser = new Mock<IPipelineParser>();
-
         ParsingContext? parsingContext = null;
 
-        parser
+        _mockParser
             .Setup(x => x.Parse(It.IsAny<ParsingContext>()))
             .Callback<ParsingContext>(context => parsingContext = context)
             .Returns(PipelineNode.Empty(SourceSpan.Unknown));
@@ -124,7 +146,8 @@ public sealed class PipelineCompilerTests
         var compilationContext = new CompilationContext();
 
         var compiler = new PipelineCompiler(
-            parser.Object);
+            _mockParser.Object,
+            _mockValidator.Object);
 
         var result = compiler.Compile(
             "test",
@@ -143,16 +166,15 @@ public sealed class PipelineCompilerTests
     [Fact]
     public void Compile_ReturnsCompilationResult()
     {
-        var parser = new Mock<IPipelineParser>();
-
         var root = PipelineNode.Empty(SourceSpan.Unknown);
 
-        parser
+        _mockParser
             .Setup(x => x.Parse(It.IsAny<ParsingContext>()))
             .Returns(root);
 
         var compiler = new PipelineCompiler(
-            parser.Object);
+            _mockParser.Object,
+            _mockValidator.Object);
 
         var result = compiler.Compile(
             "test",

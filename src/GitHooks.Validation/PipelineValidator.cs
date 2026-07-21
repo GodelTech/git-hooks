@@ -1,17 +1,18 @@
+using GitHooks.Compilation.Validation;
 using GitHooks.Diagnostics;
-using GitHooks.Domain.Ast;
+using GitHooks.Domain.Ast.Mappings;
 using GitHooks.Validation.Rules;
 using GitHooks.Validation.Symbols;
 
 namespace GitHooks.Validation;
 
-public sealed class AstValidator
+public sealed class PipelineValidator : IPipelineValidator
 {
     private readonly ValidationRuleRegistry _rules
         = new();
 
     public void Validate(
-        AstNode root,
+        PipelineNode root,
         DiagnosticBag diagnostics)
     {
         ArgumentNullException.ThrowIfNull(root);

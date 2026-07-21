@@ -5,9 +5,9 @@ using GitHooks.Testing.Diagnostics;
 
 namespace GitHooks.Validation.Tests;
 
-public sealed class AstValidatorTests
+public sealed class PipelineValidatorTests
 {
-    private readonly AstValidator _validator = new();
+    private readonly PipelineValidator _validator = new();
 
     [Fact]
     public void Validate_NullRoot_Throws()
