@@ -7,10 +7,14 @@ public sealed class DiagnosticLocationTests
     [Fact]
     public void Create_NullMessage_Throws()
     {
-        Assert.Throws<ArgumentNullException>(
+        var exception = Assert.Throws<ArgumentNullException>(
             () => DiagnosticLocation.Create(
                 SourceSpan.Unknown,
                 null!));
+
+        Assert.Equal(
+            "message",
+            exception.ParamName);
     }
 
     [Theory]
@@ -20,10 +24,14 @@ public sealed class DiagnosticLocationTests
     public void Create_EmptyMessage_Throws(
         string message)
     {
-        Assert.Throws<ArgumentException>(
+        var exception = Assert.Throws<ArgumentException>(
             () => DiagnosticLocation.Create(
                 SourceSpan.Unknown,
                 message));
+
+        Assert.Equal(
+            "message",
+            exception.ParamName);
     }
 
     [Fact]

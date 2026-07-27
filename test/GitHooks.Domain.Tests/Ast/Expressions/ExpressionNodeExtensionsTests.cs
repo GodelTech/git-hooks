@@ -8,11 +8,10 @@ public sealed class ExpressionNodeExtensionsTests
     [Fact]
     public void TryGetStringValue_NullExpression_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => ExpressionNodeExtensions.TryGetStringValue(
-                    null!,
-                    out _));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => ExpressionNodeExtensions.TryGetStringValue(
+                null!,
+                out _));
 
         Assert.Equal(
             "expression",

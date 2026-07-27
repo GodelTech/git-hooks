@@ -7,9 +7,8 @@ public sealed class StringRendererTests
     [Fact]
     public void RenderQuoted_WithNullValue_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => StringRenderer.RenderQuoted(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => StringRenderer.RenderQuoted(null!));
 
         Assert.Equal(
             "value",

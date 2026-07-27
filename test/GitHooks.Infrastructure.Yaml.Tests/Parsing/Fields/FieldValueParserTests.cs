@@ -17,12 +17,11 @@ public sealed class FieldValueParserTests
     [Fact]
     public void ParseStringKeyField_WithNullKey_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _parser.ParseStringKeyField(
-                    null!,
-                    TestYamlParserContextFactory.CreateEmpty(
-                        TestSourceDocument.Default)));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _parser.ParseStringKeyField(
+                null!,
+                TestYamlParserContextFactory.CreateEmpty(
+                    TestSourceDocument.Default)));
 
         Assert.Equal(
             "key",
@@ -34,11 +33,10 @@ public sealed class FieldValueParserTests
     {
         var key = TestScalar.Create("test");
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _parser.ParseStringKeyField(
-                    key,
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _parser.ParseStringKeyField(
+                key,
+                null!));
 
         Assert.Equal(
             "context",
@@ -48,10 +46,9 @@ public sealed class FieldValueParserTests
     [Fact]
     public void ParseComplexKeyField_WithNullContext_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _parser.ParseComplexKeyField(
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _parser.ParseComplexKeyField(
+                null!));
 
         Assert.Equal(
             "context",

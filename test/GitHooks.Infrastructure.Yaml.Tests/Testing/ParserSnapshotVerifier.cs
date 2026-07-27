@@ -16,7 +16,7 @@ internal static class ParserSnapshotVerifier
 {
     public static async Task VerifyAstAsync(
         string yaml,
-        Func<ParsingContext, PipelineNode> parseFunc,
+        Func<ParsingContext, DiagnosticBag, PipelineNode> parseFunc,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "")
     {
@@ -25,15 +25,16 @@ internal static class ParserSnapshotVerifier
 
         var context = new ParsingContext(
             yaml,
-            new SourceDocument("test.yaml"),
-            new DiagnosticBag());
+            new SourceDocument("test.yaml"));
 
-        var result = parseFunc(context);
+        var diagnostics = new DiagnosticBag();
 
-        if (context.Diagnostics.Count > 0)
+        var result = parseFunc(context, diagnostics);
+
+        if (diagnostics.Count > 0)
         {
             await DiagnosticSnapshotVerifier.VerifyAsync(
-                context.Diagnostics,
+                diagnostics,
                 memberName,
                 sourceFilePath);
 

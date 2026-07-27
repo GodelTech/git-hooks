@@ -18,10 +18,9 @@ public sealed class YamlPipelineParserTests
     [Fact]
     public void Constructor_NullPipelineParser_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new YamlPipelineParser(
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new YamlPipelineParser(
+                null!));
 
         Assert.Equal(
             "pipelineParser",
@@ -106,13 +105,14 @@ public sealed class YamlPipelineParserTests
               - script: test
                 invalid: [
             """,
-            document,
-            new DiagnosticBag());
+            document);
 
-        var result = _parser.Parse(context);
+        var diagnostics = new DiagnosticBag();
+
+        var result = _parser.Parse(context, diagnostics);
 
         DiagnosticAssert.Single(
-            context.Diagnostics,
+            diagnostics,
             DiagnosticDescriptors.InvalidYaml,
             expectedSpan,
             "While parsing a node, did not find expected node content.");

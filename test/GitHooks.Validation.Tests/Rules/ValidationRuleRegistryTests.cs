@@ -62,10 +62,9 @@ public sealed class ValidationRuleRegistryTests
     {
         var registry = new ValidationRuleRegistry();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => registry.Register(
-                    (IValidationRule<TestNode>)null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => registry.Register(
+                (IValidationRule<TestNode>)null!));
 
         Assert.Equal(
             "rule",
@@ -91,10 +90,9 @@ public sealed class ValidationRuleRegistryTests
     {
         var registry = new ValidationRuleRegistry();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => registry.Register(
-                    (IEnumerable<IValidationRule<TestNode>>)null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => registry.Register(
+                (IEnumerable<IValidationRule<TestNode>>)null!));
 
         Assert.Equal(
             "rules",

@@ -15,9 +15,8 @@ public sealed class AstPrinterTests
     {
         var printer = new AstPrinter();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => printer.Print(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => printer.Print(null!));
 
         Assert.Equal(
             "node",

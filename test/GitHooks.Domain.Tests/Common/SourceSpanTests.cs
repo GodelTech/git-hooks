@@ -135,10 +135,14 @@ public sealed class SourceSpanTests
             new SourcePosition(1, 1),
             new SourcePosition(1, 5));
 
-        Assert.Throws<ArgumentException>(
+        var exception = Assert.Throws<ArgumentException>(
             () => SourceSpan.Combine(
                 SourceSpan.Unknown,
                 span));
+
+        Assert.Equal(
+            "Cannot combine spans from different documents.",
+            exception.Message);
     }
 
     [Fact]

@@ -10,13 +10,28 @@ public sealed class YamlParserContextTests
     [Fact]
     public void Constructor_NullParsingContext_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new YamlParserContext(
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new YamlParserContext(
+                null!,
+                new DiagnosticBag()));
 
         Assert.Equal(
             "context",
+            exception.ParamName);
+    }
+
+    [Fact]
+    public void Constructor_NullDiagnostics_Throws()
+    {
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new YamlParserContext(
+                new ParsingContext(
+                    "{}",
+                    new SourceDocument("test.yaml")),
+                null!));
+
+        Assert.Equal(
+            "diagnostics",
             exception.ParamName);
     }
 
@@ -27,8 +42,8 @@ public sealed class YamlParserContextTests
             new YamlParserContext(
                 new ParsingContext(
                     "{}",
-                    new SourceDocument("test.yaml"),
-                    new DiagnosticBag()));
+                    new SourceDocument("test.yaml")),
+                new DiagnosticBag());
 
         Assert.NotNull(
             context.Cursor);
@@ -43,8 +58,8 @@ public sealed class YamlParserContextTests
             new YamlParserContext(
                 new ParsingContext(
                     "{}",
-                    new SourceDocument("test.yaml"),
-                    diagnostics));
+                    new SourceDocument("test.yaml")),
+                diagnostics);
 
         Assert.Equal(
             diagnostics,

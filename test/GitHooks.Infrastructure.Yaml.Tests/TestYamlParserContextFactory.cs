@@ -22,7 +22,7 @@ internal static class TestYamlParserContextFactory
         return new YamlParserContext(
             new ParsingContext(
                 yaml,
-                document,
-                new DiagnosticBag()));
+                document),
+            new DiagnosticBag());
     }
 }

@@ -8,11 +8,10 @@ public sealed class ParameterNodeExtensionsTests
     [Fact]
     public void TryGetName_NullParameter_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => ParameterNodeExtensions.TryGetName(
-                    null!,
-                    out _));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => ParameterNodeExtensions.TryGetName(
+                null!,
+                out _));
 
         Assert.Equal(
             "node",

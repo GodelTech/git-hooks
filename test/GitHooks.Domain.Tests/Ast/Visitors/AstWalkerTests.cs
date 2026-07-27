@@ -22,9 +22,8 @@ public sealed class AstWalkerTests
     {
         var walker = new TestAstWalker();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => walker.ExposedWalk(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => walker.ExposedWalk(null!));
 
         Assert.Equal(
             "root",

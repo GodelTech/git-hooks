@@ -11,8 +11,12 @@ public sealed class ParameterNodeValidationExtensionsTests
     {
         ParameterNode? parameter = null;
 
-        Assert.Throws<ArgumentNullException>(
+        var exception = Assert.Throws<ArgumentNullException>(
             () => parameter!.GetNameForDiagnostic());
+
+        Assert.Equal(
+            "node",
+            exception.ParamName);
     }
 
     [Fact]

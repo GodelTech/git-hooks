@@ -17,11 +17,10 @@ public sealed class FieldParserTests
     [Fact]
     public void Constructor_NullExpressionParser_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new FieldParser(
-                    null!,
-                    new FieldValueParser()));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new FieldParser(
+                null!,
+                new FieldValueParser()));
 
         Assert.Equal(
             "expressionParser",
@@ -31,11 +30,10 @@ public sealed class FieldParserTests
     [Fact]
     public void Constructor_NullFieldValueParser_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new FieldParser(
-                    TestParserFactory.CreateExpressionParser(),
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new FieldParser(
+                TestParserFactory.CreateExpressionParser(),
+                null!));
 
         Assert.Equal(
             "fieldValueParser",
@@ -45,12 +43,11 @@ public sealed class FieldParserTests
     [Fact]
     public void ParseStringKeyField_WithNullKey_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _parser.ParseStringKeyField(
-                    null!,
-                    TestYamlParserContextFactory.CreateEmpty(
-                        TestSourceDocument.Default)));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _parser.ParseStringKeyField(
+                null!,
+                TestYamlParserContextFactory.CreateEmpty(
+                    TestSourceDocument.Default)));
 
         Assert.Equal(
             "key",
@@ -62,11 +59,10 @@ public sealed class FieldParserTests
     {
         var key = TestScalar.Create("test");
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _parser.ParseStringKeyField(
-                    key,
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _parser.ParseStringKeyField(
+                key,
+                null!));
 
         Assert.Equal(
             "context",
@@ -76,12 +72,11 @@ public sealed class FieldParserTests
     [Fact]
     public void ParseSequenceField_WithNullKey_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _parser.ParseSequenceField(
-                    null!,
-                    TestYamlParserContextFactory.CreateEmpty(
-                        TestSourceDocument.Default)));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _parser.ParseSequenceField(
+                null!,
+                TestYamlParserContextFactory.CreateEmpty(
+                    TestSourceDocument.Default)));
 
         Assert.Equal(
             "key",
@@ -93,11 +88,10 @@ public sealed class FieldParserTests
     {
         var key = TestScalar.Create("values");
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _parser.ParseSequenceField(
-                    key,
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _parser.ParseSequenceField(
+                key,
+                null!));
 
         Assert.Equal(
             "context",
@@ -107,12 +101,11 @@ public sealed class FieldParserTests
     [Fact]
     public void ParseMappingField_WithNullKey_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _parser.ParseMappingField(
-                    null!,
-                    TestYamlParserContextFactory.CreateEmpty(
-                        TestSourceDocument.Default)));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _parser.ParseMappingField(
+                null!,
+                TestYamlParserContextFactory.CreateEmpty(
+                    TestSourceDocument.Default)));
 
         Assert.Equal(
             "key",
@@ -124,11 +117,10 @@ public sealed class FieldParserTests
     {
         var key = TestScalar.Create("env");
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _parser.ParseMappingField(
-                    key,
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _parser.ParseMappingField(
+                key,
+                null!));
 
         Assert.Equal(
             "context",

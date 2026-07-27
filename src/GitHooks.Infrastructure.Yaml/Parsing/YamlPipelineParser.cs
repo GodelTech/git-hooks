@@ -16,11 +16,13 @@ internal sealed class YamlPipelineParser(
         = pipelineParser ?? throw new ArgumentNullException(nameof(pipelineParser));
 
     public PipelineNode Parse(
-        ParsingContext context)
+        ParsingContext context,
+        DiagnosticBag diagnostics)
     {
         ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(diagnostics);
 
-        var parserContext = new YamlParserContext(context);
+        var parserContext = new YamlParserContext(context, diagnostics);
 
         try
         {

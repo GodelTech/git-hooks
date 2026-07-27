@@ -18,7 +18,12 @@ public sealed class PipelineParameterBinderTests
     {
         var binder = CreateBinder();
 
-        _ = Assert.Throws<ArgumentNullException>(() => binder.Bind(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => binder.Bind(null!));
+
+        Assert.Equal(
+            "pipeline",
+            exception.ParamName);
     }
 
     [Fact]

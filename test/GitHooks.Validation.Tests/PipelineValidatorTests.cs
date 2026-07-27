@@ -14,11 +14,10 @@ public sealed class PipelineValidatorTests
     {
         var diagnostics = new DiagnosticBag();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _validator.Validate(
-                    null!,
-                    diagnostics));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _validator.Validate(
+                null!,
+                diagnostics));
 
         Assert.Equal(
             "root",
@@ -31,11 +30,10 @@ public sealed class PipelineValidatorTests
         var pipeline = new PipelineNodeBuilder()
             .Build();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _validator.Validate(
-                    pipeline,
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _validator.Validate(
+                pipeline,
+                null!));
 
         Assert.Equal(
             "diagnostics",

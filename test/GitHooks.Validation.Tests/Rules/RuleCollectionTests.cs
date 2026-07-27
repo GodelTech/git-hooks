@@ -10,9 +10,8 @@ public sealed class RuleCollectionTests
     {
         var rules = new RuleCollection<ParameterNode>();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => rules.Add(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => rules.Add(null!));
 
         Assert.Equal(
             "rule",

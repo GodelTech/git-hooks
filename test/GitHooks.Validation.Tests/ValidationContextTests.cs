@@ -8,9 +8,8 @@ public sealed class ValidationContextTests
     [Fact]
     public void Constructor_NullDiagnostics_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new ValidationContext(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new ValidationContext(null!));
 
         Assert.Equal(
             "diagnostics",
@@ -38,9 +37,8 @@ public sealed class ValidationContextTests
         var context = new ValidationContext(
             new DiagnosticBag());
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => context.Report(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => context.Report(null!));
 
         Assert.Equal(
             "diagnostic",

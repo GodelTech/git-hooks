@@ -78,10 +78,14 @@ public sealed class VariableExpressionParserTests
     {
         var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
-        Assert.Throws<ArgumentException>(
+        var exception = Assert.Throws<ArgumentException>(
             () => _parser.Parse(
                 expression,
                 SourceSpan.Unknown,
                 context));
+
+        Assert.Equal(
+            "expression",
+            exception.ParamName);
     }
 }

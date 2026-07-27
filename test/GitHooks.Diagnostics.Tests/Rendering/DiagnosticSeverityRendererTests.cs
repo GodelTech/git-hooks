@@ -37,8 +37,12 @@ public sealed class DiagnosticSeverityRendererTests
     [Fact]
     public void Render_UnknownSeverity_Throws()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(
             () => DiagnosticSeverityRenderer.Render(
                 (DiagnosticSeverity)999));
+
+        Assert.Equal(
+            "severity",
+            exception.ParamName);
     }
 }

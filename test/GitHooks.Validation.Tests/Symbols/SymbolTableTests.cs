@@ -10,9 +10,8 @@ public sealed class SymbolTableTests
     {
         var symbols = new SymbolTable();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => symbols.AddParameter(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => symbols.AddParameter(null!));
 
         Assert.Equal(
             "parameter",
@@ -87,9 +86,8 @@ public sealed class SymbolTableTests
     {
         var symbols = new SymbolTable();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => symbols.ContainsParameter(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => symbols.ContainsParameter(null!));
 
         Assert.Equal(
             "name",
@@ -105,9 +103,8 @@ public sealed class SymbolTableTests
     {
         var symbols = new SymbolTable();
 
-        var exception =
-            Assert.Throws<ArgumentException>(
-                () => symbols.ContainsParameter(name));
+        var exception = Assert.Throws<ArgumentException>(
+            () => symbols.ContainsParameter(name));
 
         Assert.Equal(
             "name",
@@ -146,11 +143,10 @@ public sealed class SymbolTableTests
     {
         var symbols = new SymbolTable();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => symbols.TryGetParameter(
-                    null!,
-                    out _));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => symbols.TryGetParameter(
+                null!,
+                out _));
 
         Assert.Equal(
             "name",
@@ -166,9 +162,8 @@ public sealed class SymbolTableTests
     {
         var symbols = new SymbolTable();
 
-        var exception =
-            Assert.Throws<ArgumentException>(
-                () => symbols.TryGetParameter(name, out _));
+        var exception = Assert.Throws<ArgumentException>(
+            () => symbols.TryGetParameter(name, out _));
 
         Assert.Equal(
             "name",

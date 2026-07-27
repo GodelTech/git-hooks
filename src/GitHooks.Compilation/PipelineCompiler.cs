@@ -1,15 +1,14 @@
-using GitHooks.Compilation.Parsing;
 using GitHooks.Compilation.Validation;
 using GitHooks.Domain.Common;
 
 namespace GitHooks.Compilation;
 
 public sealed class PipelineCompiler(
-    IPipelineParser parser,
+    IPipelineAstCompiler astCompiler,
     IPipelineValidator validator)
 {
-    private readonly IPipelineParser _parser
-        = parser ?? throw new ArgumentNullException(nameof(parser));
+    private readonly IPipelineAstCompiler _astCompiler
+        = astCompiler ?? throw new ArgumentNullException(nameof(astCompiler));
 
     private readonly IPipelineValidator _validator
         = validator ?? throw new ArgumentNullException(nameof(validator));
@@ -24,12 +23,13 @@ public sealed class PipelineCompiler(
 
         context ??= new CompilationContext();
 
-        var parsingContext = new ParsingContext(
+        var source = new SourceContent(
             text,
-            document,
-            context.Diagnostics);
+            document);
 
-        var root = _parser.Parse(parsingContext);
+        var root = _astCompiler.Compile(
+            source,
+            context);
 
         _validator.Validate(
             root,

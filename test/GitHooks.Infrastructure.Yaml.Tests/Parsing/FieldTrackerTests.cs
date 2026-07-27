@@ -17,9 +17,8 @@ public sealed class FieldTrackerTests
     [Fact]
     public void Constructor_NullFieldValueParser_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new FieldTracker(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new FieldTracker(null!));
 
         Assert.Equal(
             "fieldValueParser",

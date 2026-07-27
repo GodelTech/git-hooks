@@ -14,9 +14,8 @@ public sealed class DiagnosticPrinterTests
     [Fact]
     public void Print_NullDiagnosticsProvided_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => _printer.Print(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => _printer.Print(null!));
 
         Assert.Equal(
             "diagnostics",

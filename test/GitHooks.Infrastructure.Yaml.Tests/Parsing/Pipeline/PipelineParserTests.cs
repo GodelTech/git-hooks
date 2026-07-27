@@ -17,12 +17,11 @@ public sealed class PipelineParserTests
     [Fact]
     public void Constructor_NullParametersParser_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new PipelineParser(
-                    null!,
-                    TestParserFactory.CreateStepsParser(),
-                    TestParserFactory.CreateFieldValueParser()));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new PipelineParser(
+                null!,
+                TestParserFactory.CreateStepsParser(),
+                TestParserFactory.CreateFieldValueParser()));
 
         Assert.Equal(
             "parametersParser",
@@ -32,12 +31,11 @@ public sealed class PipelineParserTests
     [Fact]
     public void Constructor_NullStepsParser_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new PipelineParser(
-                    TestParserFactory.CreateParametersParser(),
-                    null!,
-                    TestParserFactory.CreateFieldValueParser()));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new PipelineParser(
+                TestParserFactory.CreateParametersParser(),
+                null!,
+                TestParserFactory.CreateFieldValueParser()));
 
         Assert.Equal(
             "stepsParser",
@@ -47,12 +45,11 @@ public sealed class PipelineParserTests
     [Fact]
     public void Constructor_NullFieldValueParser_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new PipelineParser(
-                    TestParserFactory.CreateParametersParser(),
-                    TestParserFactory.CreateStepsParser(),
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new PipelineParser(
+                TestParserFactory.CreateParametersParser(),
+                TestParserFactory.CreateStepsParser(),
+                null!));
 
         Assert.Equal(
             "fieldValueParser",

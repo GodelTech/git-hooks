@@ -25,7 +25,11 @@ public sealed class DiagnosticCodeTests
     [Fact]
     public void Create_NegativeValue_Throws()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(
             () => DiagnosticCode.Create(-1));
+
+        Assert.Equal(
+            "value",
+            exception.ParamName);
     }
 }

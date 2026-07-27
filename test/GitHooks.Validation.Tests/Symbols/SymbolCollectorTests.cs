@@ -9,9 +9,8 @@ public sealed class SymbolCollectorTests
     [Fact]
     public void Constructor_NullContext_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new SymbolCollector(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new SymbolCollector(null!));
 
         Assert.Equal(
             "context",
@@ -25,9 +24,8 @@ public sealed class SymbolCollectorTests
 
         var collector = new SymbolCollector(context);
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => collector.Collect(null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => collector.Collect(null!));
 
         Assert.Equal(
             "root",

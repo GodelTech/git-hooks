@@ -29,24 +29,9 @@ public static class DiagnosticAssert
         params object?[] arguments)
     {
         Assert.NotNull(diagnostics);
-
-        return Single(
-            diagnostics.Diagnostics,
-            descriptor,
-            span,
-            arguments);
-    }
-
-    public static Diagnostic Single(
-        IReadOnlyList<Diagnostic> diagnostics,
-        DiagnosticDescriptor descriptor,
-        SourceSpan span,
-        params object?[] arguments)
-    {
-        Assert.NotNull(diagnostics);
         Assert.NotNull(descriptor);
 
-        var diagnostic = Assert.Single(diagnostics);
+        var diagnostic = Assert.Single(diagnostics.Diagnostics);
 
         Matches(
             diagnostic,

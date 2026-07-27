@@ -10,10 +10,9 @@ public sealed class ValidationRuleCatalogTests
     [Fact]
     public void RegisterBuiltInRules_NullRegistry_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => ValidationRuleCatalog.RegisterBuiltInRules(
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => ValidationRuleCatalog.RegisterBuiltInRules(
+                null!));
 
         Assert.Equal(
             "registry",

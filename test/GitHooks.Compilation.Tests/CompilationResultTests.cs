@@ -9,19 +9,27 @@ public sealed class CompilationResultTests
     [Fact]
     public void Constructor_NullRoot_Throws()
     {
-        Assert.Throws<ArgumentNullException>(
+        var exception = Assert.Throws<ArgumentNullException>(
             () => new CompilationResult(
                 null!,
                 new DiagnosticBag()));
+
+        Assert.Equal(
+            "root",
+            exception.ParamName);
     }
 
     [Fact]
     public void Constructor_NullDiagnostics_Throws()
     {
-        Assert.Throws<ArgumentNullException>(
+        var exception = Assert.Throws<ArgumentNullException>(
             () => new CompilationResult(
                 PipelineNode.Empty(SourceSpan.Unknown),
                 null!));
+
+        Assert.Equal(
+            "diagnostics",
+            exception.ParamName);
     }
 
     [Fact]

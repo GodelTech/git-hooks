@@ -12,11 +12,10 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Constructor_NullParser_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new YamlParserCursor(
-                    null!,
-                    new SourceDocument("test.yaml")));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new YamlParserCursor(
+                null!,
+                new SourceDocument("test.yaml")));
 
         Assert.Equal(
             "parser",
@@ -26,11 +25,10 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Constructor_NullDocument_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => new YamlParserCursor(
-                    new Parser(new StringReader("{}")),
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new YamlParserCursor(
+                new Parser(new StringReader("{}")),
+                null!));
 
         Assert.Equal(
             "document",
@@ -40,11 +38,10 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Create_NullYaml_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => YamlParserCursor.Create(
-                    null!,
-                    new SourceDocument("test.yaml")));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => YamlParserCursor.Create(
+                null!,
+                new SourceDocument("test.yaml")));
 
         Assert.Equal(
             "yaml",
@@ -54,11 +51,10 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Create_EmptyYaml_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentException>(
-                () => YamlParserCursor.Create(
-                    string.Empty,
-                    new SourceDocument("test.yaml")));
+        var exception = Assert.Throws<ArgumentException>(
+            () => YamlParserCursor.Create(
+                string.Empty,
+                new SourceDocument("test.yaml")));
 
         Assert.Equal(
             "yaml",
@@ -68,11 +64,10 @@ public sealed class YamlParserCursorTests
     [Fact]
     public void Create_NullDocument_Throws()
     {
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => YamlParserCursor.Create(
-                    "{}",
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => YamlParserCursor.Create(
+                "{}",
+                null!));
 
         Assert.Equal(
             "document",
@@ -124,10 +119,9 @@ public sealed class YamlParserCursorTests
     {
         var (context, _, end) = CreateMappingContext();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => context.Cursor.CreateSpan(
-                    null!, end));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => context.Cursor.CreateSpan(
+                null!, end));
 
         Assert.Equal(
             "start",
@@ -139,10 +133,9 @@ public sealed class YamlParserCursorTests
     {
         var (context, start, _) = CreateMappingContext();
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => context.Cursor.CreateSpan(
-                    start, null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => context.Cursor.CreateSpan(
+                start, null!));
 
         Assert.Equal(
             "end",
@@ -176,10 +169,9 @@ public sealed class YamlParserCursorTests
     {
         var context = TestYamlParserContextFactory.CreateEmpty(TestSourceDocument.Default);
 
-        var exception =
-            Assert.Throws<ArgumentNullException>(
-                () => context.Cursor.CreateSpan(
-                    null!));
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => context.Cursor.CreateSpan(
+                null!));
 
         Assert.Equal(
             "exception",

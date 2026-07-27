@@ -1,5 +1,4 @@
 using GitHooks.Compilation.Parsing;
-using GitHooks.Diagnostics;
 using GitHooks.Testing.Common;
 
 namespace GitHooks.Compilation.Tests.Parsing;
@@ -9,43 +8,37 @@ public sealed class ParsingContextTests
     [Fact]
     public void Constructor_NullText_Throws()
     {
-        Assert.Throws<ArgumentNullException>(
+        var exception = Assert.Throws<ArgumentNullException>(
             () => new ParsingContext(
                 null!,
-                TestSourceDocument.Default,
-                new DiagnosticBag()));
+                TestSourceDocument.Default));
+
+        Assert.Equal(
+            "text",
+            exception.ParamName);
     }
 
     [Fact]
     public void Constructor_NullDocument_Throws()
     {
-        Assert.Throws<ArgumentNullException>(
+        var exception = Assert.Throws<ArgumentNullException>(
             () => new ParsingContext(
                 "test",
-                null!,
-                new DiagnosticBag()));
-    }
-
-    [Fact]
-    public void Constructor_NullDiagnostics_Throws()
-    {
-        Assert.Throws<ArgumentNullException>(
-            () => new ParsingContext(
-                "test",
-                TestSourceDocument.Default,
                 null!));
+
+        Assert.Equal(
+            "document",
+            exception.ParamName);
     }
 
     [Fact]
     public void Constructor_InitializesProperties()
     {
         var document = TestSourceDocument.Default;
-        var diagnostics = new DiagnosticBag();
 
         var context = new ParsingContext(
             "test",
-            document,
-            diagnostics);
+            document);
 
         Assert.Equal(
             "test",
@@ -54,9 +47,5 @@ public sealed class ParsingContextTests
         Assert.Same(
             document,
             context.Document);
-
-        Assert.Same(
-            diagnostics,
-            context.Diagnostics);
     }
 }
