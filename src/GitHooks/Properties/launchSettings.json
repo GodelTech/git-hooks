@@ -19,6 +19,36 @@
       "commandName": "Project",
       "commandLineArgs": "uninstall",
       "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/simple.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/simple.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/pre-commit.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/pre-commit.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/push-minimal.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/push-minimal.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/push-template.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/push-template.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/missing-param.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/missing-param.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/invalid.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/invalid.yaml",
+      "workingDirectory": "$(SolutionDir)"
     }
   }
 }

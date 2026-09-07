@@ -1,4 +1,7 @@
 using GitHooks.Compilation.Validation;
+using GitHooks.Diagnostics;
+using GitHooks.Domain.Ast.Mappings;
+using GitHooks.Domain.Common;
 using GitHooks.Testing.Common;
 
 using Moq;
@@ -94,5 +97,93 @@ public sealed class PipelineCompilerTests
         Assert.Equal(
             "document",
             exception.ParamName);
+    }
+
+    [Fact]
+    public void Compile_ValidPipeline_ReturnsResultWithoutErrorsAndInvokesDependenciesOnce()
+    {
+        var expectedRoot = PipelineNode.Empty(SourceSpan.Unknown);
+
+        _mockAstCompiler
+            .Setup(static astCompiler => astCompiler.Compile(
+                It.IsAny<SourceContent>(),
+                It.IsAny<CompilationContext>()))
+            .Returns(expectedRoot);
+
+        var compiler = new PipelineCompiler(
+            _mockAstCompiler.Object,
+            _mockValidator.Object);
+
+        var result = compiler.Compile(
+            "name: test",
+            TestSourceDocument.Default);
+
+        Assert.Same(
+            expectedRoot,
+            result.Root);
+
+        Assert.False(
+            result.Diagnostics.HasErrors);
+
+        _mockAstCompiler.Verify(
+            astCompiler => astCompiler.Compile(
+                It.IsAny<SourceContent>(),
+                It.IsAny<CompilationContext>()),
+            Times.Once);
+
+        _mockValidator.Verify(
+            validator => validator.Validate(
+                expectedRoot,
+                It.IsAny<DiagnosticBag>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public void Compile_ValidatorReportsError_ReturnsResultWithErrors()
+    {
+        var expectedRoot = PipelineNode.Empty(SourceSpan.Unknown);
+
+        _mockAstCompiler
+            .Setup(static astCompiler => astCompiler.Compile(
+                It.IsAny<SourceContent>(),
+                It.IsAny<CompilationContext>()))
+            .Returns(expectedRoot);
+
+        _mockValidator
+            .Setup(static validator => validator.Validate(
+                It.IsAny<PipelineNode>(),
+                It.IsAny<DiagnosticBag>()))
+            .Callback(static (PipelineNode _, DiagnosticBag diagnostics) =>
+                diagnostics.Report(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.InvalidYaml,
+                        SourceSpan.Unknown,
+                        "test")));
+
+        var compiler = new PipelineCompiler(
+            _mockAstCompiler.Object,
+            _mockValidator.Object);
+
+        var result = compiler.Compile(
+            "name: test",
+            TestSourceDocument.Default);
+
+        Assert.True(
+            result.Diagnostics.HasErrors);
+
+        Assert.Single(
+            result.Diagnostics.Diagnostics);
+
+        _mockAstCompiler.Verify(
+            astCompiler => astCompiler.Compile(
+                It.IsAny<SourceContent>(),
+                It.IsAny<CompilationContext>()),
+            Times.Once);
+
+        _mockValidator.Verify(
+            validator => validator.Validate(
+                expectedRoot,
+                It.IsAny<DiagnosticBag>()),
+            Times.Once);
     }
 }
