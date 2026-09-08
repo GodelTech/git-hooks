@@ -44,6 +44,16 @@
       "commandName": "Project",
       "commandLineArgs": "run-pipeline-compiler --file examples/invalid.yaml",
       "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/simple.yaml -p serverName=localhost": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/simple.yaml -p serverName=localhost -p operatingSystem=windows",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/simple.yaml --parameters": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/simple.yaml --parameters serverName=localhost,operatingSystem=windows",
+      "workingDirectory": "$(SolutionDir)"
     }
   }
 }

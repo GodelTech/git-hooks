@@ -36,7 +36,24 @@ public sealed class ExpressionNodeExtensionsTests
     }
 
     [Fact]
-    public void TryGetStringValue_NonStringLiteral_ReturnsFalse()
+    public void TryGetStringValue_BooleanLiteral_ReturnsTrue()
+    {
+        var expression = new BooleanLiteralExpressionNodeBuilder()
+            .WithValue(true)
+            .Build();
+
+        var result = expression.TryGetStringValue(
+            out var value);
+
+        Assert.True(result);
+
+        Assert.Equal(
+            bool.TrueString,
+            value);
+    }
+
+    [Fact]
+    public void TryGetStringValue_IntegerLiteral_ReturnsTrue()
     {
         var expression = new IntegerLiteralExpressionNodeBuilder()
             .WithValue(42)
@@ -45,10 +62,10 @@ public sealed class ExpressionNodeExtensionsTests
         var result = expression.TryGetStringValue(
             out var value);
 
-        Assert.False(result);
+        Assert.True(result);
 
         Assert.Equal(
-            string.Empty,
+            "42",
             value);
     }
 
@@ -74,6 +91,24 @@ public sealed class ExpressionNodeExtensionsTests
     {
         var expression = new InvalidVariableExpressionNodeBuilder()
             .WithText("foo.bar")
+            .Build();
+
+        var result = expression.TryGetStringValue(
+            out var value);
+
+        Assert.False(result);
+
+        Assert.Equal(
+            string.Empty,
+            value);
+    }
+
+    [Fact]
+    public void TryGetStringValue_InterpolatedStringExpression_ReturnsFalse()
+    {
+        var expression = new InterpolatedStringExpressionNodeBuilder()
+            .WithPart("value-")
+            .WithParameterVariablePart("configuration")
             .Build();
 
         var result = expression.TryGetStringValue(

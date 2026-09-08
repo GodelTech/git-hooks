@@ -22,7 +22,10 @@ internal static class ValidationRuleCatalog
             new ParameterNameMustBeValidIdentifierRule(),
             new ParameterNameMustBeUniqueRule(),
             new ParameterValuesMustBeSequenceRule(),
-            new ParameterDisplayNameMustNotBeEmptyRule()
+            new ParameterDisplayNameMustNotBeEmptyRule(),
+            new ParameterTypeMustBeSupportedRule(),
+            new ParameterDefaultValueTypeMismatchRule(),
+            new ParameterDefaultValueMustBeInValuesRule()
         ];
 
     public static RuleCollection<ScriptStepNode> ScriptStep { get; } =

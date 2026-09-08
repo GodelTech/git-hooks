@@ -19,4 +19,20 @@ public static class ParameterNodeExtensions
         name = string.Empty;
         return false;
     }
+
+    public static bool TryGetDefaultValue(
+        this ParameterNode node,
+        out string defaultValue)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        if (node.DefaultValue is not null &&
+            node.DefaultValue.Value.TryGetStringValue(out defaultValue))
+        {
+            return true;
+        }
+
+        defaultValue = string.Empty;
+        return false;
+    }
 }

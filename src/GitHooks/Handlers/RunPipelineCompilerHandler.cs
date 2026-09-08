@@ -24,6 +24,7 @@ public sealed class RunPipelineCompilerHandler(
     /// <inheritdoc/>
     public async Task<int> HandleAsync(
         string filePath,
+        IReadOnlyDictionary<string, string>? parameterOverrides = null,
         CancellationToken cancellationToken = default)
     {
         var absoluteFilePath = Path.GetFullPath(filePath);
@@ -39,7 +40,17 @@ public sealed class RunPipelineCompilerHandler(
 
         var result = _compiler.Compile(
             yamlText,
-            document);
+            document,
+            parameterOverrides: parameterOverrides);
+
+        if (parameterOverrides is { Count: > 0 })
+        {
+            _console.MarkupLine("[bold]== Parameter Overrides ==[/]");
+            foreach (var (name, value) in parameterOverrides)
+            {
+                _console.MarkupLineInterpolated($"  - {Markup.Escape(name)} = {Markup.Escape(value)}");
+            }
+        }
 
         _console.MarkupLine("[bold]== Domain AST ==[/]");
         _console.MarkupLineInterpolated($"[blue]AST root type:[/] {result.Root.GetType().FullName}");
@@ -57,6 +68,13 @@ public sealed class RunPipelineCompilerHandler(
 
         _console.MarkupLineInterpolated($"[blue]Steps ({result.Root.Steps.Count}):[/]");
         foreach (var step in result.Root.Steps)
+        {
+            _console.MarkupLineInterpolated($"  - {Markup.Escape(DescribeStep(step))}");
+        }
+
+        _console.MarkupLine("[bold]== Bound AST (post-substitution) ==[/]");
+        _console.MarkupLineInterpolated($"[blue]Steps ({result.BoundRoot.Steps.Count}):[/]");
+        foreach (var step in result.BoundRoot.Steps)
         {
             _console.MarkupLineInterpolated($"  - {Markup.Escape(DescribeStep(step))}");
         }

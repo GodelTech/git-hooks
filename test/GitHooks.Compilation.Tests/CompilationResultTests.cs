@@ -12,6 +12,7 @@ public sealed class CompilationResultTests
         var exception = Assert.Throws<ArgumentNullException>(
             () => new CompilationResult(
                 null!,
+                PipelineNode.Empty(SourceSpan.Unknown),
                 new DiagnosticBag()));
 
         Assert.Equal(
@@ -25,6 +26,7 @@ public sealed class CompilationResultTests
         var exception = Assert.Throws<ArgumentNullException>(
             () => new CompilationResult(
                 PipelineNode.Empty(SourceSpan.Unknown),
+                PipelineNode.Empty(SourceSpan.Unknown),
                 null!));
 
         Assert.Equal(
@@ -36,15 +38,21 @@ public sealed class CompilationResultTests
     public void Constructor_InitializesProperties()
     {
         var root = PipelineNode.Empty(SourceSpan.Unknown);
+        var boundRoot = PipelineNode.Empty(SourceSpan.Unknown);
         var diagnostics = new DiagnosticBag();
 
         var result = new CompilationResult(
             root,
+            boundRoot,
             diagnostics);
 
         Assert.Same(
             root,
             result.Root);
+
+        Assert.Same(
+            boundRoot,
+            result.BoundRoot);
 
         Assert.Same(
             diagnostics,

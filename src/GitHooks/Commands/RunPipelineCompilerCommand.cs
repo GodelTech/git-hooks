@@ -18,6 +18,9 @@ namespace GitHooks.Commands;
 public sealed class RunPipelineCompilerCommand(IRunPipelineCompilerHandler handler)
     : CommandBase("run-pipeline-compiler", "TEMPORARY: compile a YAML file with the target PipelineCompiler and print the AST/diagnostics.")
 {
+    private const string ParameterOptionName = "--parameter";
+    private const string ParametersOptionName = "--parameters";
+
     private readonly IRunPipelineCompilerHandler _handler = handler;
 
     /// <inheritdoc/>
@@ -28,18 +31,38 @@ public sealed class RunPipelineCompilerCommand(IRunPipelineCompilerHandler handl
             Description = "Path to YAML file (for example: simple.yaml).",
             Required = true,
         };
+
+        var parameterOption = new Option<string[]>(ParameterOptionName)
+        {
+            Description = "Parameter override in name=value format. Repeat option to pass multiple values.",
+        };
+        parameterOption.Aliases.Add("-p");
+
+        yield return parameterOption;
+
+        yield return new Option<string?>(ParametersOptionName)
+        {
+            Description = "Comma-separated parameter overrides in name=value format.",
+        };
     }
 
     /// <inheritdoc/>
     public override Task<int> HandleActionAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
         var filePath = parseResult.GetValue<string>("--file");
+        var parameterEntries = parseResult.GetValue<string[]>(ParameterOptionName) ?? [];
+        var parameterListEntry = parseResult.GetValue<string?>(ParametersOptionName);
 
         if (string.IsNullOrWhiteSpace(filePath))
         {
             return Task.FromResult(1);
         }
 
-        return _handler.HandleAsync(filePath, cancellationToken);
+        if (!RunCommand.TryParseParameterOverrides(parameterEntries, parameterListEntry, out var parameterOverrides, out _))
+        {
+            return Task.FromResult(1);
+        }
+
+        return _handler.HandleAsync(filePath, parameterOverrides, cancellationToken);
     }
 }
