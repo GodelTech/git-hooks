@@ -19,6 +19,41 @@
       "commandName": "Project",
       "commandLineArgs": "uninstall",
       "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/simple.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/simple.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/push-minimal.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/push-minimal.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/push-template.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/push-template.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/missing-param.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/missing-param.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/invalid.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/invalid.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/simple.yaml -p serverName=localhost": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/simple.yaml -p serverName=localhost -p operatingSystem=windows",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run-pipeline-compiler --file examples/simple.yaml --parameters": {
+      "commandName": "Project",
+      "commandLineArgs": "run-pipeline-compiler --file examples/simple.yaml --parameters serverName=localhost,operatingSystem=windows",
+      "workingDirectory": "$(SolutionDir)"
     }
   }
 }
