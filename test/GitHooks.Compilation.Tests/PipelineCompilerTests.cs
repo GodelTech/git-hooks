@@ -20,7 +20,7 @@ public sealed class PipelineCompilerTests
     }
 
     [Fact]
-    public void Constructor_NullAstCompiler_Throws()
+    public void Constructor_NullAstCompiler_ThrowsArgumentNullException()
     {
         var exception = Assert.Throws<ArgumentNullException>(
             () => new PipelineCompiler(
@@ -33,7 +33,7 @@ public sealed class PipelineCompilerTests
     }
 
     [Fact]
-    public void Constructor_NullValidator_Throws()
+    public void Constructor_NullValidator_ThrowsArgumentNullException()
     {
         var exception = Assert.Throws<ArgumentNullException>(
             () => new PipelineCompiler(
@@ -46,7 +46,7 @@ public sealed class PipelineCompilerTests
     }
 
     [Fact]
-    public void Compile_NullText_Throws()
+    public void Compile_NullText_ThrowsArgumentNullException()
     {
         var compiler = new PipelineCompiler(
             _mockAstCompiler.Object,
@@ -65,7 +65,7 @@ public sealed class PipelineCompilerTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Compile_EmptyOrWhitespaceText_Throws(
+    public void Compile_EmptyOrWhitespaceText_ThrowsArgumentException(
         string text)
     {
         var compiler = new PipelineCompiler(
@@ -83,7 +83,7 @@ public sealed class PipelineCompilerTests
     }
 
     [Fact]
-    public void Compile_NullDocument_Throws()
+    public void Compile_NullDocument_ThrowsArgumentNullException()
     {
         var compiler = new PipelineCompiler(
             _mockAstCompiler.Object,

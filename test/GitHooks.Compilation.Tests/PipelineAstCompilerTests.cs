@@ -21,7 +21,7 @@ public sealed class PipelineAstCompilerTests
     }
 
     [Fact]
-    public void Constructor_NullParser_Throws()
+    public void Constructor_NullParser_ThrowsArgumentNullException()
     {
         var exception = Assert.Throws<ArgumentNullException>(
             () => new PipelineAstCompiler(
@@ -34,7 +34,7 @@ public sealed class PipelineAstCompilerTests
     }
 
     [Fact]
-    public void Constructor_NullExpander_Throws()
+    public void Constructor_NullExpander_ThrowsArgumentNullException()
     {
         var exception = Assert.Throws<ArgumentNullException>(
             () => new PipelineAstCompiler(
@@ -47,7 +47,7 @@ public sealed class PipelineAstCompilerTests
     }
 
     [Fact]
-    public void Compile_NullSource_Throws()
+    public void Compile_NullSource_ThrowsArgumentNullException()
     {
         var compiler = new PipelineAstCompiler(
             _mockParser.Object,
@@ -64,7 +64,7 @@ public sealed class PipelineAstCompilerTests
     }
 
     [Fact]
-    public void Compile_NullContext_Throws()
+    public void Compile_NullContext_ThrowsArgumentNullException()
     {
         var compiler = new PipelineAstCompiler(
             _mockParser.Object,

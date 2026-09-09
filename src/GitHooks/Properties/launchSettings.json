@@ -25,11 +25,6 @@
       "commandLineArgs": "run-pipeline-compiler --file examples/simple.yaml",
       "workingDirectory": "$(SolutionDir)"
     },
-    "run-pipeline-compiler --file examples/pre-commit.yaml": {
-      "commandName": "Project",
-      "commandLineArgs": "run-pipeline-compiler --file examples/pre-commit.yaml",
-      "workingDirectory": "$(SolutionDir)"
-    },
     "run-pipeline-compiler --file examples/push-minimal.yaml": {
       "commandName": "Project",
       "commandLineArgs": "run-pipeline-compiler --file examples/push-minimal.yaml",

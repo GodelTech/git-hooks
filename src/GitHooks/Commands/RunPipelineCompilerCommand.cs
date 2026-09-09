@@ -25,7 +25,7 @@ public sealed class RunPipelineCompilerCommand(IRunPipelineCompilerHandler handl
     {
         yield return new Option<string>("--file")
         {
-            Description = "Path to YAML file (for example: pre-commit.yaml).",
+            Description = "Path to YAML file (for example: simple.yaml).",
             Required = true,
         };
     }
