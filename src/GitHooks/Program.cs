@@ -1,9 +1,12 @@
 using System.CommandLine;
 
 using GitHooks.Commands;
+using GitHooks.Compilation.DependencyInjection;
 using GitHooks.Handlers;
 using GitHooks.Infrastructure;
+using GitHooks.Infrastructure.Yaml.DependencyInjection;
 using GitHooks.Templates;
+using GitHooks.Validation.DependencyInjection;
 using GitHooks.Workflow.Application.DependencyInjection;
 using GitHooks.Workflow.Infrastructure.DependencyInjection;
 
@@ -62,11 +65,17 @@ internal sealed class Program
         _ = services.AddTransient<CommandBase, RunCommand>();
         _ = services.AddTransient<CommandBase, UninstallCommand>();
 
+        // TEMPORARY: manual verification command for PipelineCompiler; remove before merging if not shipping.
+        _ = services.AddTransient<CommandBase, RunPipelineCompilerCommand>();
+
         // add command handlers:
         _ = services.AddTransient<IInstallHandler, InstallHandler>();
         _ = services.AddTransient<ICreateHookHandler, CreateHookHandler>();
         _ = services.AddTransient<IRunHandler, RunHandler>();
         _ = services.AddTransient<IUninstallHandler, UninstallHandler>();
+
+        // TEMPORARY: manual verification handler for PipelineCompiler; remove before merging if not shipping.
+        _ = services.AddTransient<IRunPipelineCompilerHandler, RunPipelineCompilerHandler>();
 
         // add services:
         _ = services.AddTemplates();
@@ -76,6 +85,11 @@ internal sealed class Program
         _ = services.AddYamlPipelineParsing();
         _ = services.AddPipelineParameterBinding();
         _ = services.AddPipelineResolution();
+
+        // TEMPORARY: target PipelineCompiler DI chain, wired only for the manual-verification command above.
+        _ = services.AddYamlPipelineCompilation();
+        _ = services.AddTargetPipelineCompilation();
+        _ = services.AddPipelineValidation();
 
         return services.BuildServiceProvider();
     }

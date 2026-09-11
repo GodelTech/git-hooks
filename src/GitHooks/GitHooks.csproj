@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -14,7 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GitHooks.Compilation\GitHooks.Compilation.csproj" />
     <ProjectReference Include="..\GitHooks.Infrastructure\GitHooks.Infrastructure.csproj" />
+    <ProjectReference Include="..\GitHooks.Infrastructure.Yaml\GitHooks.Infrastructure.Yaml.csproj" />
+    <ProjectReference Include="..\GitHooks.Validation\GitHooks.Validation.csproj" />
     <ProjectReference Include="..\GitHooks.Workflow.Infrastructure\GitHooks.Workflow.Infrastructure.csproj" />
   </ItemGroup>
 
