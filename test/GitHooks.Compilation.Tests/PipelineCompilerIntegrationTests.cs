@@ -86,6 +86,27 @@ public sealed class PipelineCompilerIntegrationTests
     }
 
     [Fact]
+    public void Compile_UndeclaredParameterReference_ReportsSingleDiagnostic()
+    {
+        var compiler = CreateCompiler();
+
+        var yaml = """
+            steps:
+              - script: echo ${{ parameters.doesNotExist }}
+            """;
+
+        var result = compiler.Compile(
+            yaml,
+            TestSourceDocument.Default);
+
+        var diagnostic = Assert.Single(result.Diagnostics.Diagnostics);
+
+        Assert.Equal(
+            DiagnosticDescriptors.ParameterVariableMustBeResolvable,
+            diagnostic.Descriptor);
+    }
+
+    [Fact]
     public void Compile_InvalidOverrideValue_ReportsOverrideDiagnosticAndPreservesDefaultSubstitution()
     {
         var compiler = CreateCompiler();
@@ -149,7 +170,7 @@ public sealed class PipelineCompilerIntegrationTests
 
         var firstStep = Assert.IsType<Domain.Ast.Mappings.Steps.ScriptStepNode>(result.BoundRoot.Steps[0]);
         var firstLiteral = Assert.IsType<Domain.Ast.Expressions.StringLiteralExpressionNode>(firstStep.Script.Value);
-        Assert.Equal("True", firstLiteral.Value);
+        Assert.Equal("true", firstLiteral.Value);
 
         var secondStep = Assert.IsType<Domain.Ast.Mappings.Steps.ScriptStepNode>(result.BoundRoot.Steps[1]);
         var secondLiteral = Assert.IsType<Domain.Ast.Expressions.StringLiteralExpressionNode>(secondStep.Script.Value);

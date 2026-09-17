@@ -18,7 +18,7 @@ public static class ExpressionNodeExtensions
 
         if (expression is BooleanLiteralExpressionNode booleanLiteral)
         {
-            value = booleanLiteral.Value.ToString();
+            value = booleanLiteral.Value ? "true" : "false";
             return true;
         }
 

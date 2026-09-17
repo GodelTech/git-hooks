@@ -98,7 +98,7 @@ public sealed class ParameterBinderTests
             context);
 
         Assert.True(context.Values.TryGetValue("enableDebug", out var enableDebug));
-        Assert.Equal(bool.TrueString, enableDebug);
+        Assert.Equal("true", enableDebug);
 
         Assert.True(context.Values.TryGetValue("retries", out var retries));
         Assert.Equal("42", retries);

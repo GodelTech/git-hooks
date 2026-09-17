@@ -1,5 +1,3 @@
-using System.Globalization;
-
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Mappings;
@@ -40,6 +38,7 @@ internal sealed class ParameterBinder : IParameterBinder
 
         return ParameterSubstitutionRewriter.Rewrite(
             root,
+            context.Parameters,
             context.Values,
             context.Diagnostics);
     }
@@ -128,13 +127,13 @@ internal sealed class ParameterBinder : IParameterBinder
     {
         if (declaration.Type is not null &&
             declaration.Type.Value.TryGetStringValue(out var type) &&
-            !IsValueValidForType(type, value))
+            !ParameterNodeExtensions.IsValueValidForType(type, value))
         {
             diagnostics.Report(
                 Diagnostic.Create(
                     DiagnosticDescriptors.ParameterOverrideValueTypeMismatch,
                     declaration.Span,
-                    GetNameForDiagnostic(declaration),
+                    ParameterNodeExtensions.GetNameForDiagnostic(declaration),
                     type));
 
             return false;
@@ -142,64 +141,17 @@ internal sealed class ParameterBinder : IParameterBinder
 
         if (declaration.Values is not null &&
             declaration.Values.Items.Count > 0 &&
-            !ContainsValue(declaration.Values.Items, value))
+            !ParameterNodeExtensions.ContainsValue(declaration.Values.Items, value))
         {
             diagnostics.Report(
                 Diagnostic.Create(
                     DiagnosticDescriptors.ParameterOverrideValueMustBeInValues,
                     declaration.Span,
-                    GetNameForDiagnostic(declaration)));
+                    ParameterNodeExtensions.GetNameForDiagnostic(declaration)));
 
             return false;
         }
 
         return true;
-    }
-
-    private static bool IsValueValidForType(
-        string type,
-        string value)
-    {
-        if (string.Equals(type, "boolean", StringComparison.OrdinalIgnoreCase))
-        {
-            return bool.TryParse(value, out _);
-        }
-
-        if (string.Equals(type, "number", StringComparison.OrdinalIgnoreCase))
-        {
-            return decimal.TryParse(
-                value,
-                NumberStyles.Number,
-                CultureInfo.InvariantCulture,
-                out _);
-        }
-
-        return true;
-    }
-
-    private static bool ContainsValue(
-        IReadOnlyList<ExpressionNode> values,
-        string parameterValue)
-    {
-        foreach (var candidate in values)
-        {
-            if (candidate.TryGetStringValue(out var stringValue) &&
-                string.Equals(stringValue, parameterValue, StringComparison.Ordinal))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private static string GetNameForDiagnostic(
-        ParameterNode declaration)
-    {
-        ArgumentNullException.ThrowIfNull(declaration);
-
-        return declaration.TryGetName(out var name)
-            ? name
-            : "<unknown>";
     }
 }

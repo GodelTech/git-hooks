@@ -47,7 +47,6 @@ public static class YamlPipelineCompilationRegistration
 
         // pipeline
         _ = services.AddSingleton<PipelineParser>();
-
         _ = services.AddSingleton<IPipelineParser, YamlPipelineParser>();
 
         return services;

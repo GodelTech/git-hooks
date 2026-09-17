@@ -48,7 +48,7 @@ public sealed class ExpressionNodeExtensionsTests
         Assert.True(result);
 
         Assert.Equal(
-            bool.TrueString,
+            "true",
             value);
     }
 

@@ -2,6 +2,8 @@ using System.CommandLine;
 
 using GitHooks.Handlers;
 
+using Spectre.Console;
+
 namespace GitHooks.Commands;
 
 /// <summary>
@@ -14,14 +16,16 @@ namespace GitHooks.Commands;
 /// Initializes a new instance of the <see cref="RunPipelineCompilerCommand"/> class.
 /// </remarks>
 /// <param name="handler">The handler that processes the run-pipeline-compiler command behavior.</param>
+/// <param name="console">The console used for command-level validation output.</param>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1010:Collections should implement generic interface", Justification = "Inherited from System.CommandLine.Command base class")]
-public sealed class RunPipelineCompilerCommand(IRunPipelineCompilerHandler handler)
+public sealed class RunPipelineCompilerCommand(IRunPipelineCompilerHandler handler, IAnsiConsole console)
     : CommandBase("run-pipeline-compiler", "TEMPORARY: compile a YAML file with the target PipelineCompiler and print the AST/diagnostics.")
 {
     private const string ParameterOptionName = "--parameter";
     private const string ParametersOptionName = "--parameters";
 
     private readonly IRunPipelineCompilerHandler _handler = handler;
+    private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
     public override IEnumerable<Option> CreateOptions()
@@ -58,8 +62,9 @@ public sealed class RunPipelineCompilerCommand(IRunPipelineCompilerHandler handl
             return Task.FromResult(1);
         }
 
-        if (!RunCommand.TryParseParameterOverrides(parameterEntries, parameterListEntry, out var parameterOverrides, out _))
+        if (!RunCommand.TryParseParameterOverrides(parameterEntries, parameterListEntry, out var parameterOverrides, out var errorMessage))
         {
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {Markup.Escape(errorMessage)}");
             return Task.FromResult(1);
         }
 

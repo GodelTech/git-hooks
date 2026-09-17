@@ -1,9 +1,6 @@
-using System.Globalization;
-
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Mappings.Parameters;
-using GitHooks.Validation.Extensions;
 
 namespace GitHooks.Validation.Rules.Parameters;
 
@@ -30,7 +27,7 @@ internal sealed class ParameterDefaultValueTypeMismatchRule
             return;
         }
 
-        if (IsValueValidForType(type, defaultValue))
+        if (ParameterNodeExtensions.IsValueValidForType(type, defaultValue))
         {
             return;
         }
@@ -41,26 +38,5 @@ internal sealed class ParameterDefaultValueTypeMismatchRule
                 node.DefaultValue.Span,
                 node.GetNameForDiagnostic(),
                 type));
-    }
-
-    private static bool IsValueValidForType(
-        string type,
-        string value)
-    {
-        if (string.Equals(type, "boolean", StringComparison.OrdinalIgnoreCase))
-        {
-            return bool.TryParse(value, out _);
-        }
-
-        if (string.Equals(type, "number", StringComparison.OrdinalIgnoreCase))
-        {
-            return decimal.TryParse(
-                value,
-                NumberStyles.Number,
-                CultureInfo.InvariantCulture,
-                out _);
-        }
-
-        return true;
     }
 }

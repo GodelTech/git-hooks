@@ -51,6 +51,35 @@ public class RunCommandParameterParsingTests
     }
 
     [Fact]
+    public void TryParseParameterOverrides_DuplicateParameterWithDifferentCasing_ReturnsFalse()
+    {
+        var success = RunCommand.TryParseParameterOverrides(
+            ["ServerName=TEST-SERVER", "servername=contoso"],
+            null,
+            out _,
+            out var errorMessage
+        );
+
+        Assert.False(success);
+        Assert.Equal("Parameter 'servername' is provided more than once in command-line overrides.", errorMessage);
+    }
+
+    [Fact]
+    public void TryParseParameterOverrides_ParameterLookupWithDifferentCasing_ReturnsValue()
+    {
+        var success = RunCommand.TryParseParameterOverrides(
+            ["serverName=TEST-SERVER"],
+            null,
+            out var parameterOverrides,
+            out var errorMessage
+        );
+
+        Assert.True(success);
+        Assert.Equal(string.Empty, errorMessage);
+        Assert.Equal("TEST-SERVER", parameterOverrides["SERVERNAME"]);
+    }
+
+    [Fact]
     public void TryParseParameterOverrides_EntryWithoutSeparator_ReturnsFalse()
     {
         var success = RunCommand.TryParseParameterOverrides(

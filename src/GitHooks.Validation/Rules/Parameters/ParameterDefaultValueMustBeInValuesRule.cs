@@ -1,7 +1,6 @@
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Mappings.Parameters;
-using GitHooks.Validation.Extensions;
 
 namespace GitHooks.Validation.Rules.Parameters;
 
@@ -24,7 +23,7 @@ internal sealed class ParameterDefaultValueMustBeInValuesRule
             return;
         }
 
-        if (ContainsValue(node.Values.Items, defaultValue))
+        if (ParameterNodeExtensions.ContainsValue(node.Values.Items, defaultValue))
         {
             return;
         }
@@ -34,21 +33,5 @@ internal sealed class ParameterDefaultValueMustBeInValuesRule
                 DiagnosticDescriptors.ParameterDefaultValueMustBeInValues,
                 node.DefaultValue.Span,
                 node.GetNameForDiagnostic()));
-    }
-
-    private static bool ContainsValue(
-        IReadOnlyList<ExpressionNode> values,
-        string defaultValue)
-    {
-        foreach (var value in values)
-        {
-            if (value.TryGetStringValue(out var stringValue) &&
-                string.Equals(stringValue, defaultValue, StringComparison.Ordinal))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

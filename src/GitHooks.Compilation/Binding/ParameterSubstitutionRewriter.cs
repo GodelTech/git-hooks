@@ -11,15 +11,17 @@ internal static class ParameterSubstitutionRewriter
 {
     public static PipelineNode Rewrite(
         PipelineNode root,
+        ParameterTable declarations,
         ParameterValueTable values,
         DiagnosticBag diagnostics)
     {
         ArgumentNullException.ThrowIfNull(root);
+        ArgumentNullException.ThrowIfNull(declarations);
         ArgumentNullException.ThrowIfNull(values);
         ArgumentNullException.ThrowIfNull(diagnostics);
 
-        var parameters = RewriteParameters(root.Parameters, values, diagnostics);
-        var steps = RewriteSteps(root.Steps, values, diagnostics);
+        var parameters = RewriteParameters(root.Parameters, declarations, values, diagnostics);
+        var steps = RewriteSteps(root.Steps, declarations, values, diagnostics);
 
         if (ReferenceEquals(parameters, root.Parameters) &&
             ReferenceEquals(steps, root.Steps))
@@ -38,6 +40,7 @@ internal static class ParameterSubstitutionRewriter
 
     private static IReadOnlyList<ParameterNode> RewriteParameters(
         IReadOnlyList<ParameterNode> parameters,
+        ParameterTable declarations,
         ParameterValueTable values,
         DiagnosticBag diagnostics)
     {
@@ -47,7 +50,7 @@ internal static class ParameterSubstitutionRewriter
         {
             var parameter = parameters[i];
 
-            var displayName = RewriteOptionalStringField(parameter.DisplayName, values, diagnostics);
+            var displayName = RewriteOptionalStringField(parameter.DisplayName, declarations, values, diagnostics);
 
             if (ReferenceEquals(displayName, parameter.DisplayName))
             {
@@ -73,6 +76,7 @@ internal static class ParameterSubstitutionRewriter
 
     private static IReadOnlyList<StepNode> RewriteSteps(
         IReadOnlyList<StepNode> steps,
+        ParameterTable declarations,
         ParameterValueTable values,
         DiagnosticBag diagnostics)
     {
@@ -81,7 +85,7 @@ internal static class ParameterSubstitutionRewriter
         for (var i = 0; i < steps.Count; i++)
         {
             var step = steps[i];
-            var rewrittenStep = RewriteStep(step, values, diagnostics);
+            var rewrittenStep = RewriteStep(step, declarations, values, diagnostics);
 
             if (ReferenceEquals(rewrittenStep, step))
             {
@@ -98,28 +102,30 @@ internal static class ParameterSubstitutionRewriter
 
     private static StepNode RewriteStep(
         StepNode step,
+        ParameterTable declarations,
         ParameterValueTable values,
         DiagnosticBag diagnostics)
     {
         return step switch
         {
-            ScriptStepNode script => RewriteScriptStep(script, values, diagnostics),
-            TemplateStepNode template => RewriteTemplateStep(template, values, diagnostics),
+            ScriptStepNode script => RewriteScriptStep(script, declarations, values, diagnostics),
+            TemplateStepNode template => RewriteTemplateStep(template, declarations, values, diagnostics),
             _ => step
         };
     }
 
     private static ScriptStepNode RewriteScriptStep(
         ScriptStepNode step,
+        ParameterTable declarations,
         ParameterValueTable values,
         DiagnosticBag diagnostics)
     {
-        var script = RewriteOptionalStringField(step.Script, values, diagnostics);
-        var displayName = RewriteOptionalStringField(step.DisplayName, values, diagnostics);
-        var condition = RewriteOptionalStringField(step.Condition, values, diagnostics);
-        var timeoutInMinutes = RewriteOptionalStringField(step.TimeoutInMinutes, values, diagnostics);
-        var workingDirectory = RewriteOptionalStringField(step.WorkingDirectory, values, diagnostics);
-        var env = RewriteMapping(step.Env, values, diagnostics);
+        var script = RewriteOptionalStringField(step.Script, declarations, values, diagnostics);
+        var displayName = RewriteOptionalStringField(step.DisplayName, declarations, values, diagnostics);
+        var condition = RewriteOptionalStringField(step.Condition, declarations, values, diagnostics);
+        var timeoutInMinutes = RewriteOptionalStringField(step.TimeoutInMinutes, declarations, values, diagnostics);
+        var workingDirectory = RewriteOptionalStringField(step.WorkingDirectory, declarations, values, diagnostics);
+        var env = RewriteMapping(step.Env, declarations, values, diagnostics);
 
         if (ReferenceEquals(script, step.Script) &&
             ReferenceEquals(displayName, step.DisplayName) &&
@@ -146,11 +152,12 @@ internal static class ParameterSubstitutionRewriter
 
     private static TemplateStepNode RewriteTemplateStep(
         TemplateStepNode step,
+        ParameterTable declarations,
         ParameterValueTable values,
         DiagnosticBag diagnostics)
     {
-        var template = RewriteOptionalStringField(step.Template, values, diagnostics);
-        var parameters = RewriteMapping(step.Parameters, values, diagnostics);
+        var template = RewriteOptionalStringField(step.Template, declarations, values, diagnostics);
+        var parameters = RewriteMapping(step.Parameters, declarations, values, diagnostics);
 
         if (ReferenceEquals(template, step.Template) &&
             ReferenceEquals(parameters, step.Parameters))
@@ -169,6 +176,7 @@ internal static class ParameterSubstitutionRewriter
 
     private static MappingFieldNode<StringKeyFieldNode<ExpressionNode>>? RewriteMapping(
         MappingFieldNode<StringKeyFieldNode<ExpressionNode>>? mapping,
+        ParameterTable declarations,
         ParameterValueTable values,
         DiagnosticBag diagnostics)
     {
@@ -182,7 +190,7 @@ internal static class ParameterSubstitutionRewriter
         for (var i = 0; i < mapping.Fields.Count; i++)
         {
             var field = mapping.Fields[i];
-            var rewrittenField = RewriteOptionalStringField(field, values, diagnostics);
+            var rewrittenField = RewriteOptionalStringField(field, declarations, values, diagnostics);
 
             if (ReferenceEquals(rewrittenField, field))
             {
@@ -209,6 +217,7 @@ internal static class ParameterSubstitutionRewriter
 
     private static StringKeyFieldNode<ExpressionNode>? RewriteOptionalStringField(
         StringKeyFieldNode<ExpressionNode>? field,
+        ParameterTable declarations,
         ParameterValueTable values,
         DiagnosticBag diagnostics)
     {
@@ -217,7 +226,7 @@ internal static class ParameterSubstitutionRewriter
             return null;
         }
 
-        var rewrittenValue = RewriteExpression(field.Value, values, diagnostics);
+        var rewrittenValue = RewriteExpression(field.Value, declarations, values, diagnostics);
 
         if (ReferenceEquals(rewrittenValue, field.Value))
         {
@@ -234,16 +243,17 @@ internal static class ParameterSubstitutionRewriter
 
     private static ExpressionNode RewriteExpression(
         ExpressionNode expression,
+        ParameterTable declarations,
         ParameterValueTable values,
         DiagnosticBag diagnostics)
     {
         return expression switch
         {
             ParameterVariableExpressionNode parameterVariable
-                => RewriteParameterVariable(parameterVariable, values, diagnostics),
+                => RewriteParameterVariable(parameterVariable, declarations, values, diagnostics),
 
             InterpolatedStringExpressionNode interpolated
-                => RewriteInterpolatedString(interpolated, values, diagnostics),
+                => RewriteInterpolatedString(interpolated, declarations, values, diagnostics),
 
             _ => expression
         };
@@ -251,6 +261,7 @@ internal static class ParameterSubstitutionRewriter
 
     private static StringLiteralExpressionNode RewriteParameterVariable(
         ParameterVariableExpressionNode node,
+        ParameterTable declarations,
         ParameterValueTable values,
         DiagnosticBag diagnostics)
     {
@@ -263,11 +274,14 @@ internal static class ParameterSubstitutionRewriter
             };
         }
 
-        diagnostics.Report(
-            Diagnostic.Create(
-                DiagnosticDescriptors.ParameterValueNotResolvable,
-                node.Span,
-                node.Name));
+        if (declarations.ContainsParameter(node.Name))
+        {
+            diagnostics.Report(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.ParameterValueNotResolvable,
+                    node.Span,
+                    node.Name));
+        }
 
         return new StringLiteralExpressionNode
         {
@@ -278,6 +292,7 @@ internal static class ParameterSubstitutionRewriter
 
     private static ExpressionNode RewriteInterpolatedString(
         InterpolatedStringExpressionNode node,
+        ParameterTable declarations,
         ParameterValueTable values,
         DiagnosticBag diagnostics)
     {
@@ -286,7 +301,7 @@ internal static class ParameterSubstitutionRewriter
         for (var i = 0; i < node.Parts.Count; i++)
         {
             var part = node.Parts[i];
-            var rewrittenPart = RewriteExpression(part, values, diagnostics);
+            var rewrittenPart = RewriteExpression(part, declarations, values, diagnostics);
 
             if (ReferenceEquals(rewrittenPart, part))
             {

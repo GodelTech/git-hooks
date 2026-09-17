@@ -196,4 +196,44 @@ public sealed class ParameterNodeExtensionsTests
             string.Empty,
             defaultValue);
     }
+
+    [Fact]
+    public void GetNameForDiagnostic_NullParameter_Throws()
+    {
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => ParameterNodeExtensions.GetNameForDiagnostic(
+                null!));
+
+        Assert.Equal(
+            "declaration",
+            exception.ParamName);
+    }
+
+    [Fact]
+    public void GetNameForDiagnostic_ParameterWithName_ReturnsName()
+    {
+        var parameter = new ParameterNodeBuilder()
+            .WithName("configuration")
+            .Build();
+
+        var result = parameter.GetNameForDiagnostic();
+
+        Assert.Equal(
+            "configuration",
+            result);
+    }
+
+    [Fact]
+    public void GetNameForDiagnostic_ParameterWithoutName_ReturnsUnknown()
+    {
+        var parameter = new ParameterNodeBuilder()
+            .WithName(string.Empty)
+            .Build();
+
+        var result = parameter.GetNameForDiagnostic();
+
+        Assert.Equal(
+            "<unknown>",
+            result);
+    }
 }

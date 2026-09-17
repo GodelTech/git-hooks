@@ -22,7 +22,6 @@ internal sealed class ParameterTable
             return;
         }
 
-        // Duplicate parameters are reported during validation.
         _ = _parameters.TryAdd(name, parameter);
     }
 

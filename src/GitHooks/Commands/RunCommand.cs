@@ -75,7 +75,7 @@ public sealed class RunCommand(IRunHandler runHandler, IAnsiConsole console)
         out Dictionary<string, string> parameterOverrides,
         out string errorMessage)
     {
-        parameterOverrides = new Dictionary<string, string>(StringComparer.Ordinal);
+        parameterOverrides = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         errorMessage = string.Empty;
 
         foreach (var parameterEntry in parameterEntries)
