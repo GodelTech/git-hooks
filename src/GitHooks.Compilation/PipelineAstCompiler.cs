@@ -30,6 +30,8 @@ public sealed class PipelineAstCompiler(
             parsingContext,
             context.Diagnostics);
 
+        context.Expansion.RootDocument = source.Document;
+
         return _expander.Expand(
             root,
             context.Expansion,
