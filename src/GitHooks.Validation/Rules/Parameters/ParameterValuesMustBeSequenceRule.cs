@@ -1,6 +1,5 @@
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Mappings.Parameters;
-using GitHooks.Validation.Extensions;
 
 namespace GitHooks.Validation.Rules.Parameters;
 

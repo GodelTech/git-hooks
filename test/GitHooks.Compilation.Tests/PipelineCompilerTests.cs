@@ -1,3 +1,4 @@
+using GitHooks.Compilation.Binding;
 using GitHooks.Compilation.Validation;
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Mappings;
@@ -12,11 +13,19 @@ public sealed class PipelineCompilerTests
 {
     private readonly Mock<IPipelineAstCompiler> _mockAstCompiler;
     private readonly Mock<IPipelineValidator> _mockValidator;
+    private readonly Mock<IParameterBinder> _mockParameterBinder;
 
     public PipelineCompilerTests()
     {
         _mockAstCompiler = new Mock<IPipelineAstCompiler>();
         _mockValidator = new Mock<IPipelineValidator>();
+        _mockParameterBinder = new Mock<IParameterBinder>();
+
+        _mockParameterBinder
+            .Setup(static binder => binder.Substitute(
+                It.IsAny<PipelineNode>(),
+                It.IsAny<CompilationContext>()))
+            .Returns(static (PipelineNode root, CompilationContext _) => root);
     }
 
     [Fact]
@@ -25,7 +34,8 @@ public sealed class PipelineCompilerTests
         var exception = Assert.Throws<ArgumentNullException>(
             () => new PipelineCompiler(
                 null!,
-                _mockValidator.Object));
+                _mockValidator.Object,
+                _mockParameterBinder.Object));
 
         Assert.Equal(
             "astCompiler",
@@ -38,10 +48,25 @@ public sealed class PipelineCompilerTests
         var exception = Assert.Throws<ArgumentNullException>(
             () => new PipelineCompiler(
                 _mockAstCompiler.Object,
-                null!));
+                null!,
+                _mockParameterBinder.Object));
 
         Assert.Equal(
             "validator",
+            exception.ParamName);
+    }
+
+    [Fact]
+    public void Constructor_NullParameterBinder_ThrowsArgumentNullException()
+    {
+        var exception = Assert.Throws<ArgumentNullException>(
+            () => new PipelineCompiler(
+                _mockAstCompiler.Object,
+                _mockValidator.Object,
+                null!));
+
+        Assert.Equal(
+            "parameterBinder",
             exception.ParamName);
     }
 
@@ -50,7 +75,8 @@ public sealed class PipelineCompilerTests
     {
         var compiler = new PipelineCompiler(
             _mockAstCompiler.Object,
-            _mockValidator.Object);
+            _mockValidator.Object,
+            _mockParameterBinder.Object);
 
         var exception = Assert.Throws<ArgumentNullException>(
             () => compiler.Compile(
@@ -70,7 +96,8 @@ public sealed class PipelineCompilerTests
     {
         var compiler = new PipelineCompiler(
             _mockAstCompiler.Object,
-            _mockValidator.Object);
+            _mockValidator.Object,
+            _mockParameterBinder.Object);
 
         var exception = Assert.Throws<ArgumentException>(
             () => compiler.Compile(
@@ -87,7 +114,8 @@ public sealed class PipelineCompilerTests
     {
         var compiler = new PipelineCompiler(
             _mockAstCompiler.Object,
-            _mockValidator.Object);
+            _mockValidator.Object,
+            _mockParameterBinder.Object);
 
         var exception = Assert.Throws<ArgumentNullException>(
             () => compiler.Compile(
@@ -112,7 +140,8 @@ public sealed class PipelineCompilerTests
 
         var compiler = new PipelineCompiler(
             _mockAstCompiler.Object,
-            _mockValidator.Object);
+            _mockValidator.Object,
+            _mockParameterBinder.Object);
 
         var result = compiler.Compile(
             "name: test",
@@ -162,7 +191,8 @@ public sealed class PipelineCompilerTests
 
         var compiler = new PipelineCompiler(
             _mockAstCompiler.Object,
-            _mockValidator.Object);
+            _mockValidator.Object,
+            _mockParameterBinder.Object);
 
         var result = compiler.Compile(
             "name: test",

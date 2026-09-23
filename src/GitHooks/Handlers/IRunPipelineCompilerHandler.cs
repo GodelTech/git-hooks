@@ -12,9 +12,11 @@ public interface IRunPipelineCompilerHandler
     /// pipeline and prints the resulting AST summary and diagnostics.
     /// </summary>
     /// <param name="filePath">Path to the YAML file.</param>
+    /// <param name="parameterOverrides">Optional parameter overrides to apply during binding.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation, returning an exit code.</returns>
     public Task<int> HandleAsync(
         string filePath,
+        IReadOnlyDictionary<string, string>? parameterOverrides = null,
         CancellationToken cancellationToken = default);
 }

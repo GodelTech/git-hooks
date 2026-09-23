@@ -1,5 +1,5 @@
+using GitHooks.Domain.Ast.Mappings.Parameters;
 using GitHooks.Testing.Ast.Builders.Mappings;
-using GitHooks.Validation.Extensions;
 using GitHooks.Validation.Symbols;
 
 namespace GitHooks.Validation.Tests.Symbols;

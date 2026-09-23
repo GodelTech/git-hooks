@@ -102,6 +102,38 @@ public static class DiagnosticDescriptors
             MessageFormat = "Parameter '{0}': 'displayName' field should not be empty."
         };
 
+    public static readonly DiagnosticDescriptor ParameterOverrideNotDeclared =
+        new()
+        {
+            Code = DiagnosticCode.Create(3009),
+            Severity = DiagnosticSeverity.Error,
+            MessageFormat = "Parameter override '{0}' does not match any declared parameter."
+        };
+
+    public static readonly DiagnosticDescriptor ParameterValueNotResolvable =
+        new()
+        {
+            Code = DiagnosticCode.Create(3010),
+            Severity = DiagnosticSeverity.Error,
+            MessageFormat = "Parameter '{0}' does not have a resolved value."
+        };
+
+    public static readonly DiagnosticDescriptor ParameterOverrideValueTypeMismatch =
+        new()
+        {
+            Code = DiagnosticCode.Create(3011),
+            Severity = DiagnosticSeverity.Error,
+            MessageFormat = "Parameter '{0}': override value type does not match declared type '{1}'."
+        };
+
+    public static readonly DiagnosticDescriptor ParameterOverrideValueMustBeInValues =
+        new()
+        {
+            Code = DiagnosticCode.Create(3012),
+            Severity = DiagnosticSeverity.Error,
+            MessageFormat = "Parameter '{0}': override value is not in the allowed values list."
+        };
+
     // GH4000-GH4999 Steps
     public static readonly DiagnosticDescriptor InvalidStepField =
         new()

@@ -13,7 +13,7 @@ internal sealed partial class ParameterNameMustBeValidIdentifierRule
         ParameterNode node,
         ValidationContext context)
     {
-        if (!node.Name.Value.TryGetStringValue(out var value))
+        if (!node.Name.Value.TryGetStringLiteralValue(out var value))
         {
             return;
         }

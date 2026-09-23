@@ -4,32 +4,34 @@ using GitHooks.Domain.Ast.Mappings.Parameters;
 
 namespace GitHooks.Validation.Rules.Parameters;
 
-internal sealed class ParameterDisplayNameMustNotBeEmptyRule
+internal sealed class ParameterDefaultValueMustBeInValuesRule
     : IValidationRule<ParameterNode>
 {
     public void Validate(
         ParameterNode node,
         ValidationContext context)
     {
-        if (node.DisplayName is null)
+        if (node.Values is null ||
+            node.Values.Items.Count == 0 ||
+            node.DefaultValue is null)
         {
             return;
         }
 
-        if (!node.DisplayName.Value.TryGetStringValue(out var value))
+        if (!node.DefaultValue.Value.TryGetStringValue(out var defaultValue))
         {
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(value))
+        if (ParameterNodeExtensions.ContainsValue(node.Values.Items, defaultValue))
         {
             return;
         }
 
         context.Report(
             Diagnostic.Create(
-                DiagnosticDescriptors.ParameterDisplayNameMustNotBeEmpty,
-                node.DisplayName.Span,
+                DiagnosticDescriptors.ParameterDefaultValueMustBeInValues,
+                node.DefaultValue.Span,
                 node.GetNameForDiagnostic()));
     }
 }
