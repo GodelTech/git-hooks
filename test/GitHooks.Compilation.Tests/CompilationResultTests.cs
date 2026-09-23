@@ -58,4 +58,45 @@ public sealed class CompilationResultTests
             diagnostics,
             result.Diagnostics);
     }
+
+    [Fact]
+    public void Result_WithoutErrorDiagnostics_HasErrorsIsFalse()
+    {
+        var diagnostics = new DiagnosticBag();
+        diagnostics.Report(CreateDiagnostic(DiagnosticSeverity.Warning, 1));
+
+        var result = new CompilationResult(
+            PipelineNode.Empty(SourceSpan.Unknown),
+            diagnostics);
+
+        Assert.False(result.HasErrors);
+    }
+
+    [Fact]
+    public void Result_WithErrorDiagnostics_HasErrorsIsTrue()
+    {
+        var diagnostics = new DiagnosticBag();
+        diagnostics.Report(CreateDiagnostic(DiagnosticSeverity.Warning, 1));
+        diagnostics.Report(CreateDiagnostic(DiagnosticSeverity.Error, 2));
+
+        var result = new CompilationResult(
+            PipelineNode.Empty(SourceSpan.Unknown),
+            diagnostics);
+
+        Assert.True(result.HasErrors);
+    }
+
+    private static Diagnostic CreateDiagnostic(
+        DiagnosticSeverity severity,
+        int code)
+    {
+        return Diagnostic.Create(
+            new DiagnosticDescriptor
+            {
+                Code = DiagnosticCode.Create(code),
+                Severity = severity,
+                MessageFormat = "Message",
+            },
+            SourceSpan.Unknown);
+    }
 }
