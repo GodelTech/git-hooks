@@ -1,3 +1,5 @@
+using GitHooks.Compilation.Binding;
+using GitHooks.Compilation.Validation;
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Mappings;
@@ -8,7 +10,9 @@ namespace GitHooks.Compilation.Expansion;
 
 internal sealed class TemplateExpander(
     ITemplateLoader loader,
-    ITemplateCompiler templateCompiler)
+    ITemplateCompiler templateCompiler,
+    IParameterScopeBuilder scopeBuilder,
+    IPipelineValidator validator)
     : ITemplateExpander
 {
     private readonly ITemplateLoader _loader
@@ -16,6 +20,12 @@ internal sealed class TemplateExpander(
 
     private readonly ITemplateCompiler _templateCompiler
         = templateCompiler ?? throw new ArgumentNullException(nameof(templateCompiler));
+
+    private readonly IParameterScopeBuilder _scopeBuilder
+        = scopeBuilder ?? throw new ArgumentNullException(nameof(scopeBuilder));
+
+    private readonly IPipelineValidator _validator
+        = validator ?? throw new ArgumentNullException(nameof(validator));
 
     public PipelineNode Expand(
         PipelineNode pipeline,
@@ -35,13 +45,18 @@ internal sealed class TemplateExpander(
 
         context.ExpansionStack.Push(rootReference);
 
+        var rootDeclarations = _scopeBuilder.Collect(pipeline.Parameters);
+        var rootValues = _scopeBuilder.ResolveDefaults(rootDeclarations);
+
         try
         {
             return ExpandPipeline(
                 pipeline,
                 rootDocument,
                 context,
-                diagnostics);
+                diagnostics,
+                rootDeclarations,
+                rootValues);
         }
         finally
         {
@@ -127,11 +142,42 @@ internal sealed class TemplateExpander(
         return locations;
     }
 
+    private static Dictionary<string, string>? ResolveTemplateParameterOverrides(
+        TemplateStepNode templateStep,
+        ParameterTable scopeDeclarations,
+        ParameterValueTable scopeValues,
+        DiagnosticBag diagnostics)
+    {
+        if (templateStep.Parameters is null)
+        {
+            return null;
+        }
+
+        var overrides = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var field in templateStep.Parameters.Fields)
+        {
+            if (ParameterSubstitutionRewriter.TryResolveExpressionValue(
+                field.Value,
+                scopeDeclarations,
+                scopeValues,
+                diagnostics,
+                out var value))
+            {
+                overrides[field.Key] = value;
+            }
+        }
+
+        return overrides;
+    }
+
     private PipelineNode ExpandPipeline(
         PipelineNode pipeline,
         SourceDocument currentDocument,
         ExpansionContext context,
-        DiagnosticBag diagnostics)
+        DiagnosticBag diagnostics,
+        ParameterTable scopeDeclarations,
+        ParameterValueTable scopeValues)
     {
         List<StepNode>? expandedSteps = null;
 
@@ -151,7 +197,9 @@ internal sealed class TemplateExpander(
                 templateStep,
                 currentDocument,
                 context,
-                diagnostics);
+                diagnostics,
+                scopeDeclarations,
+                scopeValues);
 
             expandedSteps.AddRange(expanded);
         }
@@ -174,7 +222,9 @@ internal sealed class TemplateExpander(
         TemplateStepNode templateStep,
         SourceDocument currentDocument,
         ExpansionContext context,
-        DiagnosticBag diagnostics)
+        DiagnosticBag diagnostics,
+        ParameterTable scopeDeclarations,
+        ParameterValueTable scopeValues)
     {
         if (!TryResolveTemplatePath(templateStep, currentDocument, diagnostics, out var resolvedPath))
         {
@@ -219,13 +269,40 @@ internal sealed class TemplateExpander(
                 source,
                 diagnostics);
 
+            _validator.Validate(
+                childPipeline,
+                diagnostics);
+
+            var childDeclarations = _scopeBuilder.Collect(childPipeline.Parameters);
+            var childValues = _scopeBuilder.ResolveDefaults(childDeclarations);
+
+            var childOverrides = ResolveTemplateParameterOverrides(
+                templateStep,
+                scopeDeclarations,
+                scopeValues,
+                diagnostics);
+
+            _scopeBuilder.ApplyOverrides(
+                childDeclarations,
+                childValues,
+                childOverrides,
+                diagnostics);
+
             var expandedChild = ExpandPipeline(
                 childPipeline,
                 templateDocument,
                 context,
+                diagnostics,
+                childDeclarations,
+                childValues);
+
+            var boundSteps = ParameterSubstitutionRewriter.RewriteStepsForScope(
+                expandedChild.Steps,
+                childDeclarations,
+                childValues,
                 diagnostics);
 
-            return expandedChild.Steps;
+            return boundSteps;
         }
         finally
         {

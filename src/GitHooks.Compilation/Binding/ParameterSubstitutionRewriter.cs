@@ -9,6 +9,67 @@ namespace GitHooks.Compilation.Binding;
 
 internal static class ParameterSubstitutionRewriter
 {
+    /// <summary>
+    /// Resolves an expression (e.g. a template step parameter override value) against the
+    /// given enclosing scope, substituting any parameter variables/interpolations it contains,
+    /// and returns the resulting literal string value.
+    /// </summary>
+    /// <param name="expression">The expression to resolve.</param>
+    /// <param name="declarations">The parameter declarations of the enclosing scope.</param>
+    /// <param name="values">The resolved parameter values of the enclosing scope.</param>
+    /// <param name="diagnostics">The diagnostic bag to report unresolved references to.</param>
+    /// <param name="value">The resolved literal string value, if resolution succeeded.</param>
+    /// <returns><see langword="true"/> if the expression resolved to a literal string value; otherwise, <see langword="false"/>.</returns>
+    public static bool TryResolveExpressionValue(
+        ExpressionNode expression,
+        ParameterTable declarations,
+        ParameterValueTable values,
+        DiagnosticBag diagnostics,
+        out string value)
+    {
+        ArgumentNullException.ThrowIfNull(expression);
+        ArgumentNullException.ThrowIfNull(declarations);
+        ArgumentNullException.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(diagnostics);
+
+        if (!IsFullyResolvable(expression, values))
+        {
+            diagnostics.Report(
+                BuildUnresolvedParameterDiagnostic(expression, declarations, values));
+
+            value = string.Empty;
+            return false;
+        }
+
+        var rewritten = RewriteExpression(expression, declarations, values, diagnostics);
+
+        return rewritten.TryGetStringValue(out value);
+    }
+
+    /// <summary>
+    /// Rewrites parameter variable references within a set of steps using the given scope.
+    /// Used to bind steps expanded from an included template against the template's own
+    /// parameter scope (declarations plus resolved values/overrides).
+    /// </summary>
+    /// <param name="steps">The steps to rewrite.</param>
+    /// <param name="declarations">The parameter declarations of the scope.</param>
+    /// <param name="values">The resolved parameter values of the scope.</param>
+    /// <param name="diagnostics">The diagnostic bag to report unresolved references to.</param>
+    /// <returns>The rewritten steps.</returns>
+    public static IReadOnlyList<StepNode> RewriteStepsForScope(
+        IReadOnlyList<StepNode> steps,
+        ParameterTable declarations,
+        ParameterValueTable values,
+        DiagnosticBag diagnostics)
+    {
+        ArgumentNullException.ThrowIfNull(steps);
+        ArgumentNullException.ThrowIfNull(declarations);
+        ArgumentNullException.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(diagnostics);
+
+        return RewriteSteps(steps, declarations, values, diagnostics);
+    }
+
     public static PipelineNode Rewrite(
         PipelineNode root,
         ParameterTable declarations,
@@ -335,5 +396,68 @@ internal static class ParameterSubstitutionRewriter
             Parts = rewritten,
             Span = node.Span
         };
+    }
+
+    private static bool IsFullyResolvable(
+        ExpressionNode expression,
+        ParameterValueTable values)
+    {
+        return expression switch
+        {
+            ParameterVariableExpressionNode parameterVariable
+                => values.ContainsValue(parameterVariable.Name),
+
+            InterpolatedStringExpressionNode interpolated
+                => interpolated.Parts.All(part => IsFullyResolvable(part, values)),
+
+            _ => true
+        };
+    }
+
+    private static Diagnostic BuildUnresolvedParameterDiagnostic(
+        ExpressionNode expression,
+        ParameterTable declarations,
+        ParameterValueTable values)
+    {
+        var unresolved = FindFirstUnresolvedParameterVariable(expression, values)
+            ?? throw new InvalidOperationException("Expected an unresolved parameter variable.");
+
+        return declarations.ContainsParameter(unresolved.Name)
+            ? Diagnostic.Create(
+                DiagnosticDescriptors.ParameterValueNotResolvable,
+                unresolved.Span,
+                unresolved.Name)
+            : Diagnostic.Create(
+                DiagnosticDescriptors.ParameterVariableMustBeResolvable,
+                unresolved.Span,
+                unresolved.Name);
+    }
+
+    private static ParameterVariableExpressionNode? FindFirstUnresolvedParameterVariable(
+        ExpressionNode expression,
+        ParameterValueTable values)
+    {
+        switch (expression)
+        {
+            case ParameterVariableExpressionNode parameterVariable
+                when !values.ContainsValue(parameterVariable.Name):
+                return parameterVariable;
+
+            case InterpolatedStringExpressionNode interpolated:
+                foreach (var part in interpolated.Parts)
+                {
+                    var found = FindFirstUnresolvedParameterVariable(part, values);
+
+                    if (found is not null)
+                    {
+                        return found;
+                    }
+                }
+
+                return null;
+
+            default:
+                return null;
+        }
     }
 }

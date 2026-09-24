@@ -167,6 +167,336 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
             diagnostic => diagnostic.Descriptor == DiagnosticDescriptors.RemoteTemplatesNotSupported);
     }
 
+    [Fact]
+    public void Compile_TemplateWithLiteralParameterOverride_SubstitutesOverrideValue()
+    {
+        var templateYaml = """
+            parameters:
+              - name: configuration
+                type: string
+                default: Release
+
+            steps:
+              - script: ${{ parameters.configuration }}
+            """;
+
+        var templatePath = WriteFile("template.yaml", templateYaml);
+
+        var rootYaml = $"""
+            steps:
+              - template: {Path.GetFileName(templatePath)}
+                parameters:
+                  configuration: Debug
+            """;
+
+        var rootPath = WriteFile("root.yaml", rootYaml);
+
+        var compiler = CreateCompiler();
+
+        var result = compiler.Compile(
+            File.ReadAllText(rootPath),
+            new SourceDocument(rootPath));
+
+        DiagnosticAssert.Empty(result.Diagnostics);
+
+        var step = Assert.IsType<Domain.Ast.Mappings.Steps.ScriptStepNode>(result.BoundRoot.Steps[0]);
+        var literal = Assert.IsType<Domain.Ast.Expressions.StringLiteralExpressionNode>(step.Script.Value);
+
+        Assert.Equal("Debug", literal.Value);
+    }
+
+    [Fact]
+    public void Compile_TemplateWithoutParameterOverride_UsesTemplateDefaultValue()
+    {
+        var templateYaml = """
+            parameters:
+              - name: configuration
+                type: string
+                default: Release
+
+            steps:
+              - script: ${{ parameters.configuration }}
+            """;
+
+        var templatePath = WriteFile("template.yaml", templateYaml);
+
+        var rootYaml = $"""
+            steps:
+              - template: {Path.GetFileName(templatePath)}
+            """;
+
+        var rootPath = WriteFile("root.yaml", rootYaml);
+
+        var compiler = CreateCompiler();
+
+        var result = compiler.Compile(
+            File.ReadAllText(rootPath),
+            new SourceDocument(rootPath));
+
+        DiagnosticAssert.Empty(result.Diagnostics);
+
+        var step = Assert.IsType<Domain.Ast.Mappings.Steps.ScriptStepNode>(result.BoundRoot.Steps[0]);
+        var literal = Assert.IsType<Domain.Ast.Expressions.StringLiteralExpressionNode>(step.Script.Value);
+
+        Assert.Equal("Release", literal.Value);
+    }
+
+    [Fact]
+    public void Compile_TemplateParameterOverrideForwardedFromRootParameter_ResolvesAgainstRootScope()
+    {
+        var templateYaml = """
+            parameters:
+              - name: configuration
+                type: string
+                default: Release
+
+            steps:
+              - script: ${{ parameters.configuration }}
+            """;
+
+        var templatePath = WriteFile("template.yaml", templateYaml);
+
+        var rootYaml = """
+            parameters:
+              - name: rootConfiguration
+                type: string
+                default: Debug
+
+            steps:
+              - template: {0}
+                parameters:
+                  configuration: ${{ parameters.rootConfiguration }}
+            """;
+
+        rootYaml = rootYaml.Replace("{0}", Path.GetFileName(templatePath));
+
+        var rootPath = WriteFile("root.yaml", rootYaml);
+
+        var compiler = CreateCompiler();
+
+        var result = compiler.Compile(
+            File.ReadAllText(rootPath),
+            new SourceDocument(rootPath));
+
+        DiagnosticAssert.Empty(result.Diagnostics);
+
+        var step = Assert.IsType<Domain.Ast.Mappings.Steps.ScriptStepNode>(result.BoundRoot.Steps[0]);
+        var literal = Assert.IsType<Domain.Ast.Expressions.StringLiteralExpressionNode>(step.Script.Value);
+
+        Assert.Equal("Debug", literal.Value);
+    }
+
+    [Fact]
+    public void Compile_NestedTemplatesWithDistinctParameters_BindEachTemplateAgainstItsOwnScope()
+    {
+        var leafYaml = """
+            parameters:
+              - name: leafValue
+                type: string
+                default: leaf-default
+
+            steps:
+              - script: ${{ parameters.leafValue }}
+            """;
+
+        var leafPath = WriteFile("leaf.yaml", leafYaml);
+
+        var middleYaml = """
+            parameters:
+              - name: middleValue
+                type: string
+                default: middle-default
+
+            steps:
+              - template: {0}
+                parameters:
+                  leafValue: from-middle
+              - script: ${{ parameters.middleValue }}
+            """;
+
+        middleYaml = middleYaml.Replace("{0}", Path.GetFileName(leafPath));
+
+        var middlePath = WriteFile("middle.yaml", middleYaml);
+
+        var rootYaml = $"""
+            steps:
+              - template: {Path.GetFileName(middlePath)}
+            """;
+
+        var rootPath = WriteFile("root.yaml", rootYaml);
+
+        var compiler = CreateCompiler();
+
+        var result = compiler.Compile(
+            File.ReadAllText(rootPath),
+            new SourceDocument(rootPath));
+
+        DiagnosticAssert.Empty(result.Diagnostics);
+        Assert.Equal(2, result.BoundRoot.Steps.Count);
+
+        var leafStep = Assert.IsType<Domain.Ast.Mappings.Steps.ScriptStepNode>(result.BoundRoot.Steps[0]);
+        var leafLiteral = Assert.IsType<Domain.Ast.Expressions.StringLiteralExpressionNode>(leafStep.Script.Value);
+        Assert.Equal("from-middle", leafLiteral.Value);
+
+        var middleStep = Assert.IsType<Domain.Ast.Mappings.Steps.ScriptStepNode>(result.BoundRoot.Steps[1]);
+        var middleLiteral = Assert.IsType<Domain.Ast.Expressions.StringLiteralExpressionNode>(middleStep.Script.Value);
+        Assert.Equal("middle-default", middleLiteral.Value);
+    }
+
+    [Fact]
+    public void Compile_TemplateParameterOverrideNotDeclaredInTemplate_ReportsOverrideNotDeclaredDiagnostic()
+    {
+        var templateYaml = """
+            steps:
+              - script: echo template
+            """;
+
+        var templatePath = WriteFile("template.yaml", templateYaml);
+
+        var rootYaml = $"""
+            steps:
+              - template: {Path.GetFileName(templatePath)}
+                parameters:
+                  unused: value
+            """;
+
+        var rootPath = WriteFile("root.yaml", rootYaml);
+
+        var compiler = CreateCompiler();
+
+        var result = compiler.Compile(
+            File.ReadAllText(rootPath),
+            new SourceDocument(rootPath));
+
+        Assert.True(result.Diagnostics.HasErrors);
+        Assert.Contains(
+            result.Diagnostics.Diagnostics,
+            diagnostic => diagnostic.Descriptor == DiagnosticDescriptors.ParameterOverrideNotDeclared);
+        Assert.Single(result.BoundRoot.Steps);
+    }
+
+    [Fact]
+    public void Compile_TemplateParameterOverrideReferencesUndeclaredParentParameter_ReportsDiagnostic()
+    {
+        var templateYaml = """
+            parameters:
+              - name: configuration
+                type: string
+                default: Release
+
+            steps:
+              - script: ${{ parameters.configuration }}
+            """;
+
+        var templatePath = WriteFile("template.yaml", templateYaml);
+
+        var rootYaml = """
+            steps:
+              - template: {0}
+                parameters:
+                  configuration: ${{ parameters.missing }}
+            """;
+
+        rootYaml = rootYaml.Replace("{0}", Path.GetFileName(templatePath));
+
+        var rootPath = WriteFile("root.yaml", rootYaml);
+
+        var compiler = CreateCompiler();
+
+        var result = compiler.Compile(
+            File.ReadAllText(rootPath),
+            new SourceDocument(rootPath));
+
+        Assert.True(result.Diagnostics.HasErrors);
+        Assert.Contains(
+            result.Diagnostics.Diagnostics,
+            diagnostic => diagnostic.Descriptor == DiagnosticDescriptors.ParameterVariableMustBeResolvable);
+
+        // The override must not be silently accepted as an empty string; the template's own
+        // default should remain in effect since the override could not be resolved.
+        var step = Assert.IsType<Domain.Ast.Mappings.Steps.ScriptStepNode>(result.BoundRoot.Steps[0]);
+        var literal = Assert.IsType<Domain.Ast.Expressions.StringLiteralExpressionNode>(step.Script.Value);
+
+        Assert.Equal("Release", literal.Value);
+    }
+
+    [Fact]
+    public void Compile_TemplateStepReferencesUndeclaredParameterInOwnBody_ReportsDiagnostic()
+    {
+        var templateYaml = """
+            steps:
+              - script: ${{ parameters.doesNotExist }}
+            """;
+
+        var templatePath = WriteFile("template.yaml", templateYaml);
+
+        var rootYaml = """
+            steps:
+              - template: {0}
+            """;
+
+        rootYaml = rootYaml.Replace("{0}", Path.GetFileName(templatePath));
+
+        var rootPath = WriteFile("root.yaml", rootYaml);
+
+        var compiler = CreateCompiler();
+
+        var result = compiler.Compile(
+            File.ReadAllText(rootPath),
+            new SourceDocument(rootPath));
+
+        Assert.True(result.Diagnostics.HasErrors);
+        Assert.Contains(
+            result.Diagnostics.Diagnostics,
+            diagnostic => diagnostic.Descriptor == DiagnosticDescriptors.ParameterVariableMustBeResolvable);
+    }
+
+    [Fact]
+    public void Compile_CycleThroughNestedTemplates_PreservesIncludeChainOnDiagnostic()
+    {
+        var rootPath = Path.Combine(_rootDirectory, "root.yaml");
+        var middlePath = Path.Combine(_rootDirectory, "middle.yaml");
+        var leafPath = Path.Combine(_rootDirectory, "leaf.yaml");
+
+        var rootYaml = $"""
+            steps:
+              - template: {Path.GetFileName(middlePath)}
+            """;
+
+        var middleYaml = $"""
+            steps:
+              - template: {Path.GetFileName(leafPath)}
+            """;
+
+        var leafYaml = $"""
+            steps:
+              - template: {Path.GetFileName(middlePath)}
+            """;
+
+        File.WriteAllText(rootPath, rootYaml);
+        File.WriteAllText(middlePath, middleYaml);
+        File.WriteAllText(leafPath, leafYaml);
+
+        var compiler = CreateCompiler();
+
+        var result = compiler.Compile(
+            File.ReadAllText(rootPath),
+            new SourceDocument(rootPath));
+
+        Assert.True(result.Diagnostics.HasErrors);
+
+        var cycleDiagnostic = Assert.Single(
+            result.Diagnostics.Diagnostics,
+            diagnostic => diagnostic.Descriptor == DiagnosticDescriptors.TemplateIncludeCycleDetected);
+
+        Assert.NotEmpty(cycleDiagnostic.RelatedLocations);
+        Assert.Collection(
+            cycleDiagnostic.RelatedLocations,
+            location => Assert.Contains(Path.GetFileName(rootPath), location.Message, StringComparison.Ordinal),
+            location => Assert.Contains(Path.GetFileName(middlePath), location.Message, StringComparison.Ordinal),
+            location => Assert.Contains(Path.GetFileName(leafPath), location.Message, StringComparison.Ordinal));
+    }
+
     private static PipelineCompiler CreateCompiler()
     {
         var services = new ServiceCollection();

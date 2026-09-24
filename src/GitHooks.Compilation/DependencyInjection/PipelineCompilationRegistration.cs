@@ -23,6 +23,7 @@ public static class PipelineCompilationRegistration
 
         _ = services.AddSingleton<ITemplateLoader, FileSystemTemplateLoader>();
         _ = services.AddSingleton<ITemplateCompiler, TemplateCompiler>();
+        _ = services.AddSingleton<IParameterScopeBuilder, ParameterScopeBuilder>();
         _ = services.AddSingleton<ITemplateExpander, TemplateExpander>();
         _ = services.AddSingleton<IPipelineAstCompiler, PipelineAstCompiler>();
         _ = services.AddSingleton<IParameterBinder, ParameterBinder>();

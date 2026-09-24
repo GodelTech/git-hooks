@@ -36,7 +36,7 @@ public sealed class RunPipelineCompilerHandler(
         }
 
         var yamlText = await File.ReadAllTextAsync(absoluteFilePath, cancellationToken);
-        var document = new SourceDocument(Path.GetFileName(absoluteFilePath));
+        var document = new SourceDocument(absoluteFilePath);
 
         var result = _compiler.Compile(
             yamlText,
