@@ -1,13 +1,16 @@
 Description:
-Move template loading and expansion to the new compilation pipeline.
+Keep the existing RunHandler, but replace its dependency on the legacy resolver.
 
 Tasks:
-1. Support local templates.
-2. Support nested templates.
-3. Pass parameters to templates.
-4. Handle missing templates.
-5. Detect circular template references.
-6. Preserve the include chain.
-7. Add unit tests for all scenarios.
 
-Done when: templates are fully expanded into the new Domain AST without dependencies on legacy Workflow projects.
+Remove the dependency on:
+Inject the new compiler facade.
+Read the YAML file.
+Create SourceDocument and compilation context.
+Pass parameter overrides to the compiler.
+Process CompilationResult.
+Preserve existing Git checks and exit-code behavior.
+Keep the existing Error Handling approach during this migration.
+
+
+Done when: RunHandler works through the new compiler and has no dependency on Workflow.*.

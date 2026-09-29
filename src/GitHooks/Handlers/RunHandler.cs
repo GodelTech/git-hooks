@@ -1,9 +1,7 @@
+using GitHooks.Compilation;
+using GitHooks.Diagnostics;
+using GitHooks.Domain.Common;
 using GitHooks.Infrastructure.Git;
-using GitHooks.Workflow.Application.Binding.Exceptions;
-using GitHooks.Workflow.Application.Expansion.Exceptions;
-using GitHooks.Workflow.Application.Parsing.Exceptions;
-using GitHooks.Workflow.Application.Resolution;
-using GitHooks.Workflow.Domain.Model;
 
 using Spectre.Console;
 
@@ -11,12 +9,12 @@ namespace GitHooks.Handlers;
 
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
-    IPipelineResolver pipelineResolver,
+    PipelineCompiler compiler,
     IAnsiConsole console)
     : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
-    private readonly IPipelineResolver _pipelineResolver = pipelineResolver;
+    private readonly PipelineCompiler _compiler = compiler;
     private readonly IAnsiConsole _console = console;
 
     /// <inheritdoc/>
@@ -61,45 +59,45 @@ public sealed class RunHandler(
             return 1;
         }
 
+        string yamlText;
+        SourceDocument document;
+
         try
         {
-            var pipelineSource = PipelineSource.LocalFile(absoluteFilePath);
-            var resolvedPipeline = await _pipelineResolver.ResolveAsync(pipelineSource, parameterOverrides, cancellationToken);
+            yamlText = await File.ReadAllTextAsync(absoluteFilePath, cancellationToken);
+            document = new SourceDocument(Path.GetFileName(absoluteFilePath));
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to read YAML file: {Markup.Escape(exception.Message)}");
             return 1;
         }
-        catch (PipelineParsingException exception)
+
+        var result = _compiler.Compile(
+            yamlText,
+            document,
+            parameterOverrides: parameterOverrides);
+
+        foreach (var diagnostic in result.Diagnostics.Diagnostics)
         {
-            var location = exception.Span.Start.Line > 0
-                ? $"{Markup.Escape(exception.Span.Source.Name)}:{exception.Span.Start.Line}:{exception.Span.Start.Column}: "
+            var location = diagnostic.Span.HasDocument && !diagnostic.Span.HasUnknownPosition
+                ? $"{Markup.Escape(diagnostic.Span.Document!.Name)}:{diagnostic.Span.Start.Line}:{diagnostic.Span.Start.Column}: "
                 : string.Empty;
 
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(exception.Message)}");
-            return 1;
+            var color = diagnostic.Severity switch
+            {
+                DiagnosticSeverity.Error => "red",
+                DiagnosticSeverity.Warning => "yellow",
+                DiagnosticSeverity.Info => "grey",
+                _ => "grey",
+            };
+
+            _console.MarkupLineInterpolated($"[{color}][[{diagnostic.Severity.ToString().ToUpperInvariant()}]][/] {location}{Markup.Escape(diagnostic.Message)}");
         }
-        catch (PipelineParameterBindingException exception)
+
+        if (result.Diagnostics.HasErrors)
         {
-            var location = exception.Span.Start.Line > 0
-                ? $"{Markup.Escape(exception.Span.Source.Name)}:{exception.Span.Start.Line}:{exception.Span.Start.Column}: "
-                : string.Empty;
-
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(exception.Message)}");
-            return 1;
-        }
-        catch (PipelineTemplateExpansionException exception)
-        {
-            var location = exception.Span.Start.Line > 0
-                ? $"{Markup.Escape(exception.Span.Source.Name)}:{exception.Span.Start.Line}:{exception.Span.Start.Column}: "
-                : string.Empty;
-
-            var includeChain = exception.IncludeChain.Count > 0
-                ? $" Include chain: {string.Join(" -> ", exception.IncludeChain.Select(source => Markup.Escape(source.Identifier)))}."
-                : string.Empty;
-
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] {location}{Markup.Escape(exception.Message)}{includeChain}");
+            _console.MarkupLine("[red][[FAILED]][/] Compilation completed with errors.");
             return 1;
         }
 
@@ -129,6 +127,7 @@ public sealed class RunHandler(
         //    _console.MarkupLineInterpolated($"[red][[ERROR]][/] {Markup.Escape(exception.Message)}");
         //    return 1;
         // }
+        _console.MarkupLine("[green][[SUCCESS]][/] Compilation completed without errors.");
         return 0;
     }
 }
