@@ -208,5 +208,54 @@ public static class DiagnosticDescriptors
             MessageFormat = "Parameter '{0}' referenced but not defined."
         };
 
+    // GH6000-GH6999 Template Expansion
+    public static readonly DiagnosticDescriptor TemplateReferenceMustBeLiteral =
+        new()
+        {
+            Code = DiagnosticCode.Create(6001),
+            Severity = DiagnosticSeverity.Error,
+            MessageFormat = "Template reference must be a literal string."
+        };
+
+    public static readonly DiagnosticDescriptor TemplateReferenceMustNotBeEmpty =
+        new()
+        {
+            Code = DiagnosticCode.Create(6002),
+            Severity = DiagnosticSeverity.Error,
+            MessageFormat = "Template path cannot be empty."
+        };
+
+    public static readonly DiagnosticDescriptor RemoteTemplatesNotSupported =
+        new()
+        {
+            Code = DiagnosticCode.Create(6003),
+            Severity = DiagnosticSeverity.Error,
+            MessageFormat = "Remote template reference '{0}' is not supported."
+        };
+
+    public static readonly DiagnosticDescriptor TemplateNotFound =
+        new()
+        {
+            Code = DiagnosticCode.Create(6004),
+            Severity = DiagnosticSeverity.Error,
+            MessageFormat = "Template file not found: '{0}'."
+        };
+
+    public static readonly DiagnosticDescriptor TemplateIncludeCycleDetected =
+        new()
+        {
+            Code = DiagnosticCode.Create(6005),
+            Severity = DiagnosticSeverity.Error,
+            MessageFormat = "Template include cycle detected at '{0}'."
+        };
+
+    public static readonly DiagnosticDescriptor TemplateExpansionDepthExceeded =
+        new()
+        {
+            Code = DiagnosticCode.Create(6006),
+            Severity = DiagnosticSeverity.Error,
+            MessageFormat = "Template expansion exceeded the maximum depth of {0}."
+        };
+
     // GH9000-GH9999 Internal
 }

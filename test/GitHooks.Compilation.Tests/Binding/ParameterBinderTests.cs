@@ -12,7 +12,7 @@ namespace GitHooks.Compilation.Tests.Binding;
 
 public sealed class ParameterBinderTests
 {
-    private readonly ParameterBinder _binder = new();
+    private readonly ParameterBinder _binder = new(new ParameterScopeBuilder());
 
     [Fact]
     public void Prepare_NullRoot_Throws()
