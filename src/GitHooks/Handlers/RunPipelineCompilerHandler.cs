@@ -103,14 +103,16 @@ public sealed class RunPipelineCompilerHandler(
             _console.MarkupLine("[grey](no diagnostics reported)[/]");
         }
 
-        if (result.Diagnostics.HasErrors)
+        var exitCode = CompilerExitCode.FromResult(result);
+
+        if (result.HasErrors)
         {
             _console.MarkupLine("[red][[FAILED]][/] Compilation completed with errors.");
-            return 1;
+            return exitCode;
         }
 
         _console.MarkupLine("[green][[SUCCESS]][/] Compilation completed without errors.");
-        return 0;
+        return exitCode;
     }
 
     private static string DescribeExpression(

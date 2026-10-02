@@ -16,4 +16,7 @@ public sealed class CompilationResult(
 
     public DiagnosticBag Diagnostics { get; }
         = diagnostics ?? throw new ArgumentNullException(nameof(diagnostics));
+
+    public bool HasErrors
+        => Diagnostics.HasErrors;
 }
