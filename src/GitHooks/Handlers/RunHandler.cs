@@ -65,7 +65,7 @@ public sealed class RunHandler(
         try
         {
             yamlText = await File.ReadAllTextAsync(absoluteFilePath, cancellationToken);
-            document = new SourceDocument(Path.GetFileName(absoluteFilePath));
+            document = new SourceDocument(absoluteFilePath);
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {

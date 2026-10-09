@@ -11,6 +11,7 @@ public sealed class CompilerExitCodeTests
     {
         var result = new CompilationResult(
             PipelineNode.Empty(SourceSpan.Unknown),
+            PipelineNode.Empty(SourceSpan.Unknown),
             new DiagnosticBag());
 
         var exitCode = CompilerExitCode.FromResult(result);
@@ -35,6 +36,7 @@ public sealed class CompilerExitCodeTests
                 SourceSpan.Unknown));
 
         var result = new CompilationResult(
+            PipelineNode.Empty(SourceSpan.Unknown),
             PipelineNode.Empty(SourceSpan.Unknown),
             diagnostics);
 
