@@ -67,6 +67,7 @@ public sealed class CompilationResultTests
 
         var result = new CompilationResult(
             PipelineNode.Empty(SourceSpan.Unknown),
+            PipelineNode.Empty(SourceSpan.Unknown),
             diagnostics);
 
         Assert.False(result.HasErrors);
@@ -80,6 +81,7 @@ public sealed class CompilationResultTests
         diagnostics.Report(CreateDiagnostic(DiagnosticSeverity.Error, 2));
 
         var result = new CompilationResult(
+            PipelineNode.Empty(SourceSpan.Unknown),
             PipelineNode.Empty(SourceSpan.Unknown),
             diagnostics);
 
