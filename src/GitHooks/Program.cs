@@ -7,8 +7,6 @@ using GitHooks.Infrastructure;
 using GitHooks.Infrastructure.Yaml.DependencyInjection;
 using GitHooks.Templates;
 using GitHooks.Validation.DependencyInjection;
-using GitHooks.Workflow.Application.DependencyInjection;
-using GitHooks.Workflow.Infrastructure.DependencyInjection;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -80,11 +78,6 @@ internal sealed class Program
         // add services:
         _ = services.AddTemplates();
         _ = services.AddInfrastructure();
-
-        // add workflow
-        _ = services.AddYamlPipelineParsing();
-        _ = services.AddPipelineParameterBinding();
-        _ = services.AddPipelineResolution();
 
         // TEMPORARY: target PipelineCompiler DI chain, wired only for the manual-verification command above.
         _ = services.AddYamlPipelineCompilation();

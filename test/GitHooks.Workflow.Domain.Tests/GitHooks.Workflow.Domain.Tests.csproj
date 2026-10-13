@@ -1,7 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\GitHooks.Workflow.Domain\GitHooks.Workflow.Domain.csproj" />
-  </ItemGroup>
-
-</Project>

@@ -18,7 +18,6 @@
     <ProjectReference Include="..\GitHooks.Infrastructure\GitHooks.Infrastructure.csproj" />
     <ProjectReference Include="..\GitHooks.Infrastructure.Yaml\GitHooks.Infrastructure.Yaml.csproj" />
     <ProjectReference Include="..\GitHooks.Validation\GitHooks.Validation.csproj" />
-    <ProjectReference Include="..\GitHooks.Workflow.Infrastructure\GitHooks.Workflow.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
