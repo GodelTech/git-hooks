@@ -55,7 +55,7 @@ public sealed class RunHandler(
 
         if (!File.Exists(absoluteFilePath))
         {
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] YAML file not found: [blue]{Markup.Escape(absoluteFilePath)}[/]");
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] YAML file not found: [blue]{absoluteFilePath}[/]");
             return 1;
         }
 
@@ -69,13 +69,13 @@ public sealed class RunHandler(
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to read YAML file: {Markup.Escape(exception.Message)}");
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to read YAML file: {exception.Message}");
             return 1;
         }
 
         if (string.IsNullOrWhiteSpace(yamlText))
         {
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] YAML file is empty: [blue]{Markup.Escape(absoluteFilePath)}[/]");
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] YAML file is empty: [blue]{absoluteFilePath}[/]");
             return 1;
         }
 
@@ -93,14 +93,14 @@ public sealed class RunHandler(
         }
         catch (ArgumentException exception)
         {
-            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Invalid compilation input: {Markup.Escape(exception.Message)}");
+            _console.MarkupLineInterpolated($"[red][[ERROR]][/] Invalid compilation input: {exception.Message}");
             return 1;
         }
 
         foreach (var diagnostic in result.Diagnostics.Diagnostics)
         {
             var location = diagnostic.Span.HasDocument && !diagnostic.Span.HasUnknownPosition
-                ? $"{Markup.Escape(diagnostic.Span.Document!.Name)}:{diagnostic.Span.Start.Line}:{diagnostic.Span.Start.Column}: "
+                ? $"{diagnostic.Span.Document!.Name}:{diagnostic.Span.Start.Line}:{diagnostic.Span.Start.Column}: "
                 : string.Empty;
 
             var color = diagnostic.Severity switch
@@ -111,13 +111,15 @@ public sealed class RunHandler(
                 _ => "grey",
             };
 
-            _console.MarkupLineInterpolated($"[{color}][[{diagnostic.Severity.ToString().ToUpperInvariant()}]][/] {location}{Markup.Escape(diagnostic.Message)}");
+            _console.MarkupLineInterpolated($"[{color}][[{diagnostic.Severity.ToString().ToUpperInvariant()}]][/] {location}{diagnostic.Message}");
         }
 
-        if (result.Diagnostics.HasErrors)
+        var exitCode = CompilerExitCode.FromResult(result);
+
+        if (result.HasErrors)
         {
             _console.MarkupLine("[red][[FAILED]][/] Compilation completed with errors.");
-            return 1;
+            return exitCode;
         }
 
         // try
@@ -147,6 +149,6 @@ public sealed class RunHandler(
         //    return 1;
         // }
         _console.MarkupLine("[green][[SUCCESS]][/] Compilation completed without errors.");
-        return 0;
+        return exitCode;
     }
 }
