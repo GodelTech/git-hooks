@@ -2,6 +2,7 @@ using System.CommandLine;
 
 using GitHooks.Commands;
 using GitHooks.Compilation.DependencyInjection;
+using GitHooks.Execution;
 using GitHooks.Handlers;
 using GitHooks.Infrastructure;
 using GitHooks.Infrastructure.Yaml.DependencyInjection;
@@ -76,6 +77,7 @@ internal sealed class Program
         _ = services.AddTransient<IRunPipelineCompilerHandler, RunPipelineCompilerHandler>();
 
         // add services:
+        _ = services.AddTransient<IScriptStepRunner, ShellScriptStepRunner>();
         _ = services.AddTemplates();
         _ = services.AddInfrastructure();
 

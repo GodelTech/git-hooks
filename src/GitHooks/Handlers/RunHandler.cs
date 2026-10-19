@@ -1,6 +1,9 @@
 using GitHooks.Compilation;
 using GitHooks.Diagnostics;
+using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Common;
+using GitHooks.Execution;
 using GitHooks.Infrastructure.Git;
 
 using Spectre.Console;
@@ -10,12 +13,14 @@ namespace GitHooks.Handlers;
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,
     PipelineCompiler compiler,
-    IAnsiConsole console)
+    IAnsiConsole console,
+    IScriptStepRunner stepRunner)
     : IRunHandler
 {
     private readonly IGitCommandLine _gitCommandLine = gitCommandLine;
     private readonly PipelineCompiler _compiler = compiler;
     private readonly IAnsiConsole _console = console;
+    private readonly IScriptStepRunner _stepRunner = stepRunner;
 
     /// <inheritdoc/>
     public async Task<int> HandleAsync(
@@ -123,6 +128,102 @@ public sealed class RunHandler(
         }
 
         _console.MarkupLine("[green][[SUCCESS]][/] Compilation completed without errors.");
-        return exitCode;
+
+        return await ExecuteStepsAsync(result, repositoryRootPath, cancellationToken);
+    }
+
+    private async Task<int> ExecuteStepsAsync(
+        CompilationResult result,
+        string workingDirectory,
+        CancellationToken cancellationToken)
+    {
+        var steps = result.BoundRoot.Steps;
+
+        var plan = new List<(string Name, string Script)>(steps.Count);
+
+        for (var i = 0; i < steps.Count; i++)
+        {
+            var position = $"{i + 1}/{steps.Count}";
+
+            if (steps[i] is not ScriptStepNode scriptStep)
+            {
+                _console.MarkupLineInterpolated($"[red][[ERROR]][/] Step {position}: unsupported step kind '{steps[i].Kind}'; refusing to run a pipeline with steps that would be skipped.");
+                return 1;
+            }
+
+            if (!scriptStep.Script.Value.TryGetStringValue(out var script))
+            {
+                _console.MarkupLineInterpolated($"[red][[ERROR]][/] Step {position}: script contains unresolved expressions.");
+                return 1;
+            }
+
+            WarnAboutIgnoredFields(scriptStep, position);
+
+            var name = scriptStep.DisplayName is not null && scriptStep.DisplayName.Value.TryGetStringValue(out var displayName)
+                ? displayName
+                : script.Split('\n', 2)[0].Trim();
+
+            plan.Add((name, script));
+        }
+
+        for (var i = 0; i < plan.Count; i++)
+        {
+            var position = $"{i + 1}/{plan.Count}";
+
+            _console.MarkupLineInterpolated($"[blue]==> Step {position}:[/] {plan[i].Name}");
+
+            int stepExitCode;
+
+            try
+            {
+                stepExitCode = await _stepRunner.RunAsync(plan[i].Script, workingDirectory, cancellationToken);
+            }
+            catch (Exception exception) when (exception is IOException or InvalidOperationException or System.ComponentModel.Win32Exception or UnauthorizedAccessException)
+            {
+                _console.MarkupLineInterpolated($"[red][[ERROR]][/] Step {position} could not be run: {exception.Message}");
+                return 1;
+            }
+
+            if (stepExitCode != 0)
+            {
+                _console.MarkupLineInterpolated($"[red][[FAILED]][/] Step {position} exited with code {stepExitCode}.");
+                return stepExitCode;
+            }
+        }
+
+        _console.MarkupLine("[green][[SUCCESS]][/] All steps completed.");
+        return 0;
+    }
+
+    private void WarnAboutIgnoredFields(
+        ScriptStepNode step,
+        string position)
+    {
+        var ignored = new List<string>();
+
+        if (step.Condition is not null)
+        {
+            ignored.Add(step.Condition.Key);
+        }
+
+        if (step.Env is not null)
+        {
+            ignored.Add(step.Env.Key);
+        }
+
+        if (step.WorkingDirectory is not null)
+        {
+            ignored.Add(step.WorkingDirectory.Key);
+        }
+
+        if (step.TimeoutInMinutes is not null)
+        {
+            ignored.Add(step.TimeoutInMinutes.Key);
+        }
+
+        if (ignored.Count > 0)
+        {
+            _console.MarkupLineInterpolated($"[yellow][[WARNING]][/] Step {position}: field(s) not supported yet and ignored: {string.Join(", ", ignored)}.");
+        }
     }
 }
