@@ -1,5 +1,6 @@
 using GitHooks.Compilation;
 using GitHooks.Compilation.DependencyInjection;
+using GitHooks.Execution;
 using GitHooks.Handlers;
 using GitHooks.Infrastructure.Cli;
 using GitHooks.Infrastructure.Git;
@@ -150,6 +151,125 @@ public sealed class RunHandlerTests : IDisposable
         Assert.Contains("[SUCCESS]", output, StringComparison.Ordinal);
         Assert.DoesNotContain("[ERROR]", output, StringComparison.Ordinal);
         Assert.DoesNotContain("[FAILED]", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WithValidPipeline_ExecutesSubstitutedScripts()
+    {
+        var yaml = """
+            parameters:
+              - name: serverName
+                type: string
+                default: TEST-SERVER
+            steps:
+              - script: echo one
+              - script: echo Hello ${{ parameters.serverName }}
+            """;
+        var path = WriteTempFile("pipeline.yaml", yaml);
+        var runner = new FakeScriptStepRunner();
+
+        var (exitCode, _) = await RunAsync(path, runner: runner);
+
+        Assert.Equal(0, exitCode);
+        Assert.Equal(["echo one", "echo Hello TEST-SERVER"], runner.Scripts);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WithParameterOverride_ExecutesOverriddenValue()
+    {
+        var yaml = """
+            parameters:
+              - name: serverName
+                type: string
+                default: TEST-SERVER
+            steps:
+              - script: echo Hello ${{ parameters.serverName }}
+            """;
+        var path = WriteTempFile("pipeline.yaml", yaml);
+        var runner = new FakeScriptStepRunner();
+
+        _ = await RunAsync(path, overrides: Overrides(("serverName", "some server name")), runner: runner);
+
+        Assert.Equal(["echo Hello some server name"], runner.Scripts);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WithCompilationErrors_DoesNotExecuteScripts()
+    {
+        var path = WriteTempFile("pipeline.yaml", "steps: []");
+        var runner = new FakeScriptStepRunner();
+
+        var (exitCode, _) = await RunAsync(path, runner: runner);
+
+        Assert.Equal(1, exitCode);
+        Assert.Empty(runner.Scripts);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenStepFails_StopsAndReturnsItsExitCode()
+    {
+        var yaml = """
+            steps:
+              - script: first
+              - script: second
+            """;
+        var path = WriteTempFile("pipeline.yaml", yaml);
+        var runner = new FakeScriptStepRunner { ExitCode = 3 };
+
+        var (exitCode, output) = await RunAsync(path, runner: runner);
+
+        Assert.Equal(3, exitCode);
+        Assert.Equal(["first"], runner.Scripts);
+        Assert.Contains("[FAILED]", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WithDisplayName_PrintsItAsStepTitle()
+    {
+        var yaml = """
+            steps:
+              - script: echo body
+                displayName: My Title
+            """;
+        var path = WriteTempFile("pipeline.yaml", yaml);
+
+        var (_, output) = await RunAsync(path);
+
+        Assert.Contains("My Title", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WithUnsupportedStepField_WarnsAndStillRuns()
+    {
+        var yaml = """
+            steps:
+              - script: echo body
+                condition: false
+            """;
+        var path = WriteTempFile("pipeline.yaml", yaml);
+        var runner = new FakeScriptStepRunner();
+
+        var (exitCode, output) = await RunAsync(path, runner: runner);
+
+        Assert.Equal(0, exitCode);
+        Assert.Contains("[WARNING]", output, StringComparison.Ordinal);
+        Assert.Contains("condition", output, StringComparison.Ordinal);
+        Assert.Single(runner.Scripts);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenRunnerThrowsInvalidOperation_ReturnsOne()
+    {
+        var yaml = """
+            steps:
+              - script: echo body
+            """;
+        var path = WriteTempFile("pipeline.yaml", yaml);
+
+        var (exitCode, output) = await RunAsync(path, runner: new FakeScriptStepRunner { Throw = true });
+
+        Assert.Equal(1, exitCode);
+        Assert.Contains("could not be run", output, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -505,10 +625,11 @@ public sealed class RunHandlerTests : IDisposable
     private static async Task<(int ExitCode, string Output)> RunAsync(
         string filePath,
         FakeGitCommandLine? git = null,
-        IReadOnlyDictionary<string, string>? overrides = null)
+        IReadOnlyDictionary<string, string>? overrides = null,
+        FakeScriptStepRunner? runner = null)
     {
         var writer = new StringWriter();
-        var handler = new RunHandler(git ?? new FakeGitCommandLine(), CreateCompiler(), CreateConsole(writer));
+        var handler = new RunHandler(git ?? new FakeGitCommandLine(), CreateCompiler(), CreateConsole(writer), runner ?? new FakeScriptStepRunner());
 
         var exitCode = await handler.HandleAsync(
             filePath,
@@ -523,6 +644,26 @@ public sealed class RunHandlerTests : IDisposable
         var filePath = Path.Combine(_tempDir, fileName);
         File.WriteAllText(filePath, content);
         return filePath;
+    }
+
+    private sealed class FakeScriptStepRunner : IScriptStepRunner
+    {
+        public List<string> Scripts { get; } = [];
+
+        public int ExitCode { get; init; }
+
+        public bool Throw { get; init; }
+
+        public Task<int> RunAsync(string script, string workingDirectory, CancellationToken cancellationToken = default)
+        {
+            if (Throw)
+            {
+                throw new InvalidOperationException("boom");
+            }
+
+            Scripts.Add(script);
+            return Task.FromResult(ExitCode);
+        }
     }
 
     private sealed class FakeGitCommandLine : IGitCommandLine
