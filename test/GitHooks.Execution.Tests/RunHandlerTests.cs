@@ -1,7 +1,5 @@
 using GitHooks.Compilation;
 using GitHooks.Compilation.DependencyInjection;
-using GitHooks.Execution;
-using GitHooks.Handlers;
 using GitHooks.Infrastructure.Cli;
 using GitHooks.Infrastructure.Git;
 using GitHooks.Infrastructure.Yaml.DependencyInjection;
@@ -11,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Spectre.Console;
 
-namespace GitHooks.Tests.Handlers;
+namespace GitHooks.Execution.Tests;
 
 public sealed class RunHandlerTests : IDisposable
 {

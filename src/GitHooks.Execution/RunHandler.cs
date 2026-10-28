@@ -3,12 +3,11 @@ using GitHooks.Diagnostics;
 using GitHooks.Domain.Ast.Expressions;
 using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Domain.Common;
-using GitHooks.Execution;
 using GitHooks.Infrastructure.Git;
 
 using Spectre.Console;
 
-namespace GitHooks.Handlers;
+namespace GitHooks.Execution;
 
 public sealed class RunHandler(
     IGitCommandLine gitCommandLine,

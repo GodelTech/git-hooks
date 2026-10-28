@@ -7,6 +7,6 @@
 
 set -e
 
-dotnet run --project "src/GitHooks" --no-launch-profile -- run --file "{{HOOKS_PATH}}/{{HOOK_NAME}}.yaml"
+githooks run --file "{{HOOKS_PATH}}/{{HOOK_NAME}}.yaml"
 
 exit 0
