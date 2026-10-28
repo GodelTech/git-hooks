@@ -1,11 +1,6 @@
-using GitHooks.Compilation.DependencyInjection;
 using GitHooks.Diagnostics;
 using GitHooks.Domain.Common;
-using GitHooks.Infrastructure.Yaml.DependencyInjection;
 using GitHooks.Testing.Diagnostics;
-using GitHooks.Validation.DependencyInjection;
-
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GitHooks.Compilation.Tests;
 
@@ -47,7 +42,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
 
         var rootPath = WriteFile("root.yaml", rootYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -82,7 +77,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
 
         var rootPath = WriteFile("root.yaml", rootYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -102,7 +97,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
 
         var rootPath = WriteFile("root.yaml", rootYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -133,7 +128,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
         File.WriteAllText(aPath, aYaml);
         File.WriteAllText(bPath, bYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(aPath),
@@ -155,7 +150,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
 
         var rootPath = WriteFile("root.yaml", rootYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -191,7 +186,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
 
         var rootPath = WriteFile("root.yaml", rootYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -227,7 +222,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
 
         var rootPath = WriteFile("root.yaml", rootYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -272,7 +267,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
 
         var rootPath = WriteFile("root.yaml", rootYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -325,7 +320,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
 
         var rootPath = WriteFile("root.yaml", rootYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -362,7 +357,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
 
         var rootPath = WriteFile("root.yaml", rootYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -401,7 +396,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
 
         var rootPath = WriteFile("root.yaml", rootYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -439,7 +434,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
 
         var rootPath = WriteFile("root.yaml", rootYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -477,7 +472,7 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
         File.WriteAllText(middlePath, middleYaml);
         File.WriteAllText(leafPath, leafYaml);
 
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var result = compiler.Compile(
             File.ReadAllText(rootPath),
@@ -495,19 +490,6 @@ public sealed class TemplateExpansionIntegrationTests : IDisposable
             location => Assert.Contains(Path.GetFileName(rootPath), location.Message, StringComparison.Ordinal),
             location => Assert.Contains(Path.GetFileName(middlePath), location.Message, StringComparison.Ordinal),
             location => Assert.Contains(Path.GetFileName(leafPath), location.Message, StringComparison.Ordinal));
-    }
-
-    private static PipelineCompiler CreateCompiler()
-    {
-        var services = new ServiceCollection();
-
-        _ = services.AddYamlPipelineCompilation();
-        _ = services.AddTargetPipelineCompilation();
-        _ = services.AddPipelineValidation();
-
-        return services
-            .BuildServiceProvider()
-            .GetRequiredService<PipelineCompiler>();
     }
 
     private string WriteFile(

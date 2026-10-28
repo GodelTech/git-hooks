@@ -1,6 +1,6 @@
 using System.CommandLine;
 
-using GitHooks.Handlers;
+using GitHooks.Execution;
 
 using Spectre.Console;
 

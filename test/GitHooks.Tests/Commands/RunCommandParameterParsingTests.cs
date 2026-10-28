@@ -106,4 +106,19 @@ public class RunCommandParameterParsingTests
         Assert.False(success);
         Assert.Equal("Option '--parameter' entry '=contoso' must specify a parameter name before '='.", errorMessage);
     }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void TryParseParameterOverrides_EmptyEntry_ReturnsFalse(string entry)
+    {
+        var success = RunCommand.TryParseParameterOverrides(
+            [entry],
+            null,
+            out _,
+            out var errorMessage);
+
+        Assert.False(success);
+        Assert.Equal("Option '--parameter' contains an empty parameter entry.", errorMessage);
+    }
 }
