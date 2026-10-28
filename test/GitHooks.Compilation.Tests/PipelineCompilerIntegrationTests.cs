@@ -1,10 +1,7 @@
-using GitHooks.Compilation.DependencyInjection;
 using GitHooks.Diagnostics;
-using GitHooks.Infrastructure.Yaml.DependencyInjection;
+using GitHooks.Domain.Ast.Expressions;
+using GitHooks.Domain.Ast.Mappings.Steps;
 using GitHooks.Testing.Common;
-using GitHooks.Validation.DependencyInjection;
-
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GitHooks.Compilation.Tests;
 
@@ -17,7 +14,7 @@ public sealed class PipelineCompilerIntegrationTests
     [Fact]
     public void Compile_ValidPipeline_ProducesAstWithoutErrors()
     {
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var yaml = """
             parameters:
@@ -44,7 +41,7 @@ public sealed class PipelineCompilerIntegrationTests
     [Fact]
     public void Compile_MalformedYaml_ReportsInvalidYamlDiagnostic()
     {
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var yaml = """
             steps:
@@ -66,7 +63,7 @@ public sealed class PipelineCompilerIntegrationTests
     [Fact]
     public void Compile_PipelineWithoutSteps_ReportsValidationDiagnostic()
     {
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var yaml = """
             parameters:
@@ -88,7 +85,7 @@ public sealed class PipelineCompilerIntegrationTests
     [Fact]
     public void Compile_UndeclaredParameterReference_ReportsSingleDiagnostic()
     {
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var yaml = """
             steps:
@@ -109,7 +106,7 @@ public sealed class PipelineCompilerIntegrationTests
     [Fact]
     public void Compile_InvalidOverrideValue_ReportsOverrideDiagnosticAndPreservesDefaultSubstitution()
     {
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var yaml = """
             parameters:
@@ -145,7 +142,7 @@ public sealed class PipelineCompilerIntegrationTests
     [Fact]
     public void Compile_BooleanAndIntegerDefaults_AreSubstitutedIntoBoundRoot()
     {
-        var compiler = CreateCompiler();
+        var compiler = IntegrationCompilerFactory.Create();
 
         var yaml = """
             parameters:
@@ -177,16 +174,93 @@ public sealed class PipelineCompilerIntegrationTests
         Assert.Equal("42", secondLiteral.Value);
     }
 
-    private static PipelineCompiler CreateCompiler()
+    [Fact]
+    public void Compile_ParameterOverride_BindsInterpolatedScriptWithoutChangingRoot()
     {
-        var services = new ServiceCollection();
+        var compiler = IntegrationCompilerFactory.Create();
+        var yaml = """
+            parameters:
+              - name: configuration
+                type: string
+                default: Release
 
-        _ = services.AddYamlPipelineCompilation();
-        _ = services.AddTargetPipelineCompilation();
-        _ = services.AddPipelineValidation();
+            steps:
+              - script: echo ${{ parameters.configuration }}
+            """;
 
-        return services
-            .BuildServiceProvider()
-            .GetRequiredService<PipelineCompiler>();
+        var result = compiler.Compile(
+            yaml,
+            TestSourceDocument.Default,
+            parameterOverrides: new Dictionary<string, string>
+            {
+                ["configuration"] = "Debug"
+            });
+
+        Assert.False(result.HasErrors);
+        Assert.NotSame(result.Root, result.BoundRoot);
+
+        var original = Assert.IsType<ScriptStepNode>(Assert.Single(result.Root.Steps));
+        var expression = Assert.IsType<InterpolatedStringExpressionNode>(original.Script.Value);
+        Assert.Contains(expression.Parts, part => part is ParameterVariableExpressionNode);
+
+        var bound = Assert.IsType<ScriptStepNode>(Assert.Single(result.BoundRoot.Steps));
+        var literal = Assert.IsType<StringLiteralExpressionNode>(bound.Script.Value);
+        Assert.Equal("echo Debug", literal.Value);
+    }
+
+    [Fact]
+    public void Compile_UndeclaredParameterReference_PreservesDiagnosticLocation()
+    {
+        var compiler = IntegrationCompilerFactory.Create();
+        var document = TestSourceDocument.Default;
+        var yaml = """
+            steps:
+              - script: echo ${{ parameters.missing }}
+            """;
+
+        var result = compiler.Compile(yaml, document);
+
+        var diagnostic = Assert.Single(result.Diagnostics.Diagnostics);
+        Assert.Equal(DiagnosticDescriptors.ParameterVariableMustBeResolvable, diagnostic.Descriptor);
+        Assert.Equal(document, diagnostic.Span.Document);
+        Assert.False(diagnostic.Span.HasUnknownPosition);
+        Assert.Equal(2, diagnostic.Span.Start.Line);
+    }
+
+    [Fact]
+    public void Compile_SeparateContexts_DoNotLeakDiagnosticsOrParameterValues()
+    {
+        var compiler = IntegrationCompilerFactory.Create();
+        var yaml = """
+            parameters:
+              - name: configuration
+                type: string
+                default: Release
+
+            steps:
+              - script: ${{ parameters.configuration }}
+            """;
+
+        var first = compiler.Compile(
+            yaml,
+            TestSourceDocument.Default,
+            parameterOverrides: new Dictionary<string, string>
+            {
+                ["configuration"] = "Debug",
+                ["unknown"] = "value"
+            });
+        var second = compiler.Compile(yaml, TestSourceDocument.Default);
+
+        Assert.True(first.HasErrors);
+        Assert.False(second.HasErrors);
+        Assert.Empty(second.Diagnostics.Diagnostics);
+
+        var firstStep = Assert.IsType<ScriptStepNode>(Assert.Single(first.BoundRoot.Steps));
+        var firstLiteral = Assert.IsType<StringLiteralExpressionNode>(firstStep.Script.Value);
+        Assert.Equal("Debug", firstLiteral.Value);
+
+        var secondStep = Assert.IsType<ScriptStepNode>(Assert.Single(second.BoundRoot.Steps));
+        var secondLiteral = Assert.IsType<StringLiteralExpressionNode>(secondStep.Script.Value);
+        Assert.Equal("Release", secondLiteral.Value);
     }
 }

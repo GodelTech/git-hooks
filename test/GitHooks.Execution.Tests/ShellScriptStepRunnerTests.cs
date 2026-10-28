@@ -1,8 +1,6 @@
-using GitHooks.Execution;
-
 using Spectre.Console;
 
-namespace GitHooks.Tests.Execution;
+namespace GitHooks.Execution.Tests;
 
 public sealed class ShellScriptStepRunnerTests
 {

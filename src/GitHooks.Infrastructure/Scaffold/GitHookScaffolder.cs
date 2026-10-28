@@ -60,6 +60,14 @@ public sealed class GitHookScaffolder(
                 }
 
                 await File.WriteAllTextAsync(hookFilePath, _bashTemplateProvider.ApplyTokens(scriptTemplate, hooksPath, hook), new UTF8Encoding(false), cancellationToken);
+                if (!OperatingSystem.IsWindows())
+                {
+                    var mode = UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute |
+                        UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
+                        UnixFileMode.OtherRead | UnixFileMode.OtherExecute;
+                    File.SetUnixFileMode(hookFilePath, mode);
+                }
+
                 await File.WriteAllTextAsync(yamlFilePath, _yamlTemplateProvider.ApplyTokens(yamlTemplate, hook), new UTF8Encoding(false), cancellationToken);
                 createdHooks.Add(hook);
             }

@@ -1,4 +1,4 @@
-namespace GitHooks.Handlers;
+namespace GitHooks.Execution;
 
 /// <summary>
 /// Defines a handler for parsing and validating a hook YAML file.

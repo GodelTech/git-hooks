@@ -2,7 +2,7 @@ using System.CommandLine;
 
 using GitHooks.Commands;
 using GitHooks.Compilation.DependencyInjection;
-using GitHooks.Execution;
+using GitHooks.Execution.DependencyInjection;
 using GitHooks.Handlers;
 using GitHooks.Infrastructure;
 using GitHooks.Infrastructure.Yaml.DependencyInjection;
@@ -70,14 +70,13 @@ internal sealed class Program
         // add command handlers:
         _ = services.AddTransient<IInstallHandler, InstallHandler>();
         _ = services.AddTransient<ICreateHookHandler, CreateHookHandler>();
-        _ = services.AddTransient<IRunHandler, RunHandler>();
         _ = services.AddTransient<IUninstallHandler, UninstallHandler>();
 
         // TEMPORARY: manual verification handler for PipelineCompiler; remove before merging if not shipping.
         _ = services.AddTransient<IRunPipelineCompilerHandler, RunPipelineCompilerHandler>();
 
         // add services:
-        _ = services.AddTransient<IScriptStepRunner, ShellScriptStepRunner>();
+        _ = services.AddExecution();
         _ = services.AddTemplates();
         _ = services.AddInfrastructure();
 

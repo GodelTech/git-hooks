@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Spectre.Console" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GitHooks.Compilation\GitHooks.Compilation.csproj" />
+    <ProjectReference Include="..\GitHooks.Diagnostics\GitHooks.Diagnostics.csproj" />
+    <ProjectReference Include="..\GitHooks.Domain\GitHooks.Domain.csproj" />
+    <ProjectReference Include="..\GitHooks.Infrastructure\GitHooks.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
