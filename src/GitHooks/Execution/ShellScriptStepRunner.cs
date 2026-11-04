@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using System.Text;
 
 using Spectre.Console;
@@ -7,13 +6,16 @@ using Spectre.Console;
 namespace GitHooks.Execution;
 
 /// <summary>
-/// Runs script text through the platform shell (<c>cmd.exe</c> on Windows, <c>sh</c> elsewhere).
+/// Runs script text through PowerShell Core (<c>pwsh</c>) on every platform.
 /// </summary>
 public sealed class ShellScriptStepRunner(
     IAnsiConsole console)
     : IScriptStepRunner
 {
+    private static readonly Lazy<string> s_encodedPowerShellLauncher = new(LoadEncodedPowerShellLauncher);
+
     private readonly IAnsiConsole _console = console;
+    private readonly Lock _consoleLock = new();
 
     /// <inheritdoc/>
     public async Task<int> RunAsync(
@@ -23,123 +25,72 @@ public sealed class ShellScriptStepRunner(
     {
         ArgumentNullException.ThrowIfNull(script);
 
-        var isWindows = OperatingSystem.IsWindows();
-        var scriptPath = Path.Combine(Path.GetTempPath(), $"githooks-{Guid.NewGuid():N}{(isWindows ? ".cmd" : ".sh")}");
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "pwsh",
+            WorkingDirectory = workingDirectory,
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            StandardInputEncoding = new UTF8Encoding(false),
+            StandardOutputEncoding = Encoding.UTF8,
+            StandardErrorEncoding = Encoding.UTF8,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
 
-        await File.WriteAllTextAsync(
-            scriptPath,
-            isWindows ? BuildBatchScript(script) : BuildShellScript(script),
-            new UTF8Encoding(false),
-            cancellationToken);
+        startInfo.ArgumentList.Add("-NoProfile");
+        startInfo.ArgumentList.Add("-NonInteractive");
+        startInfo.ArgumentList.Add("-OutputFormat");
+        startInfo.ArgumentList.Add("Text");
+        startInfo.ArgumentList.Add("-EncodedCommand");
+        startInfo.ArgumentList.Add(s_encodedPowerShellLauncher.Value);
+
+        using var process = new Process { StartInfo = startInfo };
+
+        cancellationToken.ThrowIfCancellationRequested();
+        _ = process.Start();
 
         try
         {
-            var outputEncoding = GetOutputEncoding(isWindows);
+            await Task.WhenAll(
+                WriteScriptAsync(process.StandardInput, script, cancellationToken),
+                PumpAsync(process.StandardOutput, cancellationToken),
+                PumpAsync(process.StandardError, cancellationToken),
+                process.WaitForExitAsync(cancellationToken));
+        }
+        catch (OperationCanceledException)
+        {
+            await KillAsync(process);
+            throw;
+        }
 
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = isWindows ? "cmd.exe" : "sh",
-                WorkingDirectory = workingDirectory,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                StandardOutputEncoding = outputEncoding,
-                StandardErrorEncoding = outputEncoding,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            };
+        return process.ExitCode;
+    }
 
-            if (isWindows)
-            {
-                startInfo.ArgumentList.Add("/d");
-                startInfo.ArgumentList.Add("/c");
-            }
+    private static string LoadEncodedPowerShellLauncher()
+    {
+        using var stream = typeof(ShellScriptStepRunner).Assembly.GetManifestResourceStream(
+            typeof(ShellScriptStepRunner),
+            "PowerShellLauncher.ps1")
+            ?? throw new InvalidOperationException("Embedded PowerShell launcher was not found.");
+        using var reader = new StreamReader(stream);
 
-            startInfo.ArgumentList.Add(scriptPath);
+        return Convert.ToBase64String(Encoding.Unicode.GetBytes(reader.ReadToEnd()));
+    }
 
-            using var process = new Process { StartInfo = startInfo };
-
-            _ = process.Start();
-
-            process.StandardInput.Close();
-
-            try
-            {
-                await Task.WhenAll(
-                    PumpAsync(process.StandardOutput, cancellationToken),
-                    PumpAsync(process.StandardError, cancellationToken),
-                    process.WaitForExitAsync(cancellationToken));
-            }
-            catch (OperationCanceledException)
-            {
-                await KillAsync(process);
-                throw;
-            }
-
-            return process.ExitCode;
+    private static async Task WriteScriptAsync(
+        StreamWriter writer,
+        string script,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await writer.WriteAsync(script.AsMemory(), cancellationToken);
         }
         finally
         {
-            TryDelete(scriptPath);
-        }
-    }
-
-    // cmd.exe batch parsing is unreliable with LF-only files.
-    private static string BuildBatchScript(
-        string script)
-    {
-        var lines = script.ReplaceLineEndings("\n").Split('\n');
-
-        var failFast = !lines.Any(
-            line => line.Contains('(', StringComparison.Ordinal)
-                || line.Contains(')', StringComparison.Ordinal)
-                || line.Contains('^', StringComparison.Ordinal)
-                || line.TrimStart().StartsWith(':'));
-
-        var builder = new StringBuilder("@echo off\r\n");
-
-        foreach (var line in lines)
-        {
-            _ = builder.Append(line);
-
-            if (!failFast || string.IsNullOrWhiteSpace(line))
-            {
-                _ = builder.Append("\r\n");
-                continue;
-            }
-
-            _ = builder
-                .Append(" || call set \"GH_CODE=%%errorlevel%%\"\r\n")
-                .Append("@if defined GH_CODE if \"%GH_CODE%\"==\"0\" exit /b 1\r\n")
-                .Append("@if defined GH_CODE exit /b %GH_CODE%\r\n");
-        }
-
-        return builder.ToString();
-    }
-
-    private static string BuildShellScript(
-        string script)
-    {
-        return $"set -e\n{script.ReplaceLineEndings("\n")}\n";
-    }
-
-    private static Encoding GetOutputEncoding(
-        bool isWindows)
-    {
-        if (!isWindows)
-        {
-            return new UTF8Encoding(false);
-        }
-
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-        try
-        {
-            return Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
-        }
-        catch (Exception exception) when (exception is ArgumentException or NotSupportedException)
-        {
-            return new UTF8Encoding(false);
+            writer.Close();
         }
     }
 
@@ -157,26 +108,13 @@ public sealed class ShellScriptStepRunner(
         }
     }
 
-    private static void TryDelete(
-        string path)
-    {
-        try
-        {
-            File.Delete(path);
-        }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
-        {
-            // Best-effort cleanup must never replace the step's result or a cancellation.
-        }
-    }
-
     private async Task PumpAsync(
         StreamReader reader,
         CancellationToken cancellationToken)
     {
         while (await reader.ReadLineAsync(cancellationToken) is { } line)
         {
-            lock (_console)
+            lock (_consoleLock)
             {
                 _console.WriteLine(line);
             }

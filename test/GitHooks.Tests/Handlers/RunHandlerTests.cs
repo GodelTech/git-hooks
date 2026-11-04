@@ -188,7 +188,7 @@ public sealed class RunHandlerTests : IDisposable
         var path = WriteTempFile("pipeline.yaml", yaml);
         var runner = new FakeScriptStepRunner();
 
-        _ = await RunAsync(path, overrides: Overrides(("serverName", "some server name")), runner: runner);
+        await RunAsync(path, overrides: Overrides(("serverName", "some server name")), runner: runner);
 
         Assert.Equal(["echo Hello some server name"], runner.Scripts);
     }
@@ -238,13 +238,17 @@ public sealed class RunHandlerTests : IDisposable
         Assert.Contains("My Title", output, StringComparison.Ordinal);
     }
 
-    [Fact]
-    public async Task HandleAsync_WithUnsupportedStepField_WarnsAndStillRuns()
+    [Theory]
+    [InlineData("condition", "false")]
+    [InlineData("env", "{ TEST_VARIABLE: test-value }")]
+    [InlineData("workingDirectory", "some-directory")]
+    [InlineData("timeoutInMinutes", "5")]
+    public async Task HandleAsync_WithUnsupportedStepField_WarnsAndStillRuns(string field, string value)
     {
-        var yaml = """
+        var yaml = $$"""
             steps:
               - script: echo body
-                condition: false
+                {{field}}: {{value}}
             """;
         var path = WriteTempFile("pipeline.yaml", yaml);
         var runner = new FakeScriptStepRunner();
@@ -253,23 +257,56 @@ public sealed class RunHandlerTests : IDisposable
 
         Assert.Equal(0, exitCode);
         Assert.Contains("[WARNING]", output, StringComparison.Ordinal);
-        Assert.Contains("condition", output, StringComparison.Ordinal);
+        Assert.Contains(field, output, StringComparison.Ordinal);
         Assert.Single(runner.Scripts);
     }
 
-    [Fact]
-    public async Task HandleAsync_WhenRunnerThrowsInvalidOperation_ReturnsOne()
+    [Theory]
+    [InlineData("InvalidOperation")]
+    [InlineData("IO")]
+    [InlineData("Win32")]
+    [InlineData("UnauthorizedAccess")]
+    public async Task HandleAsync_WhenRunnerThrows_ReturnsOneAndStops(string exceptionKind)
     {
         var yaml = """
             steps:
               - script: echo body
+              - script: echo should-not-run
             """;
         var path = WriteTempFile("pipeline.yaml", yaml);
 
-        var (exitCode, output) = await RunAsync(path, runner: new FakeScriptStepRunner { Throw = true });
+        Exception exception = exceptionKind switch
+        {
+            "IO" => new IOException("runner-error"),
+            "Win32" => new System.ComponentModel.Win32Exception("runner-error"),
+            "UnauthorizedAccess" => new UnauthorizedAccessException("runner-error"),
+            _ => new InvalidOperationException("runner-error"),
+        };
+        var runner = new FakeScriptStepRunner { Exception = exception };
+
+        var (exitCode, output) = await RunAsync(path, runner: runner);
 
         Assert.Equal(1, exitCode);
         Assert.Contains("could not be run", output, StringComparison.Ordinal);
+        Assert.Contains("runner-error", output, StringComparison.Ordinal);
+        Assert.Equal(["echo body"], runner.Scripts);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WithValidPipeline_PassesRepositoryRootToRunner()
+    {
+        var path = WriteTempFile("pipeline.yaml", "steps:\n  - script: echo body");
+        var runner = new FakeScriptStepRunner();
+        var repositoryRoot = Path.Combine(_tempDir, "repository");
+        var git = new FakeGitCommandLine
+        {
+            RepositoryRootPathResult = CommandLineResult.FromProcess(repositoryRoot, string.Empty, 0),
+        };
+
+        var (exitCode, _) = await RunAsync(path, git: git, runner: runner);
+
+        Assert.Equal(0, exitCode);
+        Assert.Equal([repositoryRoot], runner.WorkingDirectories);
     }
 
     [Fact]
@@ -650,18 +687,22 @@ public sealed class RunHandlerTests : IDisposable
     {
         public List<string> Scripts { get; } = [];
 
+        public List<string> WorkingDirectories { get; } = [];
+
         public int ExitCode { get; init; }
 
-        public bool Throw { get; init; }
+        public Exception? Exception { get; init; }
 
         public Task<int> RunAsync(string script, string workingDirectory, CancellationToken cancellationToken = default)
         {
-            if (Throw)
+            Scripts.Add(script);
+            WorkingDirectories.Add(workingDirectory);
+
+            if (Exception is not null)
             {
-                throw new InvalidOperationException("boom");
+                throw Exception;
             }
 
-            Scripts.Add(script);
             return Task.FromResult(ExitCode);
         }
     }

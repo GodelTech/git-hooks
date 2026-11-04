@@ -34,11 +34,113 @@ public sealed class ShellScriptStepRunnerTests
     }
 
     [Fact]
+    public async Task RunAsync_WithLargeScript_ExecutesWithoutCommandLineLengthLimits()
+    {
+        var script = $"# {new string('x', 100_000)}\nWrite-Output 'large-script-ran'";
+
+        var (exitCode, output) = await RunAsync(script, TestContext.Current.CancellationToken);
+
+        Assert.Equal(0, exitCode);
+        Assert.Contains("large-script-ran", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task RunAsync_WhenEarlierLineFails_StopsAndFails()
     {
         var (exitCode, output) = await RunAsync("exit 3\necho should-not-run", TestContext.Current.CancellationToken);
 
         Assert.Equal(3, exitCode);
+        Assert.DoesNotContain("should-not-run", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RunAsync_WhenUnknownCommandPrecedesParentheses_StopsAndFails()
+    {
+        var (exitCode, output) = await RunAsync(
+            "some-unknown-command-xyz\necho Deploying (staging)",
+            TestContext.Current.CancellationToken);
+
+        Assert.NotEqual(0, exitCode);
+        Assert.DoesNotContain("Deploying (staging)", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RunAsync_WithQuotedParentheses_PrintsOutput()
+    {
+        var (exitCode, output) = await RunAsync("echo 'Deploying (staging)'", TestContext.Current.CancellationToken);
+
+        Assert.Equal(0, exitCode);
+        Assert.Contains("Deploying (staging)", output, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("if ($true) { Write-Output 'inside-block' }", "inside-block")]
+    [InlineData("$message = 'Hello!'; Write-Output $message", "Hello!")]
+    [InlineData("Write-Output 'one & two | 100%'", "one & two | 100%")]
+    [InlineData("Write-Output 'Zażółć'", "Zażółć")]
+    [InlineData("[Console]::Error.WriteLine('stderr-message')", "stderr-message")]
+    [InlineData("[pscustomobject]@{ Message = 'formatted-object' }", "formatted-object")]
+    public async Task RunAsync_WithPowerShellSyntax_ExecutesAndStreamsOutput(string script, string expected)
+    {
+        var (exitCode, output) = await RunAsync(script, TestContext.Current.CancellationToken);
+
+        Assert.Equal(0, exitCode);
+        Assert.Contains(expected, output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RunAsync_WithParenthesisInComment_ChecksFollowingCommands()
+    {
+        var (exitCode, output) = await RunAsync(
+            "# (\nsome-unknown-command-xyz\necho should-not-run",
+            TestContext.Current.CancellationToken);
+
+        Assert.NotEqual(0, exitCode);
+        Assert.DoesNotContain("should-not-run", output, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("param([string] $message = 'hello-from-param')\nWrite-Output $message", "hello-from-param")]
+    [InlineData("using namespace System.Text\nWrite-Output ([StringBuilder]::new('hello-from-using').ToString())", "hello-from-using")]
+    public async Task RunAsync_WithScriptDeclarations_ExecutesUnmodifiedScript(string script, string expected)
+    {
+        var (exitCode, output) = await RunAsync(script, TestContext.Current.CancellationToken);
+
+        Assert.Equal(0, exitCode);
+        Assert.Contains(expected, output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RunAsync_WhenUnknownCommandFails_StopsBeforeNextCommand()
+    {
+        var (exitCode, output) = await RunAsync(
+            "some-unknown-command-xyz\necho should-not-run",
+            TestContext.Current.CancellationToken);
+
+        Assert.NotEqual(0, exitCode);
+        Assert.DoesNotContain("should-not-run", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RunAsync_WhenNativeCommandFails_StopsAndReturnsItsExitCode()
+    {
+        var (exitCode, output) = await RunAsync(
+            "pwsh -NoProfile -NonInteractive -Command 'exit 7'\necho should-not-run",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(7, exitCode);
+        Assert.DoesNotContain("should-not-run", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RunAsync_WhenPowerShellCommandWritesError_StopsAndFails()
+    {
+        var (exitCode, output) = await RunAsync(
+            "Write-Error 'step-error'\necho should-not-run",
+            TestContext.Current.CancellationToken);
+
+        Assert.NotEqual(0, exitCode);
+        Assert.Contains("step-error", output, StringComparison.Ordinal);
         Assert.DoesNotContain("should-not-run", output, StringComparison.Ordinal);
     }
 
@@ -63,9 +165,9 @@ public sealed class ShellScriptStepRunnerTests
     [Fact]
     public async Task RunAsync_WithReadingScript_DoesNotHangOnStdin()
     {
-        var script = OperatingSystem.IsWindows() ? "set /p x=" : "read x";
+        var (exitCode, _) = await RunAsync("Read-Host 'input'", TestContext.Current.CancellationToken);
 
-        _ = await RunAsync(script, TestContext.Current.CancellationToken);
+        Assert.NotEqual(0, exitCode);
     }
 
     [Fact]
@@ -73,9 +175,9 @@ public sealed class ShellScriptStepRunnerTests
     {
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
         cts.CancelAfter(TimeSpan.FromMilliseconds(300));
-        var script = OperatingSystem.IsWindows() ? "ping -n 30 127.0.0.1 > nul" : "sleep 30";
+        var script = "Start-Sleep -Seconds 30";
 
-        _ = await Assert.ThrowsAnyAsync<OperationCanceledException>(
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
             () => RunAsync(script, cts.Token));
     }
 
