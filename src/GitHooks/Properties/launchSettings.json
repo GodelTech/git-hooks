@@ -10,6 +10,16 @@
       "commandLineArgs": "run --file examples/simple.yaml",
       "workingDirectory": "$(SolutionDir)"
     },
+    "run --file examples/simple expanded.yaml": {
+      "commandName": "Project",
+      "commandLineArgs": "run --file \"examples/simple expanded.yaml\"",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "run --file examples/simple expanded.yaml -p serverName=some server name": {
+      "commandName": "Project",
+      "commandLineArgs": "run --file \"examples/simple expanded.yaml\" -p \"serverName=some server name\"",
+      "workingDirectory": "$(SolutionDir)"
+    },
     "run --file examples/push-minimal.yaml": {
       "commandName": "Project",
       "commandLineArgs": "run --file examples/push-minimal.yaml",
