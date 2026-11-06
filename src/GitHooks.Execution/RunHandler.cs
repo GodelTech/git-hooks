@@ -30,13 +30,13 @@ public sealed class RunHandler(
         if (!await _gitCommandLine.IsAvailableAsync(cancellationToken))
         {
             _console.MarkupLine("[red][[ERROR]][/] Git not found in PATH. Install Git and retry.");
-            return 1;
+            return RunExitCode.CompilationFailed;
         }
 
         if (!await _gitCommandLine.IsInsideGitRepositoryAsync(cancellationToken))
         {
             _console.MarkupLine("[red][[ERROR]][/] Not inside a git repository. The [blue]run[/] command requires running from within a git repository.");
-            return 1;
+            return RunExitCode.CompilationFailed;
         }
 
         var repositoryRootPathResult = await _gitCommandLine.GetRepositoryRootPathAsync(cancellationToken);
@@ -44,7 +44,7 @@ public sealed class RunHandler(
         if (!repositoryRootPathResult.IsSuccess)
         {
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to resolve repository root path: {repositoryRootPathResult.Error.Trim()}");
-            return 1;
+            return RunExitCode.CompilationFailed;
         }
 
         var repositoryRootPath = repositoryRootPathResult.Output.Trim();
@@ -52,7 +52,7 @@ public sealed class RunHandler(
         if (string.IsNullOrWhiteSpace(repositoryRootPath))
         {
             _console.MarkupLine("[red][[ERROR]][/] Git returned an empty repository root path.");
-            return 1;
+            return RunExitCode.CompilationFailed;
         }
 
         var absoluteFilePath = Path.GetFullPath(filePath);
@@ -60,7 +60,7 @@ public sealed class RunHandler(
         if (!File.Exists(absoluteFilePath))
         {
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] YAML file not found: [blue]{absoluteFilePath}[/]");
-            return 1;
+            return RunExitCode.CompilationFailed;
         }
 
         string yamlText;
@@ -74,13 +74,13 @@ public sealed class RunHandler(
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] Failed to read YAML file: {exception.Message}");
-            return 1;
+            return RunExitCode.CompilationFailed;
         }
 
         if (string.IsNullOrWhiteSpace(yamlText))
         {
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] YAML file is empty: [blue]{absoluteFilePath}[/]");
-            return 1;
+            return RunExitCode.CompilationFailed;
         }
 
         var context = new CompilationContext();
@@ -98,7 +98,7 @@ public sealed class RunHandler(
         catch (ArgumentException exception)
         {
             _console.MarkupLineInterpolated($"[red][[ERROR]][/] Invalid compilation input: {exception.Message}");
-            return 1;
+            return RunExitCode.CompilationFailed;
         }
 
         foreach (var diagnostic in result.Diagnostics.Diagnostics)
@@ -118,12 +118,10 @@ public sealed class RunHandler(
             _console.MarkupLineInterpolated($"[{color}][[{diagnostic.Severity.ToString().ToUpperInvariant()}]][/] {location}{diagnostic.Message}");
         }
 
-        var exitCode = CompilerExitCode.FromResult(result);
-
         if (result.HasErrors)
         {
             _console.MarkupLine("[red][[FAILED]][/] Compilation completed with errors.");
-            return exitCode;
+            return RunExitCode.CompilationFailed;
         }
 
         _console.MarkupLine("[green][[SUCCESS]][/] Compilation completed without errors.");
@@ -147,13 +145,13 @@ public sealed class RunHandler(
             if (steps[i] is not ScriptStepNode scriptStep)
             {
                 _console.MarkupLineInterpolated($"[red][[ERROR]][/] Step {position}: unsupported step kind '{steps[i].Kind}'; refusing to run a pipeline with steps that would be skipped.");
-                return 1;
+                return RunExitCode.CompilationFailed;
             }
 
             if (!scriptStep.Script.Value.TryGetStringValue(out var script))
             {
                 _console.MarkupLineInterpolated($"[red][[ERROR]][/] Step {position}: script contains unresolved expressions.");
-                return 1;
+                return RunExitCode.CompilationFailed;
             }
 
             WarnAboutIgnoredFields(scriptStep, position);
@@ -180,18 +178,18 @@ public sealed class RunHandler(
             catch (Exception exception) when (exception is IOException or InvalidOperationException or System.ComponentModel.Win32Exception or UnauthorizedAccessException)
             {
                 _console.MarkupLineInterpolated($"[red][[ERROR]][/] Step {position} could not be run: {exception.Message}");
-                return 1;
+                return RunExitCode.ExecutionError;
             }
 
             if (stepExitCode != 0)
             {
                 _console.MarkupLineInterpolated($"[red][[FAILED]][/] Step {position} exited with code {stepExitCode}.");
-                return stepExitCode;
+                return RunExitCode.StepFailed;
             }
         }
 
         _console.MarkupLine("[green][[SUCCESS]][/] All steps completed.");
-        return 0;
+        return RunExitCode.Success;
     }
 
     private void WarnAboutIgnoredFields(
