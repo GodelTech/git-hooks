@@ -35,6 +35,29 @@ public sealed class RunCommandIntegrationTests : IDisposable
     }
 
     [Fact]
+    public async Task Run_WhenStepFails_ReturnsStepFailedAndPrintsOriginalExitCode()
+    {
+        await InitializeRepositoryAsync();
+        var pipelinePath = Path.Combine(_repositoryDirectory, "pipeline.yaml");
+        var yaml = """
+            steps:
+              - script: exit 42
+              - script: echo should-not-run
+            """;
+        await File.WriteAllTextAsync(
+            pipelinePath,
+            yaml,
+            TestContext.Current.CancellationToken);
+
+        var (exitCode, output) = await RunCliAsync("run", "--file", pipelinePath);
+
+        Assert.Equal(2, exitCode);
+        Assert.Contains("Step 1/2 exited with code 42.", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("should-not-run", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("All steps completed.", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task Run_WithMalformedYaml_ReportsErrorAndReturnsOne()
     {
         await InitializeRepositoryAsync();

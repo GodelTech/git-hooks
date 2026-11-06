@@ -42,31 +42,31 @@ public sealed class RunHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task HandleAsync_WithUnavailableGit_ReturnsOne()
+    public async Task HandleAsync_WithUnavailableGit_ReturnsCompilationFailed()
     {
         var git = new FakeGitCommandLine { IsAvailable = false };
 
         var (exitCode, output) = await RunAsync("pipeline.yaml", git);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("Git not found in PATH", output, StringComparison.Ordinal);
         AssertCompilerNotReached(output);
     }
 
     [Fact]
-    public async Task HandleAsync_OutsideGitRepository_ReturnsOne()
+    public async Task HandleAsync_OutsideGitRepository_ReturnsCompilationFailed()
     {
         var git = new FakeGitCommandLine { IsInsideRepository = false };
 
         var (exitCode, output) = await RunAsync("pipeline.yaml", git);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("Not inside a git repository", output, StringComparison.Ordinal);
         AssertCompilerNotReached(output);
     }
 
     [Fact]
-    public async Task HandleAsync_WhenRepositoryRootCannotBeResolved_ReturnsOne()
+    public async Task HandleAsync_WhenRepositoryRootCannotBeResolved_ReturnsCompilationFailed()
     {
         var git = new FakeGitCommandLine
         {
@@ -75,13 +75,13 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync("pipeline.yaml", git);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("Failed to resolve repository root path: fatal: boom", output, StringComparison.Ordinal);
         AssertCompilerNotReached(output);
     }
 
     [Fact]
-    public async Task HandleAsync_WhenRepositoryRootIsEmpty_ReturnsOne()
+    public async Task HandleAsync_WhenRepositoryRootIsEmpty_ReturnsCompilationFailed()
     {
         var git = new FakeGitCommandLine
         {
@@ -90,17 +90,17 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync("pipeline.yaml", git);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("Git returned an empty repository root path", output, StringComparison.Ordinal);
         AssertCompilerNotReached(output);
     }
 
     [Fact]
-    public async Task HandleAsync_WithMissingFile_ReturnsOne()
+    public async Task HandleAsync_WithMissingFile_ReturnsCompilationFailed()
     {
         var (exitCode, output) = await RunAsync(Path.Combine(_tempDir, "missing.yaml"));
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("YAML file not found", output, StringComparison.Ordinal);
         AssertCompilerNotReached(output);
     }
@@ -108,19 +108,19 @@ public sealed class RunHandlerTests : IDisposable
     [Theory]
     [InlineData("")]
     [InlineData("  \n\t\n")]
-    public async Task HandleAsync_WithEmptyFile_ReturnsOne(string content)
+    public async Task HandleAsync_WithEmptyFile_ReturnsCompilationFailed(string content)
     {
         var path = WriteTempFile("pipeline.yaml", content);
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("YAML file is empty", output, StringComparison.Ordinal);
         AssertCompilerNotReached(output);
     }
 
     [Fact]
-    public async Task HandleAsync_WhenFileCannotBeRead_ReturnsOne()
+    public async Task HandleAsync_WhenFileCannotBeRead_ReturnsCompilationFailed()
     {
         var path = WriteTempFile("pipeline.yaml", "steps:\n  - script: echo hi\n");
 
@@ -128,13 +128,13 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("Failed to read YAML file", output, StringComparison.Ordinal);
         AssertCompilerNotReached(output);
     }
 
     [Fact]
-    public async Task HandleAsync_WithValidPipeline_ReturnsZero()
+    public async Task HandleAsync_WithValidPipeline_ReturnsSuccess()
     {
         var pipelineYaml = """
             steps:
@@ -145,7 +145,7 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(0, exitCode);
+        Assert.Equal(RunExitCode.Success, exitCode);
         Assert.Contains("[SUCCESS]", output, StringComparison.Ordinal);
         Assert.DoesNotContain("[ERROR]", output, StringComparison.Ordinal);
         Assert.DoesNotContain("[FAILED]", output, StringComparison.Ordinal);
@@ -168,7 +168,7 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, _) = await RunAsync(path, runner: runner);
 
-        Assert.Equal(0, exitCode);
+        Assert.Equal(RunExitCode.Success, exitCode);
         Assert.Equal(["echo one", "echo Hello TEST-SERVER"], runner.Scripts);
     }
 
@@ -199,12 +199,16 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, _) = await RunAsync(path, runner: runner);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Empty(runner.Scripts);
     }
 
-    [Fact]
-    public async Task HandleAsync_WhenStepFails_StopsAndReturnsItsExitCode()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(42)]
+    public async Task HandleAsync_WhenStepFails_StopsAndReturnsStepFailed(int stepExitCode)
     {
         var yaml = """
             steps:
@@ -212,13 +216,14 @@ public sealed class RunHandlerTests : IDisposable
               - script: second
             """;
         var path = WriteTempFile("pipeline.yaml", yaml);
-        var runner = new FakeScriptStepRunner { ExitCode = 3 };
+        var runner = new FakeScriptStepRunner { ExitCode = stepExitCode };
 
         var (exitCode, output) = await RunAsync(path, runner: runner);
 
-        Assert.Equal(3, exitCode);
+        Assert.Equal(RunExitCode.StepFailed, exitCode);
         Assert.Equal(["first"], runner.Scripts);
         Assert.Contains("[FAILED]", output, StringComparison.Ordinal);
+        Assert.Contains($"Step 1/2 exited with code {stepExitCode}.", output, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -253,7 +258,7 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path, runner: runner);
 
-        Assert.Equal(0, exitCode);
+        Assert.Equal(RunExitCode.Success, exitCode);
         Assert.Contains("[WARNING]", output, StringComparison.Ordinal);
         Assert.Contains(field, output, StringComparison.Ordinal);
         Assert.Single(runner.Scripts);
@@ -264,7 +269,7 @@ public sealed class RunHandlerTests : IDisposable
     [InlineData("IO")]
     [InlineData("Win32")]
     [InlineData("UnauthorizedAccess")]
-    public async Task HandleAsync_WhenRunnerThrows_ReturnsOneAndStops(string exceptionKind)
+    public async Task HandleAsync_WhenRunnerThrows_ReturnsExecutionErrorAndStops(string exceptionKind)
     {
         var yaml = """
             steps:
@@ -284,7 +289,7 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path, runner: runner);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.ExecutionError, exitCode);
         Assert.Contains("could not be run", output, StringComparison.Ordinal);
         Assert.Contains("runner-error", output, StringComparison.Ordinal);
         Assert.Equal(["echo body"], runner.Scripts);
@@ -303,12 +308,12 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, _) = await RunAsync(path, git: git, runner: runner);
 
-        Assert.Equal(0, exitCode);
+        Assert.Equal(RunExitCode.Success, exitCode);
         Assert.Equal([repositoryRoot], runner.WorkingDirectories);
     }
 
     [Fact]
-    public async Task HandleAsync_WithMalformedYaml_ReturnsOneAndReportsLocation()
+    public async Task HandleAsync_WithMalformedYaml_ReturnsCompilationFailedAndReportsLocation()
     {
         var pipelineYaml = """
             steps:
@@ -320,7 +325,7 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("[ERROR]", output, StringComparison.Ordinal);
         Assert.Contains("Invalid YAML", output, StringComparison.Ordinal);
         Assert.Contains($"{path}:", output, StringComparison.Ordinal);
@@ -328,19 +333,19 @@ public sealed class RunHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task HandleAsync_WithPipelineWithoutSteps_ReturnsOneAndPrintsDiagnostic()
+    public async Task HandleAsync_WithPipelineWithoutSteps_ReturnsCompilationFailedAndPrintsDiagnostic()
     {
         var path = WriteTempFile("pipeline.yaml", "steps: []\n");
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("[ERROR]", output, StringComparison.Ordinal);
         Assert.Contains("Compilation completed with errors.", output, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task HandleAsync_WithParameterDefault_ReturnsZero()
+    public async Task HandleAsync_WithParameterDefault_ReturnsSuccess()
     {
         var pipelineYaml = """
             parameters:
@@ -356,12 +361,12 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(0, exitCode);
+        Assert.Equal(RunExitCode.Success, exitCode);
         Assert.DoesNotContain("[ERROR]", output, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task HandleAsync_WithDefaultOutsideAllowedValues_ReturnsOne()
+    public async Task HandleAsync_WithDefaultOutsideAllowedValues_ReturnsCompilationFailed()
     {
         var pipelineYaml = """
             parameters:
@@ -380,57 +385,57 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("default value is not in the allowed values list", output, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task HandleAsync_WithValidParameterOverride_ReturnsZero()
+    public async Task HandleAsync_WithValidParameterOverride_ReturnsSuccess()
     {
         var path = WriteTempFile("pipeline.yaml", ParameterizedPipeline);
 
         var (exitCode, output) = await RunAsync(path, overrides: Overrides(("os", "windows")));
 
-        Assert.Equal(0, exitCode);
+        Assert.Equal(RunExitCode.Success, exitCode);
         Assert.DoesNotContain("[ERROR]", output, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task HandleAsync_WithOverrideOutsideAllowedValues_ReturnsOne()
+    public async Task HandleAsync_WithOverrideOutsideAllowedValues_ReturnsCompilationFailed()
     {
         var path = WriteTempFile("pipeline.yaml", ParameterizedPipeline);
 
         var (exitCode, output) = await RunAsync(path, overrides: Overrides(("os", "macos")));
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("override value is not in the allowed values list", output, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task HandleAsync_WithOverrideForUndeclaredParameter_ReturnsOne()
+    public async Task HandleAsync_WithOverrideForUndeclaredParameter_ReturnsCompilationFailed()
     {
         var path = WriteTempFile("pipeline.yaml", ParameterizedPipeline);
 
         var (exitCode, output) = await RunAsync(path, overrides: Overrides(("unknown", "value")));
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("Parameter override 'unknown' does not match any declared parameter.", output, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task HandleAsync_WithBlankOverrideName_ReturnsOneWithoutThrowing()
+    public async Task HandleAsync_WithBlankOverrideName_ReturnsCompilationFailedWithoutThrowing()
     {
         var path = WriteTempFile("pipeline.yaml", ParameterizedPipeline);
 
         var (exitCode, output) = await RunAsync(path, overrides: Overrides((" ", "value")));
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("[ERROR] Invalid compilation input", output, StringComparison.Ordinal);
         AssertCompilerNotReached(output);
     }
 
     [Fact]
-    public async Task HandleAsync_WithUndeclaredParameterReference_ReturnsOneAndReportsLocation()
+    public async Task HandleAsync_WithUndeclaredParameterReference_ReturnsCompilationFailedAndReportsLocation()
     {
         var pipelineYaml = """
             steps:
@@ -441,13 +446,13 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("Parameter 'doesNotExist' referenced but not defined.", output, StringComparison.Ordinal);
         Assert.Contains($"{path}:2:", output, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task HandleAsync_WithMissingTemplate_ReturnsOneAndReportsPath()
+    public async Task HandleAsync_WithMissingTemplate_ReturnsCompilationFailedAndReportsPath()
     {
         var pipelineYaml = """
             steps:
@@ -458,7 +463,7 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("Template file not found", output, StringComparison.Ordinal);
         Assert.Contains("missing-template.yaml", output, StringComparison.Ordinal);
     }
@@ -482,12 +487,12 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(0, exitCode);
+        Assert.Equal(RunExitCode.Success, exitCode);
         Assert.DoesNotContain("[ERROR]", output, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task HandleAsync_WithNestedTemplates_ReturnsZero()
+    public async Task HandleAsync_WithNestedTemplates_ReturnsSuccess()
     {
         var leafYaml = """
             steps:
@@ -513,12 +518,12 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(0, exitCode);
+        Assert.Equal(RunExitCode.Success, exitCode);
         Assert.DoesNotContain("[ERROR]", output, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task HandleAsync_WithMissingNestedTemplate_ReturnsOne()
+    public async Task HandleAsync_WithMissingNestedTemplate_ReturnsCompilationFailed()
     {
         var middleYaml = """
             steps:
@@ -536,13 +541,13 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("Template file not found", output, StringComparison.Ordinal);
         Assert.Contains("leaf-missing.yaml", output, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task HandleAsync_WithTemplateIncludeCycle_ReturnsOne()
+    public async Task HandleAsync_WithTemplateIncludeCycle_ReturnsCompilationFailed()
     {
         var aYaml = """
             steps:
@@ -567,7 +572,7 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("Template include cycle detected", output, StringComparison.Ordinal);
     }
 
@@ -584,14 +589,14 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(1, exitCode);
+        Assert.Equal(RunExitCode.CompilationFailed, exitCode);
         Assert.Contains("Parameter 'first' referenced but not defined.", output, StringComparison.Ordinal);
         Assert.Contains("Parameter 'second' referenced but not defined.", output, StringComparison.Ordinal);
         Assert.Contains("Compilation completed with errors.", output, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task HandleAsync_WithWarningOnly_PrintsWarningAndReturnsZero()
+    public async Task HandleAsync_WithWarningOnly_PrintsWarningAndReturnsSuccess()
     {
         var pipelineYaml = """
             parameters:
@@ -608,7 +613,7 @@ public sealed class RunHandlerTests : IDisposable
 
         var (exitCode, output) = await RunAsync(path);
 
-        Assert.Equal(0, exitCode);
+        Assert.Equal(RunExitCode.Success, exitCode);
         Assert.Contains("[WARNING]", output, StringComparison.Ordinal);
         Assert.Contains("[SUCCESS]", output, StringComparison.Ordinal);
         Assert.DoesNotContain("[ERROR]", output, StringComparison.Ordinal);
