@@ -1,0 +1,3 @@
+steps:
+  - script: exit 42
+  - script: echo This step should never run

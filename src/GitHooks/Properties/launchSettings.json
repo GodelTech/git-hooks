@@ -1,5 +1,29 @@
 {
   "profiles": {
+    "Demo exit 0 - Success": {
+      "commandName": "Project",
+      "commandLineArgs": "run --file examples/exit-codes/success.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Demo exit 1 - Compilation failed": {
+      "commandName": "Project",
+      "commandLineArgs": "run --file examples/invalid.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Demo exit 2 - Step failed (script exits 42)": {
+      "commandName": "Project",
+      "commandLineArgs": "run --file examples/exit-codes/step-failed.yaml",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Demo exit 3 - Execution error": {
+      "commandName": "Project",
+      "commandLineArgs": "run --file examples/exit-codes/success.yaml",
+      "workingDirectory": "$(SolutionDir)",
+      "environmentVariables": {
+        "TEMP": "$(SolutionDir)examples\\exit-codes\\unavailable-temp",
+        "TMP": "$(SolutionDir)examples\\exit-codes\\unavailable-temp"
+      }
+    },
     "install": {
       "commandName": "Project",
       "commandLineArgs": "install",
