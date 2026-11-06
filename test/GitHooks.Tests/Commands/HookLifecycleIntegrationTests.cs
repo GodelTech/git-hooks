@@ -71,6 +71,7 @@ public sealed class HookLifecycleIntegrationTests : IDisposable
     {
         if (OperatingSystem.IsWindows())
         {
+            Assert.Skip("Requires a POSIX shell hook stand-in; not applicable on Windows.");
             return;
         }
 
