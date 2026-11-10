@@ -71,7 +71,6 @@ internal sealed class Program
         _ = services.AddTransient<IInstallHandler, InstallHandler>();
         _ = services.AddTransient<ICreateHookHandler, CreateHookHandler>();
         _ = services.AddTransient<IUninstallHandler, UninstallHandler>();
-        _ = services.AddTransient<IScriptStepRunner, ShellScriptStepRunner>();
 
         // TEMPORARY: manual verification handler for PipelineCompiler; remove before merging if not shipping.
         _ = services.AddTransient<IRunPipelineCompilerHandler, RunPipelineCompilerHandler>();
