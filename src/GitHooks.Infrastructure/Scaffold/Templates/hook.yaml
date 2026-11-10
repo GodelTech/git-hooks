@@ -4,5 +4,4 @@
 # Define the steps to run for this hook below.
 
 steps:
-  - name: example
-    run: echo "Running {{HOOK_NAME}} hook"
+  - script: echo "Running {{HOOK_NAME}} hook"
