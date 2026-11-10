@@ -63,6 +63,8 @@ githooks uninstall --scope local
 githooks run --file pre-commit.yaml
 ```
 
+Script steps use PowerShell 7.4 or later (`pwsh` on PATH) on every platform. Check the installed version with `pwsh --version`.
+
 Generated hook scripts resolve paths from the repository root instead of relying on the current working directory. This keeps project and YAML file discovery stable when Git invokes hooks.
 
 ## Scope behavior
@@ -74,6 +76,7 @@ Generated hook scripts resolve paths from the repository root instead of relying
 ## Troubleshooting
 
 - If Git is not in PATH, install Git and retry.
+- If script steps cannot start, install PowerShell 7.4 or later and ensure `pwsh` is on PATH.
 - If `--scope local` fails, run inside a Git repository.
 - If hooks do not run, confirm `core.hooksPath` points to the folder containing your hook files.
 - Generated hook scripts resolve the repository root with `git rev-parse --show-toplevel`; they do not rely on the shell starting in a particular directory.

@@ -114,6 +114,7 @@ githooks install --scope global --hooks-path .githooks
 ## Troubleshooting
 
 - Git not found: install Git and ensure `git --version` works in shell.
+- Script steps cannot start: install PowerShell 7.4 or later and ensure `pwsh --version` works in the shell.
 - Local scope error: run command from inside a Git repository.
 - Hooks not executing: verify `core.hooksPath` points to the directory containing actual hook files.
 - Existing path collision: rerun install with `--force`.

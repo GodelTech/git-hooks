@@ -1,0 +1,26 @@
+parameters:
+  - name: enableDebug
+    displayName: 'Enable debug'
+    type: boolean
+    default: true
+
+  - name: operatingSystem
+    displayName: 'Operating system'
+    type: string
+    default: 'ubuntu'
+    values:
+      - windows
+      - ubuntu
+      - macOS
+
+  - name: serverName
+    displayName: 'Server name'
+    type: string
+    default: 'TEST-SERVER'
+
+steps:
+  - script: echo Hello 1
+  - script: echo Hello ${{ parameters.serverName }}
+    displayName: Hello 2
+  - script: echo Hello 3
+    otherField: ${{ parameters.serverName }}
